@@ -1,5 +1,5 @@
 import random
-import jwt
+# from jose import jwt
 from jose import jwt, JWTError
 from datetime import datetime, timedelta, timezone
 from app.config import settings
