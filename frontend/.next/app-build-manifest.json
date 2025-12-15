@@ -36,10 +36,15 @@
       "static/chunks/main-app.js",
       "static/chunks/app/(user)/page.js"
     ],
-    "/_not-found/page": [
+    "/admin/papers/[paper_id]/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/_not-found/page.js"
+      "static/chunks/app/admin/papers/[paper_id]/page.js"
+    ],
+    "/admin/papers/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/admin/papers/layout.js"
     ]
   }
 }

@@ -1,8 +1,13 @@
 "use client";
+
+export const dynamic = "force-dynamic";
+
+
 import { useEffect, useState } from "react";
 import { API_URL } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { useAuthModal  } from "@/components/auth/AuthModal";
+
 
 export default function HomePage() {
   const [backendStatus, setBackendStatus] = useState("Checking...");
