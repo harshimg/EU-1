@@ -72,13 +72,13 @@ export default function LoginForm({ showSignup, hide }: any) {
         {loading ? "Signing in..." : "Login"}
       </button>
 
-      <div className="flex items-center gap-3 my-5">
+      {/* <div className="flex items-center gap-3 my-5">
         <div className="flex-1 h-px bg-gray-300" />
         <span className="text-xs text-gray-500">OR</span>
         <div className="flex-1 h-px bg-gray-300" />
       </div>
 
-      <GoogleLoginButton />
+      <GoogleLoginButton /> */}
 
       <p className="text-sm mt-3">
         Don&apos;t have an account?

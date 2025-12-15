@@ -173,7 +173,7 @@ export default function AdminPaperQuestionsPage() {
                       </ul>
                     )} 
                     
-                    Corrct Answer is :- {sq.correct_index +1}
+                    Correct Answer is :- {sq?.correct_index +1}
 
                       <br/>
                     Solution

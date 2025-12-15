@@ -247,11 +247,17 @@ export default function PYQPage() {
             {current.solution_md && (
               <div className="bg-indigo-50 border-l-4 border-indigo-400 p-4 rounded">
                 <strong className="block mb-1">Solution</strong>
-                <div className="whitespace-pre-wrap">
+                {/* <div className="whitespace-pre-wrap"> */}
+                <div className="mt-2 text-sm-400 whitespace-pre-wrap">
+                {/* <div className="mt-3 rounded-lg bg-emerald-50 border border-emerald-200 
+                px-4 py-3 text-emerald-900 text-sm leading-relaxed 
+                whitespace-pre-wrap"> */}
                   {current.solution_md}
                 </div>
               </div>
             )}
+
+            
           </div>
         )}
       </main>

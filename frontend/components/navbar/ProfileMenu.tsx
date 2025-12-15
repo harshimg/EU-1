@@ -1,6 +1,6 @@
 "use client";
-import Link from "next/link";
 
+import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/lib/auth";
 
@@ -9,7 +9,7 @@ export default function ProfileMenu({ user }: any) {
   const { logout } = useAuth();
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Close on outside click
+  // Close on outside click (desktop)
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
@@ -22,19 +22,23 @@ export default function ProfileMenu({ user }: any) {
 
   return (
     <div ref={menuRef} className="relative">
-      {/* PROFILE ICON BUTTON */}
+      {/* PROFILE BUTTON (VISIBLE ON WHITE NAV) */}
       <button
-        onClick={() => setOpen(!open)}
-        className="w-10 h-10 rounded-full bg-yellow-400
-                   flex items-center justify-center
-                   shadow hover:scale-105 transition"
+        onClick={() => setOpen(true)}
+        className="
+          w-10 h-10 rounded-full
+          bg-white border border-gray-300
+          flex items-center justify-center
+          shadow-sm hover:bg-gray-100
+          transition
+        "
       >
         {/* USER ICON */}
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
           fill="currentColor"
-          className="w-6 h-6 text-black"
+          className="w-6 h-6 text-gray-700"
         >
           <path
             fillRule="evenodd"
@@ -44,12 +48,17 @@ export default function ProfileMenu({ user }: any) {
         </svg>
       </button>
 
-      {/* DROPDOWN */}
+      {/* ================= DESKTOP DROPDOWN ================= */}
       {open && (
         <div
-          className="absolute right-0 mt-3 w-48 bg-white
-                     rounded-xl shadow-xl border
-                     overflow-hidden animate-scaleIn z-50"
+          className="
+            hidden md:block
+            absolute right-0 mt-3 w-48
+            bg-white rounded-xl shadow-xl
+            border border-gray-200
+            overflow-hidden z-50
+            animate-scaleIn
+          "
         >
           {/* USER INFO */}
           <div className="px-4 py-3 border-b">
@@ -61,23 +70,70 @@ export default function ProfileMenu({ user }: any) {
             </p>
           </div>
 
-            {/* ACTIONS */}
+          {/* ACTIONS */}
+          <Link href="/account">
+            <button className="w-full text-left px-4 py-3 text-sm hover:bg-gray-100">
+              Account
+            </button>
+          </Link>
+
+          <button
+            onClick={logout}
+            className="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50"
+          >
+            Logout
+          </button>
+        </div>
+      )}
+
+      {/* ================= MOBILE BOTTOM SHEET ================= */}
+      {open && (
+        <div className="md:hidden fixed inset-0 z-50 bg-black/40">
+          <div
+            className="
+              absolute bottom-0 left-0 right-0
+              bg-white rounded-t-2xl
+              p-4 shadow-xl
+              animate-slideUp
+            "
+          >
+            {/* HANDLE */}
+            <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-4" />
+
+            {/* USER INFO */}
+            <div className="mb-4 text-center">
+              <p className="font-semibold text-gray-800">
+                {user?.name || "User"}
+              </p>
+              <p className="text-sm text-gray-500">{user?.email}</p>
+            </div>
+
             <Link href="/account">
               <button
-                className="w-full text-left px-4 py-3 text-sm
-                          hover:bg-gray-100 transition"
+                onClick={() => setOpen(false)}
+                className="w-full py-3 text-left rounded-lg hover:bg-gray-100"
               >
                 Account
               </button>
             </Link>
 
-          <button
-            onClick={logout}
-            className="w-full text-left px-4 py-3 text-sm
-                       text-red-600 hover:bg-red-50 transition"
-          >
-            Logout
-          </button>
+            <button
+              onClick={() => {
+                setOpen(false);
+                logout();
+              }}
+              className="w-full py-3 text-left rounded-lg text-red-600 hover:bg-red-50"
+            >
+              Logout
+            </button>
+
+            <button
+              onClick={() => setOpen(false)}
+              className="w-full py-3 mt-2 text-center text-gray-500 text-sm"
+            >
+              Cancel
+            </button>
+          </div>
         </div>
       )}
     </div>

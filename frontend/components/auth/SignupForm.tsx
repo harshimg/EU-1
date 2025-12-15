@@ -132,13 +132,13 @@ export default function SignupForm({ showLogin, showOtp }: any) {
       </button>
 
       {/* DIVIDER */}
-      <div className="flex items-center gap-3 my-5">
+      {/* <div className="flex items-center gap-3 my-5">
         <div className="flex-1 h-px bg-gray-300" />
         <span className="text-xs text-gray-500">OR</span>
         <div className="flex-1 h-px bg-gray-300" />
       </div>
 
-      <GoogleLoginButton />
+      <GoogleLoginButton /> */}
 
       <p className="text-sm text-center mt-4">
         Already have an account?
