@@ -62,16 +62,24 @@ export default function Footer() {
       </div>
 
       {/* MOVING CREDIT BAR */}
-      <div className="border-t border-slate-700 overflow-hidden">
+      {/* <div className="border-t border-slate-700 overflow-hidden">
         <div className="whitespace-nowrap animate-marquee py-4 text-sm text-slate-400">
           <span className="mx-8">
             Designed & Developed with ❤️ by Alpha Team of K.E.C Katihar
           </span>
-          {/* <span className="mx-8">
-            Designed & Developed with ❤️ by Alpha Team of K.E.C Katihar
-          </span> */}
         </div>
-      </div>
+      </div> */}
+
+{/* MOVING CREDIT BAR */}
+<div className="border-t border-slate-700 overflow-hidden">
+  <div className="whitespace-nowrap py-4 text-sm text-slate-400 animate-marquee-left">
+    <span className="mx-8">
+      Designed & Developed with ❤️ by Alpha Team of K.E.C Katihar
+    </span>
+  </div>
+</div>
+
+
 
       <div className="text-center text-xs py-3 text-slate-500">
         © 2025 Alpha Result. All rights reserved.

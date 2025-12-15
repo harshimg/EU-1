@@ -367,7 +367,7 @@ function PanelLeft({ subjects, papers, activeSubject, activePaper, onSubject, on
 }
 
 /* ---------------- RIGHT PANEL ---------------- */
-function PanelRight({ paper, activeQ, onSelect }: any) {
+function duplicatePanelRight({ paper, activeQ, onSelect }: any) {
   return (
     <div className="p-4 text-sm">
       <h3 className="font-semibold mb-3">Questions</h3>
@@ -408,3 +408,56 @@ function PanelRight({ paper, activeQ, onSelect }: any) {
     </div>
   );
 }
+
+
+/* ---------------- RIGHT PANEL ---------------- */
+function PanelRight({ paper, activeQ, onSelect }: any) {
+  return (
+    <div className="p-4 text-sm">
+      <h3 className="font-semibold mb-3">Questions</h3>
+
+      {paper.questions.map((q: any) => {
+        const isMainActive = activeQ?.q.q_no === q.q_no;
+
+        return (
+          <div key={q.q_no} className="mb-2">
+            {/* MAIN QUESTION */}
+            <button
+              onClick={() => onSelect({ q })}
+              className={`block w-full text-left px-2 py-1 rounded font-medium ${
+                isMainActive && !activeQ?.sq
+                  ? "bg-indigo-100 text-indigo-700"
+                  : "hover:bg-slate-100"
+              }`}
+            >
+              Q{q.q_no}
+            </button>
+
+            {/* SUB-QUESTIONS → ONLY FOR ACTIVE MAIN QUESTION */}
+            {isMainActive &&
+              q.sub_questions?.map((sq: any) => {
+                const isSubActive =
+                  activeQ?.q.q_no === q.q_no &&
+                  activeQ?.sq?.sq_no === sq.sq_no;
+
+                return (
+                  <button
+                    key={sq.sq_no}
+                    onClick={() => onSelect({ q, sq })}
+                    className={`block w-full text-left ml-4 px-2 py-1 rounded ${
+                      isSubActive
+                        ? "bg-blue-100 text-blue-700"
+                        : "hover:bg-slate-100 text-slate-600"
+                    }`}
+                  >
+                    ({sq.sq_no})
+                  </button>
+                );
+              })}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
