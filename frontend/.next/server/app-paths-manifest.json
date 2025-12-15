@@ -1,6 +1,5 @@
 {
-  "/admin/ssb/page": "app/admin/ssb/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
   "/(user)/pyq/page": "app/(user)/pyq/page.js",
-  "/(user)/page": "app/(user)/page.js",
-  "/admin/papers/[paper_id]/page": "app/admin/papers/[paper_id]/page.js"
+  "/(user)/page": "app/(user)/page.js"
 }
