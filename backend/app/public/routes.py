@@ -1,8 +1,8 @@
 from fastapi import APIRouter
 from app.public.controllers import *
 
-router = APIRouter()
 
+router = APIRouter()
 
 
 
