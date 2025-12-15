@@ -5,8 +5,9 @@ from .config import settings
 from .database import connect_to_mongo, close_mongo_connection
 
 # Import routers (for now empty, we add later)
-from app.public.routes import router as public_router
+# from app.public.routes import router as public_router
 from app.auth.routes import router as auth_router
+from app.public.routes import router as public_router
 from app.admin.routes import router as admin_router
 from app.user.routes import router as user_router
 from app.auth.google_routes import router as google_router
