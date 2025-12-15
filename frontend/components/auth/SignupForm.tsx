@@ -35,7 +35,7 @@ export default function SignupForm({ showLogin, showOtp }: any) {
     try {
       setLoading(true);
 
-      if (!data.email || !data.password || !data.semester || !data.branch) {
+      if (!data.email || !data.password || !data.semester || !data.branch || !data.mobile || !data.reg_no) {
         alert("Please fill all required fields");
         return;
       }
