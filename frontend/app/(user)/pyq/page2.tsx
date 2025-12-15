@@ -1,0 +1,340 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { useAuth } from "@/lib/auth";
+import { API_URL } from "@/lib/api";
+
+export default function PYQPage() {
+  const { user, loading } = useAuth();
+
+  const [subjects, setSubjects] = useState<any[]>([]);
+  const [papers, setPapers] = useState<any[]>([]);
+  const [paper, setPaper] = useState<any | null>(null);
+
+  const [activeSubject, setActiveSubject] = useState<any | null>(null);
+  const [activePaper, setActivePaper] = useState<any | null>(null);
+  const [activeQ, setActiveQ] = useState<{ q: any; sq?: any } | null>(null);
+
+  /* Desktop panel sizes (CHANGE DEFAULTS HERE) */
+  const [leftW, setLeftW] = useState(150);
+  const [rightW, setRightW] = useState(100);
+
+  /* Mobile drawers */
+  const [showLeftMobile, setShowLeftMobile] = useState(false);
+  const [showRightMobile, setShowRightMobile] = useState(false);
+
+  const resizing = useRef<"left" | "right" | null>(null);
+
+  /* ---------------- FETCH SUBJECTS ---------------- */
+  useEffect(() => {
+    if (!user) return;
+
+    fetch(
+      `${API_URL}/user/subjects?semester_code=${user.semester}&branch_code=${user.branch}`,
+      { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+    )
+      .then(res => res.json())
+      .then(json => {
+        setSubjects(json.data || []);
+        if (json.data?.length) setActiveSubject(json.data[0]);
+      });
+  }, [user]);
+
+  /* ---------------- FETCH PAPERS ---------------- */
+  useEffect(() => {
+    if (!activeSubject) return;
+
+    fetch(
+      `${API_URL}/user/papers?subject_code=${activeSubject.code}`,
+      { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+    )
+      .then(res => res.json())
+      .then(json => {
+        setPapers(json.data || []);
+        if (json.data?.length) setActivePaper(json.data[0]);
+      });
+  }, [activeSubject]);
+
+  /* ---------------- FETCH PAPER ---------------- */
+  useEffect(() => {
+    if (!activePaper) return;
+
+    fetch(`${API_URL}/user/paper/${activePaper._id}`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    })
+      .then(res => res.json())
+      .then(json => {
+        setPaper(json.data);
+        const q = json.data?.questions?.[0];
+        if (q) {
+          setActiveQ(
+            q.sub_questions?.length
+              ? { q, sq: q.sub_questions[0] }
+              : { q }
+          );
+        }
+      });
+  }, [activePaper]);
+
+  /* ---------------- DESKTOP RESIZE ---------------- */
+  useEffect(() => {
+    function onMove(e: MouseEvent) {
+      if (resizing.current === "left") {
+        setLeftW(Math.min(300, Math.max(180, e.clientX)));
+      }
+      if (resizing.current === "right") {
+        const newW = window.innerWidth - e.clientX;
+        setRightW(Math.min(260, Math.max(180, newW)));
+      }
+    }
+    function onUp() {
+      resizing.current = null;
+    }
+
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+  }, []);
+
+  if (loading || !user) {
+    return <div className="h-screen flex items-center justify-center">Loading…</div>;
+  }
+
+  return (
+    <div className="h-screen overflow-hidden bg-slate-100 flex flex-col md:flex-row">
+
+      {/* MOBILE TOP BAR
+      <div className="md:hidden flex justify-between items-center p-3 bg-white border-b">
+        <button onClick={() => setShowLeftMobile(true)} className="btn-outline">
+          Change Subjects/paper
+        </button>
+        <button onClick={() => setShowRightMobile(true)} className="btn-outline">
+          Change Question
+        </button>
+      </div> */}
+
+      {/* MOBILE TOP BAR */}
+<div className="md:hidden sticky top-0 z-30 flex justify-between items-center gap-3 px-3 py-3 
+                bg-gradient-to-r from-indigo-600 to-blue-600 border-b border-black/10 shadow-md">
+  <button
+    onClick={() => setShowLeftMobile(true)}
+    className="flex-1 text-center py-2 rounded-lg text-sm font-medium 
+               bg-white/90 text-indigo-700 shadow active:scale-[0.98]"
+  >
+    Subjects / Papers
+  </button>
+
+  <button
+    onClick={() => setShowRightMobile(true)}
+    className="flex-1 text-center py-2 rounded-lg text-sm font-medium 
+               bg-white/90 text-blue-700 shadow active:scale-[0.98]"
+  >
+    Questions
+  </button>
+</div>
+
+      
+
+      {/* LEFT PANEL (DESKTOP) */}
+      <aside
+        className="hidden md:block h-full overflow-y-auto border-r bg-white"
+        style={{ width: leftW }}
+      >
+        <PanelLeft
+          subjects={subjects}
+          papers={papers}
+          activeSubject={activeSubject}
+          activePaper={activePaper}
+          onSubject={setActiveSubject}
+          onPaper={setActivePaper}
+        />
+      </aside>
+
+      {/* LEFT RESIZER (DESKTOP) */}
+      <div
+        className="hidden md:block w-[4px] cursor-col-resize"
+        onMouseDown={() => (resizing.current = "left")}
+      />
+
+      {/* MAIN CONTENT */}
+      <main className="flex-1 min-h-0 h-full overflow-y-auto p-4 md:p-6">
+        {paper && (
+          <div className="bg-white rounded-xl p-4 mb-6 shadow-sm">
+            <h2 className="text-lg font-semibold">{paper.name}</h2>
+            <p className="text-slate-500 text-sm">
+              {paper.subject_code} • {paper.type} • {paper.year}
+            </p>
+            <p className="text-slate-600 mt-1 text-sm">{paper.description}</p>
+          </div>
+        )}
+
+        {activeQ && (
+          <div className="bg-white rounded-xl shadow-md p-4 md:p-6 space-y-6">
+            <h3 className="text-xl font-semibold">
+              Q{activeQ.q.q_no}
+              {activeQ.sq && ` (${activeQ.sq.sq_no})`}
+            </h3>
+
+            <p className="whitespace-pre-wrap">
+              {activeQ.sq ? activeQ.sq.question_md : activeQ.q.question_md}
+            </p>
+
+            {(activeQ.sq?.solution_md || activeQ.q.solution_md) && (
+              <div className="bg-indigo-50 border-l-4 border-indigo-400 p-4 rounded">
+                <strong className="block mb-1">Solution</strong>
+                {activeQ.sq?.solution_md || activeQ.q.solution_md}
+              </div>
+            )}
+          </div>
+        )}
+      </main>
+
+      {/* RIGHT RESIZER (DESKTOP) */}
+      <div
+        className="hidden md:block w-[4px] cursor-col-resize"
+        onMouseDown={() => (resizing.current = "right")}
+      />
+
+      {/* RIGHT PANEL (DESKTOP) */}
+      {paper && (
+        <aside
+          className="hidden md:block h-full overflow-y-auto border-l bg-white"
+          style={{ width: rightW }}
+        >
+          <PanelRight paper={paper} activeQ={activeQ} onSelect={setActiveQ} />
+        </aside>
+      )}
+
+      {/* MOBILE LEFT DRAWER */}
+      {showLeftMobile && (
+        <MobileDrawer onClose={() => setShowLeftMobile(false)}>
+          <PanelLeft
+            subjects={subjects}
+            papers={papers}
+            activeSubject={activeSubject}
+            activePaper={activePaper}
+            onSubject={(s: any) => {
+              setActiveSubject(s);
+              setShowLeftMobile(false);
+            }}
+            onPaper={(p: any) => {
+              setActivePaper(p);
+              setShowLeftMobile(false);
+            }}
+          />
+        </MobileDrawer>
+      )}
+
+      {/* MOBILE RIGHT DRAWER */}
+      {showRightMobile && paper && (
+        <MobileDrawer onClose={() => setShowRightMobile(false)}>
+          <PanelRight
+            paper={paper}
+            activeQ={activeQ}
+            onSelect={(v: any) => {
+              setActiveQ(v);
+              setShowRightMobile(false);
+            }}
+          />
+        </MobileDrawer>
+      )}
+    </div>
+  );
+}
+
+/* ---------------- MOBILE DRAWER ---------------- */
+function MobileDrawer({ children, onClose }: any) {
+  return (
+    <div className="fixed inset-0 z-50 bg-black/40">
+      <div className="absolute inset-y-0 left-0 w-full bg-white p-4 overflow-y-auto">
+        <button onClick={onClose} className="mb-4 text-sm text-slate-500">
+          ← Back
+        </button>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- LEFT PANEL ---------------- */
+function PanelLeft({ subjects, papers, activeSubject, activePaper, onSubject, onPaper }: any) {
+  return (
+    <div className="p-4 space-y-4 text-sm">
+      <h3 className="font-semibold">Subjects</h3>
+      {subjects.map((s: any) => (
+        <button
+          key={s._id}
+          onClick={() => onSubject(s)}
+          className={`block w-full text-left px-3 py-2 rounded ${
+            activeSubject?.code === s.code
+              ? "bg-indigo-100 text-indigo-700"
+              : "hover:bg-slate-100"
+          }`}
+        >
+          {s.short_name}
+        </button>
+      ))}
+
+      <h3 className="font-semibold mt-4">Papers</h3>
+      {papers.map((p: any) => (
+        <button
+          key={p._id}
+          onClick={() => onPaper(p)}
+          className={`block w-full text-left px-3 py-2 rounded ${
+            activePaper?._id === p._id
+              ? "bg-blue-100 text-blue-700"
+              : "hover:bg-slate-100"
+          }`}
+        >
+          {p.year}   {p.name}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/* ---------------- RIGHT PANEL ---------------- */
+function PanelRight({ paper, activeQ, onSelect }: any) {
+  return (
+    <div className="p-4 text-sm">
+      <h3 className="font-semibold mb-3">Questions</h3>
+      {paper.questions.map((q: any) => (
+        <div key={q.q_no} className="mb-2">
+          <button
+            onClick={() => onSelect({ q })}
+            className={`block w-full text-left px-2 py-1 rounded ${
+              activeQ?.q.q_no === q.q_no && !activeQ?.sq
+                ? "bg-indigo-100 text-indigo-700"
+                : "hover:bg-slate-100"
+            }`}
+          >
+            Q{q.q_no}
+          </button>
+
+          {q.sub_questions?.map((sq: any) => {
+            const isActive =
+              activeQ?.q.q_no === q.q_no &&
+              activeQ?.sq?.sq_no === sq.sq_no;
+
+            return (
+              <button
+                key={sq.sq_no}
+                onClick={() => onSelect({ q, sq })}
+                className={`block w-full text-left ml-4 px-2 py-1 rounded ${
+                  isActive
+                    ? "bg-blue-100 text-blue-700"
+                    : "hover:bg-slate-100 text-slate-600"
+                }`}
+              >
+                ({sq.sq_no})
+              </button>
+            );
+          })}
+        </div>
+      ))}
+    </div>
+  );
+}

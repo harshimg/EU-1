@@ -1,0 +1,165 @@
+@import "tailwindcss";
+
+/* -------------------- */
+/*  ROOT THEME COLORS   */
+/* -------------------- */
+:root {
+  --primary: #5B2EBD;
+  --primary-light: #7E4AF5;
+  --primary-dark: #421E8E;
+
+  --accent: #FFD447;
+  --accent-dark: #F2C029;
+
+  --bg: #F9FAFF;
+  --text-dark: #0F172A;
+  --text-light: #64748B;
+
+  --radius: 14px;
+}
+
+/* Body */
+body {
+  background: var(--bg);
+  color: var(--text-dark);
+  font-family: Inter, system-ui, sans-serif;
+}
+
+/* -------------------- */
+/*  BUTTONS             */
+/* -------------------- */
+.btn-primary {
+  background: var(--primary);
+  color: white;
+  padding: 10px 16px;
+  border-radius: var(--radius);
+  font-weight: 600;
+  transition: all .25s;
+}
+.btn-primary:hover {
+  background: var(--primary-dark);
+}
+
+.btn-accent {
+  background: var(--accent);
+  color: black;
+  padding: 10px 16px;
+  border-radius: var(--radius);
+  font-weight: 600;
+  transition: all .2s;
+}
+.btn-accent:hover {
+  background: var(--accent-dark);
+}
+
+/* OUTLINE BUTTON */
+.btn-outline {
+  border: 2px solid white;
+  color: white;
+  padding: 10px 16px;
+  border-radius: var(--radius);
+  font-weight: 600;
+  transition: .25s;
+}
+.btn-outline:hover {
+  background: white;
+  color: var(--primary);
+}
+
+/* -------------------- */
+/*  INPUT FIELDS        */
+/* -------------------- */
+.input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  border: 1px solid #dcdfe7;
+  background: white;
+  transition: .25s;
+  margin-top: 10px;
+}
+.input {
+  @apply w-full px-4 py-2 rounded-md
+         bg-[#0B1020]
+         border border-white/10
+         text-white
+         placeholder:text-slate-400
+         focus:outline-none
+         focus:border-indigo-500
+         focus:ring-1 focus:ring-indigo-500;
+}
+
+
+
+.input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(91, 46, 189, 0.18);
+}
+
+/* -------------------- */
+/*  GLASS MODAL         */
+/* -------------------- */
+.modal-glass {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: 0 8px 24px rgba(15,23,42,0.15);
+}
+
+/* CARD PREMIUM */
+.card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 22px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  transition: .2s;
+}
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.12);
+}
+
+/* HERO */
+.hero {
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  padding: 60px 40px;
+  border-radius: 26px;
+  color: white;
+  box-shadow: 0 14px 28px rgba(91,46,189,0.3);
+}
+
+/* -------------------- */
+/*  ANIMATIONS          */
+/* -------------------- */
+@layer utilities {
+  .fade-in { animation: fadeIn .3s ease-out forwards; }
+  .scale-in { animation: scaleIn .3s ease-out forwards; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes scaleIn {
+    from {
+      transform: scale(.92);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+}
+
+
+/* Smooth modal scrollbar */
+.modal-glass ::-webkit-scrollbar {
+  width: 6px;
+}
+.modal-glass ::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.2);
+  border-radius: 10px;
+}
