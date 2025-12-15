@@ -51,7 +51,7 @@ def root():
     return {"message": "EU Study Backend Running 🚀"}
 
 # All rotes api
-app.include_router(public_router, prefix="/api/public", tags=["Public"])
+# app.include_router(public_router, prefix="/api/public", tags=["Public"])
 app.include_router(auth_router, prefix="/auth", tags=["Auth"])
 app.include_router(admin_router, prefix="/admin", tags=["Admin"])
 app.include_router(user_router, prefix="/user", tags=['User'])
