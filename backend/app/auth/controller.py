@@ -3,7 +3,7 @@ from fastapi import HTTPException
 
 from app.database import db_instance
 from app.utils.email_sender import send_otp_email
-from .utils import hash_password, verify_password, generate_otp, create_access_token
+from .utils import hash_password, verify_password, generate_otp, create_access_token, validate_user_email
 
 
 # ======================================================
@@ -21,11 +21,13 @@ async def initiate_signup(body):
     if await user_exists(body.email):
         return {"success": False, "message": "Email already registered"}
 
+    email = validate_user_email(body.email)
+
     otp = generate_otp()
 
     temp_record = {
         "name": body.name,
-        "email": body.email,
+        "email": email,
         "password_hash": hash_password(body.password),
         "semester": body.semester,
         "branch": body.branch,
@@ -37,12 +39,12 @@ async def initiate_signup(body):
 
     # Save or overwrite OTP record
     await db_instance.db.email_otps.update_one(
-        {"email": body.email},
+        {"email": email},
         {"$set": temp_record},
         upsert=True
     )
 
-    send_ok = send_otp_email(body.email, otp)
+    send_ok = send_otp_email(email, otp)
 
     if not send_ok:
         return {"success": False, "message": "Failed to send OTP"}

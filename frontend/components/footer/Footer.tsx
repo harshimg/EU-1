@@ -33,7 +33,7 @@ export default function Footer() {
           <ul className="space-y-2 text-sm">
             <li><Link href="/pyq" className="hover:text-white">PYQs</Link></li>
             <li><Link href="/about" className="hover:text-white">About</Link></li>
-            <li><Link href="/contact" className="hover:text-white">Contact</Link></li>
+            <li><Link href="/about" className="hover:text-white">Contact</Link></li>
           </ul>
         </div>
 

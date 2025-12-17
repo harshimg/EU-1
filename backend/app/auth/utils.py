@@ -5,6 +5,7 @@ from datetime import datetime, timedelta, timezone
 from app.config import settings
 from passlib.context import CryptContext
 from fastapi import HTTPException
+from email_validator import validate_email, EmailNotValidError
 
 pwd_ctx = CryptContext(schemes=["bcrypt_sha256"], deprecated="auto")
 
@@ -82,3 +83,17 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
             detail="Invalid token",
         )
     return payload
+
+
+
+def validate_user_email(email: str):
+
+    try:
+        v = validate_email(email)
+        return v.email
+
+    except EmailNotValidError as e:
+        raise HTTPException(
+        status_code=400,
+        detail=str(e)
+        )

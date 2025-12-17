@@ -40,6 +40,25 @@ export default function SignupForm({ showLogin, showOtp }: any) {
         return;
       }
 
+        //Email check
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(data.email)) {
+      alert("Please enter a valid email address");
+      return;
+    }
+
+        // ✅ MOBILE VALIDATION (10 digits only)
+    if (!/^\d{10}$/.test(data.mobile)) {
+      alert("Mobile number must be exactly 10 digits");
+      return;
+    }
+
+    if (!/^\d{11}$/.test(data.reg_no)) {
+      alert("Invalid Registration  No.");
+      return;
+    }
+
+
       await apiPost("/auth/signup", data);
 
       alert("OTP sent to your email");
@@ -113,11 +132,13 @@ export default function SignupForm({ showLogin, showOtp }: any) {
         <input
           className="input"
           placeholder="Mobile"
+          inputMode="numeric"
+          maxLength={10}
           onChange={e => setData({ ...data, mobile: e.target.value })}
         />
         <input
           className="input"
-          placeholder="Registration No."
+          placeholder="Registration  No." inputMode="numeric" maxLength={11}
           onChange={e => setData({ ...data, reg_no: e.target.value })}
         />
       </div>
