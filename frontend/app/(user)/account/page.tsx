@@ -54,14 +54,13 @@ export default function AccountPage() {
     }
   }
 
-  if (loading) {
+  if (loading || !profile) {
     return (
       <div className="h-screen flex items-center justify-center">
         Loading…
       </div>
     );
   }
-
 
   return (
     <div className="min-h-screen bg-slate-100 px-4 py-8">
@@ -76,12 +75,12 @@ export default function AccountPage() {
         </div>
 
         {/* PROFILE */}
-        <ProfileField label="Name" value={profile.name} />
-        <ProfileField label="Email" value={profile.email} />
-        <ProfileField label="Registration No." value={profile.reg_no} />
-        <ProfileField label="Branch" value={profile.branch} />
-        <ProfileField label="Semester" value={profile.semester} />
-        <ProfileField label="Mobile" value={profile.mobile} />
+        <ProfileField label="Name" value={profile?.name} />
+        <ProfileField label="Email" value={profile?.email} />
+        <ProfileField label="Registration No." value={profile?.reg_no} />
+        <ProfileField label="Branch" value={profile?.branch} />
+        <ProfileField label="Semester" value={profile?.semester} />
+        <ProfileField label="Mobile" value={profile?.mobile} />
 
         <button
           onClick={() => setShowModal(true)}
