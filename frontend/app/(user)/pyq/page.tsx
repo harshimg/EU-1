@@ -88,40 +88,74 @@ export default function PYQPage() {
 
 
   /* ---------------- FETCH PAPERS ---------------- */
-  useEffect(() => {
-    if (!activeSubject) return;
+  // useEffect(() => {
+  //   if (!activeSubject) return;
 
-    fetch(
-      `${API_URL}/user/papers?subject_code=${activeSubject.code}`,
-      { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-    )
-      .then(res => res.json())
-      .then(json => {
-        setPapers(json.data || []);
-        if (json.data?.length) setActivePaper(json.data[0]);
-      });
-  }, [activeSubject]);
+  //   fetch(
+  //     `${API_URL}/user/papers?subject_code=${activeSubject.code}`,
+  //     { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+  //   )
+  //     .then(res => res.json())
+  //     .then(json => {
+  //       setPapers(json.data || []);
+  //       if (json.data?.length) setActivePaper(json.data[0]);
+  //     });
+  // }, [activeSubject]);
+
+/* ---------------- FETCH PAPERS ---------------- */
+useEffect(() => {
+  if (!activeSubject) return;
+
+  apiGet(`/user/papers?subject_code=${activeSubject.code}`)
+    .then(json => {
+      setPapers(json.data || []);
+      if (json.data?.length) setActivePaper(json.data[0]);
+    })
+    .catch(err => console.error(err.message));
+}, [activeSubject]);
+
 
   /* ---------------- FETCH PAPER ---------------- */
-  useEffect(() => {
-    if (!activePaper) return;
+  // useEffect(() => {
+  //   if (!activePaper) return;
 
-    fetch(`${API_URL}/user/paper/${activePaper._id}`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+  //   fetch(`${API_URL}/user/paper/${activePaper._id}`, {
+  //     headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+  //   })
+  //     .then(res => res.json())
+  //     .then(json => {
+  //       setPaper(json.data);
+  //       const q = json.data?.questions?.[0];
+  //       if (q) {
+  //         setActiveQ(
+  //           q.sub_questions?.length
+  //             ? { q, sq: q.sub_questions[0] }
+  //             : { q }
+  //         );
+  //       }
+  //     });
+  // }, [activePaper]);
+
+  /* ---------------- FETCH PAPER ---------------- */
+useEffect(() => {
+  if (!activePaper) return;
+
+  apiGet(`/user/paper/${activePaper._id}`)
+    .then(json => {
+      setPaper(json.data);
+
+      const q = json.data?.questions?.[0];
+      if (q) {
+        setActiveQ(
+          q.sub_questions?.length
+            ? { q, sq: q.sub_questions[0] }
+            : { q }
+        );
+      }
     })
-      .then(res => res.json())
-      .then(json => {
-        setPaper(json.data);
-        const q = json.data?.questions?.[0];
-        if (q) {
-          setActiveQ(
-            q.sub_questions?.length
-              ? { q, sq: q.sub_questions[0] }
-              : { q }
-          );
-        }
-      });
-  }, [activePaper]);
+    .catch(err => console.error(err.message));
+}, [activePaper]);
+
 
   /* ---------------- DESKTOP RESIZE ---------------- */
   useEffect(() => {

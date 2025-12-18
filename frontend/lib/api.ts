@@ -51,6 +51,24 @@ async function apiFetch(path: string, options: RequestInit = {}) {
   return json;
 }
 
+
+
+// api for update
+export async function apiPut(path: string, data: any) {
+  const res = await fetch(`${API_URL}${path}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+    body: JSON.stringify(data),
+  });
+
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.detail || json.message || "API Error");
+  return json;
+}
+
 /* ---------------- HELPERS ---------------- */
 
 export async function apiPost(path: string, data: any) {

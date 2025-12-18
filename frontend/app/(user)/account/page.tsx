@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
-import { API_URL } from "@/lib/api";
+import { apiGet, apiPut } from "@/lib/api";
 
 export default function AccountPage() {
   const { user, loading, refreshUser } = useAuth();
@@ -18,73 +18,50 @@ export default function AccountPage() {
   useEffect(() => {
     if (!user) return;
 
-    fetch(`${API_URL}/user/account`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    })
-      .then(res => res.json())
+    apiGet("/user/account")
       .then(json => {
         setProfile(json.data);
         setSemester(json.data.semester);
-      });
+      })
+      .catch(err => console.error(err.message));
   }, [user]);
 
   /* ---------------- FETCH SEMESTERS ---------------- */
   useEffect(() => {
     if (!showModal) return;
 
-    fetch(`${API_URL}/user/semester`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    })
-      .then(res => res.json())
-      .then(json => setSemesters(json.data || []));
+    apiGet("/user/semester")
+      .then(json => setSemesters(json.data || []))
+      .catch(err => console.error(err.message));
   }, [showModal]);
 
   async function updateSemester() {
     if (!semester) return;
-  
+
     setSaving(true);
-  
+
     try {
-      const res = await fetch(`${API_URL}/user/account/semester`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({ semester }),
-      });
-  
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.detail);
-  
+      await apiPut("/user/account/semester", { semester });
+
       alert("✅ Semester updated successfully");
-  
-      // ✅ update UI without auth refresh
-      setProfile((prev: any) => ({
-        ...prev,
-        semester,
-      }));
-  
-      setShowModal(false); // ✅ CLOSE MODAL
+
+      refreshUser();        // keep auth context in sync
+      setShowModal(false);  // close modal
     } catch (e: any) {
       alert(e.message || "Failed to update semester");
     } finally {
       setSaving(false);
     }
   }
-  
 
-  if (loading || !profile) {
+  if (loading) {
     return (
       <div className="h-screen flex items-center justify-center">
         Loading…
       </div>
     );
   }
+
 
   return (
     <div className="min-h-screen bg-slate-100 px-4 py-8">
