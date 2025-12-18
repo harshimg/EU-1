@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/lib/auth";
-import { API_URL } from "@/lib/api";
+import { API_URL, apiGet, apiPost } from "@/lib/api";
 import { useAuthModal } from "@/components/auth/AuthModal";
 
 
@@ -57,16 +57,35 @@ export default function PYQPage() {
   useEffect(() => {
     if (!user) return;
 
-    fetch(
-      `${API_URL}/user/subjects?semester_code=${user.semester}&branch_code=${user.branch}`,
-      { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-    )
-      .then(res => res.json())
-      .then(json => {
-        setSubjects(json.data || []);
-        if (json.data?.length) setActiveSubject(json.data[0]);
-      });
-  }, [user]);
+  //   fetch(
+  //     `${API_URL}/user/subjects?semester_code=${user.semester}&branch_code=${user.branch}`,
+  //     { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+  //   )
+
+    
+
+
+  //     .then(res => res.json())
+  //     .then(json => {
+  //       setSubjects(json.data || []);
+  //       if (json.data?.length) setActiveSubject(json.data[0]);
+  //     });
+  // }, [user]);
+
+
+
+  apiGet(
+    `/user/subjects?semester_code=${user.semester}&branch_code=${user.branch}`
+  )
+    .then(json => {
+      setSubjects(json.data || []);
+      if (json.data?.length) setActiveSubject(json.data[0]);
+    })
+    .catch(err => {
+      console.error(err.message);
+    });
+}, [user]);
+
 
   /* ---------------- FETCH PAPERS ---------------- */
   useEffect(() => {
