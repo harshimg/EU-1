@@ -91,12 +91,12 @@ export default function AdminPaperQuestionsPage() {
       </header>
 
       <main className="max-w-7xl mx-auto px-6 py-8 space-y-6">
-        <button
+        {/* <button
           onClick={() => setEditor({ q_no: nextQno() })}
           className="btn-primary"
         >
           + Add Question
-        </button>
+        </button> */}
 
         {paper.questions.length === 0 && (
           <div className="p-8 text-center text-slate-500 bg-[#11172C] rounded-xl">
@@ -197,6 +197,15 @@ export default function AdminPaperQuestionsPage() {
             onSaved={fetchPaper}
           />
         )}
+
+<button
+          onClick={() => setEditor({ q_no: nextQno() })}
+          className="btn-primary"
+        >
+          + Add Question
+        </button>
+
+
       </main>
     </div>
   );
@@ -226,6 +235,7 @@ function QuestionEditor({ paperId, data, onClose, onSaved }: any) {
     if (!marks || !structure) return false;
     if (structure === "single") return !!question;
     if (!heading || !nature || subs.length === 0) return false;
+    // if (!solution || !nature || subs.length === 0) return false;
     return subs.every(
       s =>
         s.marks &&
@@ -372,13 +382,13 @@ function QuestionEditor({ paperId, data, onClose, onSaved }: any) {
             <option value="subjective">Subjective</option>
           </select>
 
-          <button
+          {/* <button
             onClick={() => addSub(nature)}
             className="text-indigo-400 text-sm"
             disabled={!nature}
           >
             + Add Sub-question
-          </button>
+          </button> */}
 
           {subs.map((s, i) => (
             <div key={s.sq_no} className="border border-white/10 p-4 rounded">
@@ -454,7 +464,19 @@ function QuestionEditor({ paperId, data, onClose, onSaved }: any) {
               )}
             </div>
           ))}
+
+        <button
+            onClick={() => addSub(nature)}
+            className="text-indigo-400 text-sm"
+            disabled={!nature}
+          >
+            + Add Sub-question
+        </button>
+
         </>
+
+      
+        
       )}
 
       <div className="flex gap-4 pt-4">
@@ -466,5 +488,9 @@ function QuestionEditor({ paperId, data, onClose, onSaved }: any) {
         </button>
       </div>
     </div>
+    
   );
+
+
+  
 }

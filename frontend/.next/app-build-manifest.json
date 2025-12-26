@@ -11,30 +11,35 @@
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
     ],
+    "/admin/papers/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/admin/papers/page.js"
+    ],
+    "/admin/papers/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/admin/papers/layout.js"
+    ],
     "/(user)/pyq/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/(user)/pyq/page.js"
     ],
-    "/(user)/about/page": [
+    "/admin/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(user)/about/page.js"
+      "static/chunks/app/admin/page.js"
     ],
-    "/(user)/result/page": [
+    "/admin/papers/[paper_id]/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(user)/result/page.js"
+      "static/chunks/app/admin/papers/[paper_id]/page.js"
     ],
-    "/(user)/account/page": [
+    "/admin/ssb/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(user)/account/page.js"
-    ],
-    "/_not-found/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/_not-found/page.js"
+      "static/chunks/app/admin/ssb/page.js"
     ]
   }
 }
