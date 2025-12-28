@@ -238,7 +238,7 @@ const ActionBtn = ({ children, danger, ...p }: any) => (
 
 function PaperModal({ subject, data, onClose, onSaved }: any) {
   const [name, setName] = useState(data?.name || "");
-  const [type, setType] = useState(data?.type || "MID-SEM");
+  const [type, setType] = useState(data?.type || "END-SEM");
   const [year, setYear] = useState(data?.year || new Date().getFullYear());
   const [desc, setDesc] = useState(data?.description || "");
 

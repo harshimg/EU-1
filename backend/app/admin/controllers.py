@@ -117,6 +117,8 @@ async def create_subject(body):
         "full_name": body["full_name"],
         "semester_code": body["semester_code"],
         "branch_code": body["branch_code"],
+        "subject_type": body["subject_type"],
+        "subject_credit": body["subject_credit"],
         "created_at": datetime.now(timezone.utc),
         "updated_at": None
     })
@@ -141,6 +143,8 @@ async def update_subject(code: str, body):
                 "full_name": body["full_name"],
                 "semester_code": body["semester_code"],
                 "branch_code": body["branch_code"],
+                "subject_type": body["subject_type"],
+                "subject_credit": body["subject_credit"],
                 "updated_at": datetime.now(timezone.utc)
             }
         }

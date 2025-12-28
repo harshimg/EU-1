@@ -28,6 +28,8 @@ interface Subject {
   full_name: string;
   semester_code: string;
   branch_code: string;
+  subject_type: string;
+  subject_credit: number;
 }
 
 /* =====================================================
@@ -284,7 +286,7 @@ function SubjectSection() {
         <Select value={filterBranch} onChange={setFilterBranch} options={branches} />
       </div>
 
-      <Table headers={["Code", "Short", "Full Name", "Semester", "Branch", "Actions"]}>
+      <Table headers={["Code", "Short", "Full Name", "Semester", "Branch", "Type", "Credit", "Actions"]}>
         {subjects.map(s => (
           <tr key={s.code}>
             <Td>{s.code}</Td>
@@ -292,6 +294,8 @@ function SubjectSection() {
             <Td>{s.full_name}</Td>
             <Td>{s.semester_code}</Td>
             <Td>{s.branch_code}</Td>
+            <Td>{s.subject_type}</Td>
+            <Td>{s.subject_credit}</Td>
             <Td>
               <ActionBtn onClick={() => { setEdit(s); setOpen(true); }}>Edit</ActionBtn>
               <ActionBtn danger onClick={() => remove(s.code)}>Delete</ActionBtn>
@@ -561,9 +565,11 @@ function SubjectModal({ data, semesters, branches, onClose, onSaved }: any) {
   const [fullName, setFullName] = useState(data?.full_name || "");
   const [semester, setSemester] = useState(data?.semester_code || "");
   const [branch, setBranch] = useState(data?.branch_code || "");
+  const [subject_type, setsubject_type] = useState(data?.subject_type || "");
+  const [subject_credit, setsubject_credit] = useState(data?.subject_credit || "")
 
   async function submit() {
-    if (!code || !shortName || !fullName || !semester || !branch) {
+    if (!code || !shortName || !fullName || !semester || !branch || !subject_type) {
       alert("All fields are required");
       return;
     }
@@ -584,6 +590,8 @@ function SubjectModal({ data, semesters, branches, onClose, onSaved }: any) {
         full_name: fullName,
         semester_code: semester,
         branch_code: branch,
+        subject_type: subject_type,
+        subject_credit: subject_credit
       }),
     });
 
@@ -641,6 +649,22 @@ function SubjectModal({ data, semesters, branches, onClose, onSaved }: any) {
         ))}
       </select>
 
+      <select className="input" value={subject_type}
+          onChange={e => setsubject_type(e.target.value)}>
+          <option value="">Subject type</option>
+          <option>Theory</option>
+          <option>Practical</option>
+        </select>
+
+      <input
+        className="input"
+        placeholder="Subject Credit"
+        value={subject_credit}
+        // only int or float
+        type = "Number"       
+        onChange={e => setsubject_credit(e.target.value)}
+      />
+
       <button  disabled={!code || !shortName || !fullName || !semester || !branch}
             onClick={submit} className="btn-primary w-full mt-4 disabled:opacity-40">
         Save
@@ -650,9 +674,4 @@ function SubjectModal({ data, semesters, branches, onClose, onSaved }: any) {
 }
 
 
-
-
-
-// form → POST / PUT → close → refresh
-// If you want, next step I’ll provide them cleanly.
 
