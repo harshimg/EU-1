@@ -1,129 +1,130 @@
-from email import message
-import re
-from app.database import db_instance
-from app.utils.mongo_serializer import mongo_to_json
-from fastapi import HTTPException
+"use client";
 
+import { useEffect, useState } from "react";
+import { apiGet } from "@/lib/api";
+import { useAuth } from "@/lib/auth";
 
-async def list_semesters():
-    sem = await db_instance.db.semesters.find().sort("code", 1).to_list(100)
-    return {"success": True, 'data': mongo_to_json(sem)}
+export default function CgpaPage() {
+  const { user, loading } = useAuth();
 
+  /* ---------------- CORE STATE ---------------- */
+  const [semester, setSemester] = useState<string>("");
+  const [branch, setBranch] = useState<string>("");
 
-async def list_branches():
-    br = await db_instance.db.branches.find().sort("code", 1).to_list(100)
-    return {"success": True, 'data': mongo_to_json(br)}
+  const [subjects, setSubjects] = useState<any[]>([]);
+  const [loadingSubjects, setLoadingSubjects] = useState(false);
 
+  /* Dropdown data (guest users only) */
+  const [semesters, setSemesters] = useState<any[]>([]);
+  const [branches, setBranches] = useState<any[]>([]);
 
-def marks_to_grade_point(percent: float) -> int:
-    if percent >= 90:
-        return 10
-    elif percent >= 80:
-        return 9
-    elif percent >= 70:
-        return 8
-    elif percent >= 60:
-        return 7
-    elif percent >= 50:
-        return 6
-    elif percent >= 35:
-        return 5
-    else:
-        return 0
+  const isLoggedIn = !!user;
 
+  /* ---------------- INIT FROM USER (ONCE) ---------------- */
+  useEffect(() => {
+    if (user?.semester && user?.branch) {
+      setSemester(user.semester);
+      setBranch(user.branch);
 
-async def sgpa(body):
+    }
 
-    sem = body.get("semester")
-    br = body.get("branch")
-    marks = body.get("marks")
+  }, [user]);
 
-    if not sem or not br or not marks:
-        raise HTTPException(status_code=400, message="Invalid subject details")
+  /* ---------------- FETCH DROPDOWNS (GUEST ONLY) ---------------- */
+  useEffect(() => {
+    // if (isLoggedIn) return;
+    if (semester  && branch) return;
 
-    cursor = db_instance.db.subjects.find(
-        {"semester_code": sem, "branch_code": br}
-        )
+    apiGet("/api/public/semester")
+      .then(res => setSemesters(res.data || []))
+      .catch(() => {});
 
-    subs = await cursor.to_list(length=None)
-    if not subs:
-        raise HTTPException(status_code=404, message="Subjects not found")
+    apiGet("/api/public/branch")
+      .then(res => setBranches(res.data || []))
+      .catch(() => {});
+  }, [isLoggedIn]);
 
-    subject_map = {}
-    for sub in subs:
-        
-        if sub.get("subject_credit") is None:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Credit missing for subject {sub["code"]}"
-            )
+  /* ---------------- FETCH SUBJECTS ---------------- */
+  useEffect(() => {
+    if (!semester || !branch) return;
 
-        subject_map[sub["code"]] = {
-            "credit": float(sub["subject_credit"]),
-            "type": sub["subject_type"],
-            "max_marks": int(sub.get("max_marks", 100))
-        }
+    setLoadingSubjects(true);
 
-    result  = -1
-    total_credit = 0.0
-    total_grade_points = 0.0
-    for sub_code, sub_mark in marks.items():
-        if sub_code not in subject_map:
-            raise HTTPException(
-                status_code=400,
-                detail=f"subject {sub_code} not found"
-            )
-        
+    apiGet(`/api/public/subjects?semester_code=${semester}&branch_code=${branch}`)
+      .then(res => setSubjects(res.data || []))
+      .catch(() => setSubjects([]))
+      .finally(() => setLoadingSubjects(false));
+  }, [semester, branch]);
 
-        meta = subject_map[sub_code]
-        credit = meta["credit"]
-        subject_type = meta["type"]
-        max_marks = meta["max_marks"]
+  /* ---------------- UI ---------------- */
+  return (
+    <div className="max-w-3xl mx-auto p-4 space-y-6">
+      <h2 className="text-2xl font-bold">CGPA Calculator</h2>
 
+      {/* GUEST DROPDOWNS */}
+      {/* {!isLoggedIn && ( */}
+      {    (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-white p-4 rounded-xl shadow">
+          <select
+            className="input"
+            value={semester}
+            onChange={e => setSemester(e.target.value)}
+          >
+            <option value="">Select Semester</option>
+            {semesters.map(s => (
+              <option key={s.code} value={s.code}>
+                {s.name}
+              </option>
+            ))}
+          </select>
 
-        # ---------------- THEORY ----------------
-        if subject_type == "Theory":
-            ext = sub_mark.get("external")
-            inte = sub_mark.get("internal")
+          <select
+            className="input"
+            value={branch}
+            onChange={e => setBranch(e.target.value)}
+          >
+            <option value="">Select Branch</option>
+            {branches.map(b => (
+              <option key={b.code} value={b.code}>
+                {b.full_name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
-            if ext is None or inte is None:
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"Missing marks for {sub_code}"
-                )
+      {/* SUBJECTS */}
+      {loadingSubjects && (
+        <p className="text-sm text-gray-500">Loading subjects…</p>
+      )}
 
-            total = ext + inte
+      {!loadingSubjects && subjects.length > 0 && (
+        <div className="bg-white rounded-xl p-4 shadow space-y-3">
+          <h3 className="font-semibold">Subjects</h3>
 
-            # PASS RULES
-            if ext < 25 or total < 35:
-                grade_point = 0
-            else:
-                percent = (total / max_marks) * 100
-                grade_point = marks_to_grade_point(percent)
+          {subjects.map(sub => (
+            <div
+              key={sub.code}
+              className="flex justify-between py-2 border-b last:border-0"
+            >
+              <span>{sub.short_name}</span>
+              <span className="text-gray-500">{sub.code}</span>
+              <input
+              className="input mb-0"
+              placeholder="Enter MArks"
+         
+              //onChange={e => setCode(e.target.value)}
+              />
+            </div>
+          ))}
+        </div>
+      )}
 
-        # ---------------- PRACTICAL ----------------
-        elif subject_type == "Practical":
-            total = sub_mark.get("total")
-
-            if total is None:
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"Missing practical marks for {sub_code}"
-                )
-
-            percent = (total / max_marks) * 100
-            grade_point = marks_to_grade_point(percent)
-
-
-        total_grade_points += grade_point * credit
-        total_credit += credit
-
-    if total_credit == 0:
-        raise HTTPException(status_code=400, detail="Credits not found, contact Alpha Result")
-
-    result = round(total_grade_points / total_credit, 2)
-
-    return {
-            "success": True,
-            "sgpa": result
-        }
+      {!loadingSubjects && semester && branch && subjects.length === 0 && (
+        <p className="text-sm text-red-500">
+          No subjects found for selected semester & branch.
+        </p>
+      )}
+    </div>
+  );
+}
