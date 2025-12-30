@@ -275,7 +275,7 @@ const [sgpa, setSgpa] = useState<number | null>(null);
           placeholder="Marks"
           className="w-24 text-center border rounded-lg px-2 py-1
                      focus:ring-2 focus:ring-indigo-400 outline-none"
-          value={marks[sub.code] ?? ""}
+          //value={marks[sub.code] ?? ""}
           onChange={e =>
             setMarks(prev => ({
               ...prev,
