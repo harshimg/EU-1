@@ -81,11 +81,7 @@ const [sgpa, setSgpa] = useState<number | null>(null);
 // Calcultion of Sgpa
   async function handleCalculate() {
     // basic validation
-    const entered = Object.values(marks).filter(v => v !== "");
-    if (entered.length !== subjects.length) {
-      alert("Please enter marks for all subjects");
-      return;
-    }
+
   
     setCalculating(true);
   
