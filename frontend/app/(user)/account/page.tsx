@@ -42,7 +42,7 @@ export default function AccountPage() {
 
     try {
       await apiPut("/user/account/semester", { semester });
-
+      // localStorage.setItem("semester ", {semester});
       alert("✅ Semester updated successfully");
 
       refreshUser();        // keep auth context in sync
@@ -114,7 +114,7 @@ export default function AccountPage() {
             </select>
 
             <div className="flex gap-3 pt-3">
-              {/* ✅ VISIBLE CANCEL */}
+              {/*  VISIBLE CANCEL */}
               <button
                 onClick={() => setShowModal(false)}
                 className="flex-1 py-2 rounded-lg border border-slate-300

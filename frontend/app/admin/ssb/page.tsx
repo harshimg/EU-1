@@ -30,6 +30,7 @@ interface Subject {
   branch_code: string;
   subject_type: string;
   subject_credit: number;
+  max_marks: number
 }
 
 /* =====================================================
@@ -286,7 +287,7 @@ function SubjectSection() {
         <Select value={filterBranch} onChange={setFilterBranch} options={branches} />
       </div>
 
-      <Table headers={["Code", "Short", "Full Name", "Semester", "Branch", "Type", "Credit", "Actions"]}>
+      <Table headers={["Code", "Short", "Full Name", "Semester", "Branch", "Type", "Credit", "max_marks", "Actions"]}>
         {subjects.map(s => (
           <tr key={s.code}>
             <Td>{s.code}</Td>
@@ -296,6 +297,7 @@ function SubjectSection() {
             <Td>{s.branch_code}</Td>
             <Td>{s.subject_type}</Td>
             <Td>{s.subject_credit}</Td>
+            <Td>{s.max_marks}</Td>
             <Td>
               <ActionBtn onClick={() => { setEdit(s); setOpen(true); }}>Edit</ActionBtn>
               <ActionBtn danger onClick={() => remove(s.code)}>Delete</ActionBtn>
@@ -566,10 +568,11 @@ function SubjectModal({ data, semesters, branches, onClose, onSaved }: any) {
   const [semester, setSemester] = useState(data?.semester_code || "");
   const [branch, setBranch] = useState(data?.branch_code || "");
   const [subject_type, setsubject_type] = useState(data?.subject_type || "");
-  const [subject_credit, setsubject_credit] = useState(data?.subject_credit || "")
+  const [subject_credit, setsubject_credit] = useState(data?.subject_credit || "");
+  const [max_marks, setmax_marks] = useState(data?.max_marks || "");
 
   async function submit() {
-    if (!code || !shortName || !fullName || !semester || !branch || !subject_type) {
+    if (!code || !shortName || !fullName || !semester || !branch || !subject_type || !max_marks) {
       alert("All fields are required");
       return;
     }
@@ -591,7 +594,8 @@ function SubjectModal({ data, semesters, branches, onClose, onSaved }: any) {
         semester_code: semester,
         branch_code: branch,
         subject_type: subject_type,
-        subject_credit: subject_credit
+        subject_credit: subject_credit,
+        max_marks: max_marks
       }),
     });
 
@@ -627,8 +631,10 @@ function SubjectModal({ data, semesters, branches, onClose, onSaved }: any) {
         onChange={e => setFullName(e.target.value)}
       />
 
+  <div className="grid grid-cols-2 gap-3">
       <select
-        className="input mb-3"
+        // className="input mb-3"
+        className="input"
         value={semester}
         onChange={e => setSemester(e.target.value)}
       >
@@ -648,13 +654,23 @@ function SubjectModal({ data, semesters, branches, onClose, onSaved }: any) {
           <option key={b.code} value={b.code}>{b.code}</option>
         ))}
       </select>
+  </div>
 
+  <div className="grid grid-cols-2 gap-3">
       <select className="input" value={subject_type}
           onChange={e => setsubject_type(e.target.value)}>
           <option value="">Subject type</option>
           <option>Theory</option>
           <option>Practical</option>
         </select>
+
+        <select className="input" value={max_marks}
+            onChange={e => setmax_marks(e.target.value)}>
+            <option value="">Max Marks</option>
+            <option>100</option>
+            <option>50</option>
+          </select>
+  </div>
 
       <input
         className="input"

@@ -109,6 +109,21 @@ async def create_subject(body):
             detail=f"Subjects with code '{code}' already exists",
             
         )
+    
+    subject_type = body["subject_type"]
+    max_marks = int(body["max_marks"])
+
+    if subject_type == "Theory" and max_marks != 100:
+        raise HTTPException(
+            status_code=400,
+            detail="Theory subjects must have max_marks = 100"
+        )
+
+    if subject_type == "Practical" and max_marks not in (50, 100):
+        raise HTTPException(
+            status_code=400,
+            detail="Practical subjects must have max_marks = 50 or 100"
+        )
 
 
     await db_instance.db.subjects.insert_one({
@@ -117,8 +132,9 @@ async def create_subject(body):
         "full_name": body["full_name"],
         "semester_code": body["semester_code"],
         "branch_code": body["branch_code"],
-        "subject_type": body["subject_type"],
+        "subject_type": subject_type,
         "subject_credit": body["subject_credit"],
+        "max_marks": max_marks,
         "created_at": datetime.now(timezone.utc),
         "updated_at": None
     })
@@ -135,6 +151,22 @@ async def list_subjects(semester=None, branch=None):
     return {"success": True, 'data': mongo_to_json(subject)}
 
 async def update_subject(code: str, body):
+
+    subject_type = body["subject_type"]
+    max_marks = int(body["max_marks"])
+
+    if subject_type == "Theory" and max_marks != 100:
+        raise HTTPException(
+            status_code=400,
+            detail="Theory subjects must have max_marks = 100"
+        )
+
+    if subject_type == "Practical" and max_marks not in (50, 100):
+        raise HTTPException(
+            status_code=400,
+            detail="Practical subjects must have max_marks = 50 or 100"
+        )
+
     await db_instance.db.subjects.update_one(
         {"code": code},
         {
@@ -143,8 +175,9 @@ async def update_subject(code: str, body):
                 "full_name": body["full_name"],
                 "semester_code": body["semester_code"],
                 "branch_code": body["branch_code"],
-                "subject_type": body["subject_type"],
+                "subject_type": subject_type,
                 "subject_credit": body["subject_credit"],
+                "max_marks": max_marks,
                 "updated_at": datetime.now(timezone.utc)
             }
         }

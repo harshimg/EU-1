@@ -85,16 +85,6 @@ async def sgpa(body):
         if subject_type == "Theory":
             ext = sub_mark.get("external")
             inte = sub_mark.get("internal")
-            if ext > 70:
-                raise HTTPException(
-                status_code=400,
-                detail=f"Maximum marks for external ({sub_code}) is 70"
-            )
-            if inte > 30:
-                raise HTTPException(
-                status_code=400,
-                detail=f"Maximum marks for internal ({sub_code}) is 30"
-            )
 
             if ext is None or inte is None:
                 raise HTTPException(
@@ -120,11 +110,6 @@ async def sgpa(body):
                     status_code=400,
                     detail=f"Missing practical marks for {sub_code}"
                 )
-            if total > max_marks:
-                raise HTTPException(
-                status_code=400,
-                detail=f"Maximum marks for Practical ({sub_code}) is {max_marks}"
-            )
 
             percent = (total / max_marks) * 100
             grade_point = marks_to_grade_point(percent)
@@ -142,6 +127,3 @@ async def sgpa(body):
             "success": True,
             "sgpa": result
         }
-
-
-        

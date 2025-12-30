@@ -1,9 +1,9 @@
 {
   "pages": {
-    "/admin/ssb/page": [
+    "/(user)/cgpa/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/admin/ssb/page.js"
+      "static/chunks/app/(user)/cgpa/page.js"
     ],
     "/layout": [
       "static/chunks/webpack.js",
@@ -20,6 +20,16 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/(user)/pyq/page.js"
+    ],
+    "/admin/ssb/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/admin/ssb/page.js"
+    ],
+    "/_not-found/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/_not-found/page.js"
     ]
   }
 }
