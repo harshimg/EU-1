@@ -321,3 +321,4 @@ const [sgpa, setSgpa] = useState<number | null>(null);
     </div>
   );
 }
+
