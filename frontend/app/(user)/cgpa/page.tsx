@@ -207,15 +207,27 @@ const canCalculate =
           className="w-20 input"
           value={(marks[sub.code] as TheoryMarks)?.external ?? ""}
         //   value={(marks[sub.code] as any)?.external ?? ""}
+          // onChange={e =>
+          //   setMarks(prev => ({
+          //     ...prev,
+          //     [sub.code]: {
+          //       ...(prev[sub.code] as any),
+          //       external: Number(e.target.value) || "",
+          //     },
+          //   }))
+          // }
           onChange={e =>
             setMarks(prev => ({
               ...prev,
               [sub.code]: {
                 ...(prev[sub.code] as any),
-                external: Number(e.target.value) || "",
+                external: e.target.value === ""
+                  ? ""
+                  : Number(e.target.value),
               },
             }))
           }
+          
         />
 
         {/* Internal */}
@@ -230,7 +242,8 @@ const canCalculate =
               ...prev,
               [sub.code]: {
                 ...(prev[sub.code] as any),
-                internal: Number(e.target.value) || "",
+                // internal: Number(e.target.value) || "",
+                internal: e.target.value === "" ? "" : Number(e.target.value)
               },
             }))
                 }
@@ -262,7 +275,8 @@ const canCalculate =
             setMarks(prev => ({
               ...prev,
               [sub.code]: {
-                total: Number(e.target.value) || "",
+                // total: Number(e.target.value) || "",
+                total: e.target.value === "" ? "" : Number(e.target.value)
               },
             }))
           }
