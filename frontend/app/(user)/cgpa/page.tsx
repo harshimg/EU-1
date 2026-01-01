@@ -92,6 +92,15 @@ const canCalculate =
       .finally(() => setLoadingSubjects(false));
   }, [semester, branch]);
 
+  useEffect(() => {
+    setMarks({});
+    setSgpa(null);
+  }, [semester, branch]);
+
+  useEffect(() => {
+    setMarks({});
+  }, [subjects]);  
+
 
   useEffect(() => {
     setSgpa(null);

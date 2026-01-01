@@ -26,10 +26,10 @@
       "static/chunks/main-app.js",
       "static/chunks/app/admin/ssb/page.js"
     ],
-    "/_not-found/page": [
+    "/(user)/account/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/_not-found/page.js"
+      "static/chunks/app/(user)/account/page.js"
     ]
   }
 }
