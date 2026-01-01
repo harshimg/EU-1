@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { apiGet } from "@/lib/api";
+import { apiGet, apiPost } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 
-export default function CgpaPage() {
+export default function SgpaPage() {
   const { user, loading } = useAuth();
 
   /* ---------------- CORE STATE ---------------- */
@@ -13,10 +13,46 @@ export default function CgpaPage() {
 
   const [subjects, setSubjects] = useState<any[]>([]);
   const [loadingSubjects, setLoadingSubjects] = useState(false);
+  const theorySubjects = subjects.filter(s => s.subject_type === "Theory");
+  const practicalSubjects = subjects.filter(s => s.subject_type === "Practical");
+
 
   /* Dropdown data (guest users only) */
   const [semesters, setSemesters] = useState<any[]>([]);
   const [branches, setBranches] = useState<any[]>([]);
+
+  // Marks
+// const [marks, setMarks] = useState<Record<string, number | "">>({});
+
+type TheoryMarks = { external: number | ""; internal: number | "" };
+type PracticalMarks = { total: number | "" };
+const [marks, setMarks] = useState<
+  Record<string, TheoryMarks | PracticalMarks>
+>({});
+
+const [calculating, setCalculating] = useState(false);
+const [sgpa, setSgpa] = useState<number | null>(null);
+
+const canCalculate =
+  subjects.length > 0 &&
+  subjects.every(sub => {
+    const m = marks[sub.code];
+
+    if (sub.subject_type === "Theory") {
+        const tm = m as TheoryMarks;
+      return tm && tm.external !== "" && tm.internal !== "";
+    }
+
+    if (sub.subject_type === "Practical") {
+        const pm = m as PracticalMarks;
+      return pm && pm.total !== "";
+    }
+
+    return false;
+  });
+
+
+
 
   const isLoggedIn = !!user;
 
@@ -56,10 +92,64 @@ export default function CgpaPage() {
       .finally(() => setLoadingSubjects(false));
   }, [semester, branch]);
 
+
+  useEffect(() => {
+    setSgpa(null);
+  }, [semester, branch, marks]);
+  
+
+// Calcultion of Sgpa
+  async function handleCalculate() {
+    // basic validation
+    for (const sub of subjects) {
+        const m = marks[sub.code];
+      
+        if (sub.subject_type === "Theory") {
+            const tm = m as TheoryMarks;
+
+          if (!tm || tm.external === "" || tm.internal === "") {
+            alert(`Enter both marks for ${sub.short_name}`);
+            return;
+          }
+        }
+      
+        if (sub.subject_type === "Practical") {
+            const pm = m as PracticalMarks;
+
+          if (!pm || pm.total === "") {
+            alert(`Enter marks for ${sub.short_name}`);
+            return;
+          }
+        }
+      }
+      
+
+
+ 
+  
+    setCalculating(true);
+  
+    try {
+      const payload = {
+        semester,
+        branch,
+        marks, // { "105403": 78, "105404": 66 }
+      };
+  
+      const res = await apiPost("/api/public/sgpa/calculate", payload);
+      setSgpa(res.sgpa);
+    } catch (e: any) {
+      alert(e.message || "Calculation failed");
+    } finally {
+      setCalculating(false);
+    }
+  }
+  
+
   /* ---------------- UI ---------------- */
   return (
     <div className="max-w-3xl mx-auto p-4 space-y-6">
-      <h2 className="text-2xl font-bold">CGPA Calculator</h2>
+      <h2 className="text-2xl font-bold">SGPA Calculator</h2>
 
       {/* GUEST DROPDOWNS */}
       {/* {!isLoggedIn && ( */}
@@ -98,27 +188,129 @@ export default function CgpaPage() {
         <p className="text-sm text-gray-500">Loading subjects…</p>
       )}
 
-      {!loadingSubjects && subjects.length > 0 && (
-        <div className="bg-white rounded-xl p-4 shadow space-y-3">
-          <h3 className="font-semibold">Subjects</h3>
 
-          {subjects.map(sub => (
-            <div
-              key={sub.code}
-              className="flex justify-between py-2 border-b last:border-0"
-            >
-              <span>{sub.short_name}</span>
-              <span className="text-gray-500">{sub.code}</span>
-              <input
-              className="input mb-0"
-              placeholder="Enter MArks"
-         
-              //onChange={e => setCode(e.target.value)}
-              />
-            </div>
-          ))}
+{!loadingSubjects && theorySubjects.length > 0 && (
+  <div className="space-y-3">
+    <h4 className="font-semibold text-indigo-700">Theory Subjects</h4>
+
+    {theorySubjects.map(sub => (
+      <div key={sub.code} className="flex items-center gap-4">
+        <div className="flex-1">
+          <p className="font-medium">{sub.short_name}</p>
+          <p className="text-xs text-gray-500">{sub.code}</p>
         </div>
-      )}
+
+        {/* External */}
+        <input
+          type="number"
+          placeholder="External"
+          className="w-20 input"
+          value={(marks[sub.code] as TheoryMarks)?.external ?? ""}
+          onChange={e =>
+            setMarks(prev => ({
+              ...prev,
+              [sub.code]: {
+                ...(prev[sub.code] as any),
+                external: e.target.value === ""
+                  ? ""
+                  : Number(e.target.value),
+              },
+            }))
+          }
+          
+        />
+
+        {/* Internal */}
+        <input
+          type="number"
+          placeholder="Internal"
+          className="w-20 input"
+          value={(marks[sub.code] as TheoryMarks)?.internal ?? ""}
+        //   value={(marks[sub.code] as any)?.internal ?? ""}
+          onChange={e =>
+            setMarks(prev => ({
+              ...prev,
+              [sub.code]: {
+                ...(prev[sub.code] as any),
+                // internal: Number(e.target.value) || "",
+                internal: e.target.value === "" ? "" : Number(e.target.value)
+              },
+            }))
+                }
+                />
+            </div>
+            ))}
+        </div>
+        )}
+
+
+{!loadingSubjects && practicalSubjects.length > 0 && (
+  <div className="space-y-3 mt-6">
+    <h4 className="font-semibold text-green-700">Practical Subjects</h4>
+
+    {practicalSubjects.map(sub => (
+      <div key={sub.code} className="flex items-center gap-4">
+        <div className="flex-1">
+          <p className="font-medium">{sub.short_name}</p>
+          <p className="text-xs text-gray-500">{sub.code}</p>
+        </div>
+
+        <input
+          type="number"
+          placeholder="Total"
+          className="w-24 input"
+          value={(marks[sub.code] as PracticalMarks)?.total ?? ""}
+        //   value={(marks[sub.code] as any)?.total ?? ""}
+          onChange={e =>
+            setMarks(prev => ({
+              ...prev,
+              [sub.code]: {
+                // total: Number(e.target.value) || "",
+                total: e.target.value === "" ? "" : Number(e.target.value)
+              },
+            }))
+          }
+        />
+      </div>
+    ))}
+  </div>
+)}
+
+
+
+
+
+
+    {/* ACTION */}
+    <button
+  disabled={!canCalculate || calculating}
+  onClick={handleCalculate}
+  className={`w-full mt-4 btn-primary transition
+    ${(!canCalculate || calculating)
+      ? "opacity-50 cursor-not-allowed"
+      : "hover:scale-[1.01]"
+    }`}
+>
+  {calculating ? "Calculating..." : "Calculate SGPA"}
+</button>
+
+
+    {/* RESULT */}
+    {sgpa !== null && (
+      <div className="mt-4 text-center bg-green-50
+                      border border-green-200 rounded-lg p-4">
+        <p className="text-sm text-gray-600">Your SGPA</p>
+        <p className="text-3xl font-bold text-green-600">{sgpa}</p>
+      </div>
+    )}
+
+
+
+
+
+
+
+
 
       {!loadingSubjects && semester && branch && subjects.length === 0 && (
         <p className="text-sm text-red-500">

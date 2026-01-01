@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from app.public2.controllers import *
-from app.user.controllers import list_subjects
+# from app.user.controllers import list_subjects
 
 router = APIRouter()
 

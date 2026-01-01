@@ -15,6 +15,39 @@ async def list_branches():
     return {"success": True, 'data': mongo_to_json(br)}
 
 
+async def list_subjects(semester=None, branch=None):
+    query = {
+        "subject_credit": {
+            "$exists": True,
+            "$nin": [None, "", "0"]
+        },
+        "subject_type": {"$in": ["Theory", "Practical"]},
+        "max_marks": {
+            "$exists": True,
+            "$nin": [None, "", 0]
+        },
+    }
+
+    if semester:
+        query["semester_code"] = semester
+
+    if branch:
+        query["branch_code"] = branch
+
+    subjects = await (
+        db_instance.db.subjects
+        .find(query)
+        .sort("code", 1)
+        .to_list(length=200)
+    )
+
+    return {
+        "success": True,
+        "data": mongo_to_json(subjects),
+    }
+
+
+
 def marks_to_grade_point(percent: float) -> int:
     if percent >= 90:
         return 10
@@ -52,7 +85,9 @@ async def sgpa(body):
     subject_map = {}
     for sub in subs:
         
-        if sub.get("subject_credit") is None:
+        if not sub.get("subject_credit"):
+            print(f"Credit missing for subject {sub["code"]}")
+            continue
             raise HTTPException(
                 status_code=400,
                 detail=f"Credit missing for subject {sub["code"]}"
@@ -144,4 +179,3 @@ async def sgpa(body):
         }
 
 
-        
