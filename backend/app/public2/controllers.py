@@ -3,6 +3,10 @@ import re
 from app.database import db_instance
 from app.utils.mongo_serializer import mongo_to_json
 from fastapi import HTTPException
+from bson import ObjectId
+from zoneinfo import ZoneInfo
+from datetime import datetime
+from pymongo import ReturnDocument
 
 
 async def list_semesters():
@@ -47,6 +51,15 @@ async def list_subjects(semester=None, branch=None):
     }
 
 
+async def get_next_gpa1_count():
+    doc = await db_instance.db.counters.find_one_and_update(
+        {"_id": "gpa1"},
+        {"$inc": {"seq": 1}},
+        return_document=ReturnDocument.AFTER,
+        upsert=True
+    )
+    return doc["seq"]
+
 
 def marks_to_grade_point(percent: float) -> int:
     if percent >= 90:
@@ -65,7 +78,7 @@ def marks_to_grade_point(percent: float) -> int:
         return 0
 
 
-async def sgpa(body):
+async def sgpa(body, current_user):
 
     sem = body.get("semester")
     br = body.get("branch")
@@ -172,6 +185,29 @@ async def sgpa(body):
         raise HTTPException(status_code=400, detail="Credits not found, contact Alpha Result")
 
     result = round(total_grade_points / total_credit, 2)
+
+    email = ""
+    if current_user and current_user.get("user_id"):
+        user = await db_instance.db.users.find_one(
+            {"_id": ObjectId(current_user["user_id"])}
+        )
+        if user:
+            email = user.get("email", "")
+
+
+    count = await get_next_gpa1_count()
+
+
+    await db_instance.db.gpa1.insert_one({
+        "count": count,
+        "email": email or "",
+        "semester": sem,
+        "branch": br,
+        "marks": marks,
+        "sgpa": result,
+        "created_at": datetime.now(ZoneInfo("Asia/Kolkata"))
+    })
+
 
     return {
             "success": True,

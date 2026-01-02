@@ -5,6 +5,7 @@ from datetime import datetime, timedelta, timezone
 from app.config import settings
 from passlib.context import CryptContext
 from fastapi import HTTPException
+from typing import Optional
 from email_validator import validate_email, EmailNotValidError
 
 pwd_ctx = CryptContext(schemes=["bcrypt_sha256"], deprecated="auto")
@@ -82,6 +83,15 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid token",
         )
+    return payload
+
+async def get_current_user_optional(
+    token: Optional[str] = Depends(oauth2_scheme)
+):
+    if not token:
+        return None
+
+    payload = decode_token(token)
     return payload
 
 
