@@ -85,8 +85,11 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         )
     return payload
 
+
+oauth2_optional = OAuth2PasswordBearer(tokenUrl="/auth/login", auto_error=False)
+
 async def get_current_user_optional(
-    token: Optional[str] = Depends(oauth2_scheme)
+    token: Optional[str] = Depends(oauth2_optional)
 ):
     if not token:
         return None

@@ -29,7 +29,6 @@
     --color-blue-700: oklch(48.8% 0.243 264.376);
     --color-indigo-50: oklch(96.2% 0.018 272.314);
     --color-indigo-100: oklch(93% 0.034 272.788);
-    --color-indigo-200: oklch(87% 0.065 274.039);
     --color-indigo-300: oklch(78.5% 0.115 274.713);
     --color-indigo-400: oklch(67.3% 0.182 276.935);
     --color-indigo-500: oklch(58.5% 0.233 277.117);
@@ -426,12 +425,6 @@
   .h-10 {
     height: calc(var(--spacing) * 10);
   }
-  .h-11 {
-    height: calc(var(--spacing) * 11);
-  }
-  .h-19 {
-    height: calc(var(--spacing) * 19);
-  }
   .h-32 {
     height: calc(var(--spacing) * 32);
   }
@@ -459,9 +452,6 @@
   .min-h-screen {
     min-height: 100vh;
   }
-  .w-4 {
-    width: calc(var(--spacing) * 4);
-  }
   .w-5 {
     width: calc(var(--spacing) * 5);
   }
@@ -477,14 +467,8 @@
   .w-24 {
     width: calc(var(--spacing) * 24);
   }
-  .w-44 {
-    width: calc(var(--spacing) * 44);
-  }
   .w-48 {
     width: calc(var(--spacing) * 48);
-  }
-  .w-444 {
-    width: calc(var(--spacing) * 444);
   }
   .w-\[4px\] {
     width: 4px;
@@ -546,77 +530,17 @@
   .grid-cols-\[1fr_80px_80px\] {
     grid-template-columns: 1fr 80px 80px;
   }
-  .grid-cols-\[1fr_80px_85px\] {
-    grid-template-columns: 1fr 80px 85px;
-  }
   .grid-cols-\[1fr_85px\] {
     grid-template-columns: 1fr 85px;
-  }
-  .grid-cols-\[1fr_85px_85px\] {
-    grid-template-columns: 1fr 85px 85px;
-  }
-  .grid-cols-\[1fr_90px\] {
-    grid-template-columns: 1fr 90px;
-  }
-  .grid-cols-\[1fr_90px_90px\] {
-    grid-template-columns: 1fr 90px 90px;
   }
   .grid-cols-\[1fr_100px\] {
     grid-template-columns: 1fr 100px;
   }
-  .grid-cols-\[1fr_100px_8px\] {
-    grid-template-columns: 1fr 100px 8px;
-  }
-  .grid-cols-\[1fr_100px_10px\] {
-    grid-template-columns: 1fr 100px 10px;
-  }
-  .grid-cols-\[1fr_100px_80px\] {
-    grid-template-columns: 1fr 100px 80px;
-  }
-  .grid-cols-\[1fr_100px_81px\] {
-    grid-template-columns: 1fr 100px 81px;
-  }
-  .grid-cols-\[1fr_100px_82px\] {
-    grid-template-columns: 1fr 100px 82px;
-  }
-  .grid-cols-\[1fr_100px_84px\] {
-    grid-template-columns: 1fr 100px 84px;
-  }
-  .grid-cols-\[1fr_100px_85px\] {
-    grid-template-columns: 1fr 100px 85px;
-  }
-  .grid-cols-\[1fr_100px_88px\] {
-    grid-template-columns: 1fr 100px 88px;
-  }
-  .grid-cols-\[1fr_100px_89px\] {
-    grid-template-columns: 1fr 100px 89px;
-  }
-  .grid-cols-\[1fr_100px_90px\] {
-    grid-template-columns: 1fr 100px 90px;
-  }
-  .grid-cols-\[1fr_100px_95px\] {
-    grid-template-columns: 1fr 100px 95px;
-  }
-  .grid-cols-\[1fr_100px_98px\] {
-    grid-template-columns: 1fr 100px 98px;
-  }
   .grid-cols-\[1fr_100px_100px\] {
     grid-template-columns: 1fr 100px 100px;
   }
-  .grid-cols-\[1fr_100px_110px\] {
-    grid-template-columns: 1fr 100px 110px;
-  }
-  .grid-cols-\[1fr_100px_120px\] {
-    grid-template-columns: 1fr 100px 120px;
-  }
-  .grid-cols-\[1fr_110px_72px\] {
-    grid-template-columns: 1fr 110px 72px;
-  }
   .grid-cols-\[1fr_110px_110px\] {
     grid-template-columns: 1fr 110px 110px;
-  }
-  .grid-cols-\[1fr_140px_95px\] {
-    grid-template-columns: 1fr 140px 95px;
   }
   .flex-col {
     flex-direction: column;
@@ -656,9 +580,6 @@
   }
   .gap-10 {
     gap: calc(var(--spacing) * 10);
-  }
-  .gap-33 {
-    gap: calc(var(--spacing) * 33);
   }
   .space-y-1 {
     :where(& > :not(:last-child)) {
@@ -945,10 +866,6 @@
       background-color: color-mix(in oklab, var(--color-white) 90%, transparent);
     }
   }
-  .bg-gradient-to-br {
-    --tw-gradient-position: to bottom right in oklab;
-    background-image: linear-gradient(var(--tw-gradient-stops));
-  }
   .bg-gradient-to-r {
     --tw-gradient-position: to right in oklab;
     background-image: linear-gradient(var(--tw-gradient-stops));
@@ -957,28 +874,8 @@
     --tw-gradient-from: var(--color-indigo-600);
     --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
   }
-  .from-slate-50 {
-    --tw-gradient-from: var(--color-slate-50);
-    --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
-  }
   .to-blue-600 {
     --tw-gradient-to: var(--color-blue-600);
-    --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
-  }
-  .to-indigo-50 {
-    --tw-gradient-to: var(--color-indigo-50);
-    --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
-  }
-  .to-indigo-100 {
-    --tw-gradient-to: var(--color-indigo-100);
-    --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
-  }
-  .to-indigo-200 {
-    --tw-gradient-to: var(--color-indigo-200);
-    --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
-  }
-  .to-indigo-500 {
-    --tw-gradient-to: var(--color-indigo-500);
     --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
   }
   .object-contain {
@@ -1041,12 +938,6 @@
   }
   .py-14 {
     padding-block: calc(var(--spacing) * 14);
-  }
-  .py-100 {
-    padding-block: calc(var(--spacing) * 100);
-  }
-  .py-1000 {
-    padding-block: calc(var(--spacing) * 1000);
   }
   .pt-3 {
     padding-top: calc(var(--spacing) * 3);
@@ -1268,13 +1159,6 @@
       }
     }
   }
-  .hover\:scale-\[1\.02\] {
-    &:hover {
-      @media (hover: hover) {
-        scale: 1.02;
-      }
-    }
-  }
   .hover\:border-indigo-500\/40 {
     &:hover {
       @media (hover: hover) {
@@ -1431,11 +1315,6 @@
   .sm\:grid-cols-2 {
     @media (width >= 40rem) {
       grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-  .sm\:grid-cols-\[1fr_110px_110px\] {
-    @media (width >= 40rem) {
-      grid-template-columns: 1fr 110px 110px;
     }
   }
   .md\:block {

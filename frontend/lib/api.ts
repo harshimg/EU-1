@@ -102,6 +102,12 @@ async function apiFetch(path: string, options: RequestInit = {}) {
 
   // 🌍 GLOBAL 401 HANDLER
   if (res.status === 401) {
+
+    if (path.startsWith("/api/public")) {
+      const json = await res.json();
+      throw new Error(json.detail || "Unauthorized");
+    }
+    
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     window.location.reload();
