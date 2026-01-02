@@ -234,7 +234,7 @@ return (
             // >
  <div
               key={sub.code}
-              className="grid grid-cols-[1fr_85px_85px]
+              className="grid grid-cols-[1fr_100px_100px]
                          items-center gap-2 py-1"
             >
 
@@ -311,7 +311,7 @@ return (
           {practicalSubjects.map(sub => (
             <div
               key={sub.code}
-              className="grid grid-cols-[1fr_90px]
+              className="grid grid-cols-[1fr_100px]
                          items-center gap-2 py-1"
             >
               <div>
