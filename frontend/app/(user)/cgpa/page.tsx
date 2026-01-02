@@ -217,19 +217,27 @@ return (
           </h4>
 
           {/* HEADER */}
-          <div className="grid grid-cols-[1fr_72px_72px]
-                          text-xs text-gray-500 border-b pb-2">
-            <span>Subject</span>
-            <span className="text-center">Ext</span>
-            <span className="text-center">Int</span>
-          </div>
+          {/* <div className="grid grid-cols-[1fr_72px_72px]
+                          text-xs text-gray-500 border-b pb-2"> */}
+          <div className="grid grid-cols-[1fr_110px_110px] text-xs text-gray-500 border-b pb-2">
 
+            <span>Subject</span>
+            <span className="text-center">Ext (End-Sem)</span>
+            <span className="text-center">Int (Mid-Sem)</span>
+          </div>
+          
           {theorySubjects.map(sub => (
-            <div
+            // <div
+            //   key={sub.code}
+            //   className="grid grid-cols-[1fr_72px_72px]
+            //              items-center gap-2 py-1"
+            // >
+ <div
               key={sub.code}
-              className="grid grid-cols-[1fr_72px_72px]
+              className="grid grid-cols-[1fr_85px_85px]
                          items-center gap-2 py-1"
             >
+
               {/* SUBJECT */}
               <div>
                 <p className="text-sm font-medium text-slate-800">
@@ -245,8 +253,8 @@ return (
                 type="number"
                 min={0}
                 max={70}
-                placeholder="Ext"
-                className="input h-9 text-center"
+                placeholder="Max 70"
+                className="input h-9 w-24 sm:w-28 md:w-32 text-center"
                 value={(marks[sub.code] as TheoryMarks)?.external ?? ""}
                 onChange={e =>
                   setMarks(prev => ({
@@ -266,8 +274,8 @@ return (
               <input
                 type="number"min={0}
                 max={30}
-                placeholder="Int"
-                className="input h-9 text-center"
+                placeholder="Max 30"
+                className="input h-9 w-24 sm:w-28 md:w-32 text-center"
                 value={(marks[sub.code] as TheoryMarks)?.internal ?? ""}
                 onChange={e =>
                   setMarks(prev => ({
@@ -294,7 +302,7 @@ return (
             Practical Subjects
           </h4>
 
-          <div className="grid grid-cols-[1fr_90px]
+          <div className="grid grid-cols-[1fr_85px]
                           text-xs text-gray-500 border-b pb-2">
             <span>Subject</span>
             <span className="text-center">Total</span>
@@ -319,8 +327,8 @@ return (
                 type="number"
                 min={0}
                 max={sub.max_marks}
-                placeholder="Marks"
-                className="input h-9 text-center"
+                placeholder={`Max ${sub.max_marks}`}
+                className="input h-9  text-center"
                 value={(marks[sub.code] as PracticalMarks)?.total ?? ""}
                 onChange={e =>
                   setMarks(prev => ({
