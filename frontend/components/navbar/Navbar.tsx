@@ -45,7 +45,8 @@ export default function Navbar() {
         <nav className="hidden md:flex gap-8 font-medium text-slate-700">
           <Link href="/" className="hover:text-[#5B2EBD]">Home</Link>
           <Link href="/pyq" className="hover:text-[#5B2EBD]">PYQs</Link>
-          <Link href="/result" className="hover:text-[#5B2EBD]">Result</Link>
+          <Link href="/cgpa" className="hover:text-[#5B2EBD]">CGPA</Link>
+          {/* <Link href="/result" className="hover:text-[#5B2EBD]">Result</Link> */}
           <Link href="/about" className="hover:text-[#5B2EBD]">About</Link>
         </nav>
 
@@ -74,7 +75,8 @@ export default function Navbar() {
         <div className="md:hidden bg-white border-t px-6 py-4 space-y-4">
           <Link href="/" className="block">Home</Link>
           <Link href="/pyq" className="block">PYQs</Link>
-          <Link href="/result" className="block">Result</Link>
+          <Link href="/cgpa" className="block">CGPA</Link>
+          {/* <Link href="/result" className="block">Result</Link> */}
           <Link href="/about" className="block">About</Link>
 
           {!user && (
