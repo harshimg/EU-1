@@ -79,11 +79,10 @@ export default function Footer() {
   </div>
 </div>
 
+        <div className="text-center text-xs py-3 text-slate-500">
+          © {new Date().getFullYear()} Alpha Result. All rights reserved.
+        </div>
 
-
-      <div className="text-center text-xs py-3 text-slate-500">
-        © 2025 Alpha Result. All rights reserved.
-      </div>
     </footer>
   );
 }
