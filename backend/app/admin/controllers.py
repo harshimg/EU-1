@@ -112,6 +112,19 @@ async def create_subject(body):
     
     subject_type = body["subject_type"]
     max_marks = int(body["max_marks"])
+    branch_code = body.get("branch_code")
+
+    if not branch_code:
+        raise HTTPException(
+            status_code=400,
+            detail="branch_code is required"
+        )
+
+    if not isinstance(branch_code, (str, list)):
+        raise HTTPException(
+            status_code=400,
+            detail="branch_code must be string or list"
+        )
 
     if subject_type == "Theory" and max_marks != 100:
         raise HTTPException(
@@ -131,7 +144,7 @@ async def create_subject(body):
         "short_name": body["short_name"],
         "full_name": body["full_name"],
         "semester_code": body["semester_code"],
-        "branch_code": body["branch_code"],
+        "branch_code": branch_code,
         "subject_type": subject_type,
         "subject_credit": body["subject_credit"],
         "max_marks": max_marks,
@@ -154,6 +167,19 @@ async def update_subject(code: str, body):
 
     subject_type = body["subject_type"]
     max_marks = int(body["max_marks"])
+    branch_code = body.get("branch_code")
+
+    if not branch_code:
+        raise HTTPException(
+            status_code=400,
+            detail="branch_code is required"
+        )
+
+    if not isinstance(branch_code, (str, list)):
+        raise HTTPException(
+            status_code=400,
+            detail="branch_code must be string or list"
+        )
 
     if subject_type == "Theory" and max_marks != 100:
         raise HTTPException(
@@ -174,7 +200,7 @@ async def update_subject(code: str, body):
                 "short_name": body["short_name"],
                 "full_name": body["full_name"],
                 "semester_code": body["semester_code"],
-                "branch_code": body["branch_code"],
+                "branch_code": branch_code,
                 "subject_type": subject_type,
                 "subject_credit": body["subject_credit"],
                 "max_marks": max_marks,

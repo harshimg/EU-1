@@ -28,6 +28,9 @@ interface Subject {
   full_name: string;
   semester_code: string;
   branch_code: string;
+  subject_type: string;
+  subject_credit: number;
+  max_marks: number
 }
 
 /* =====================================================
@@ -51,9 +54,14 @@ export default function AdminStructurePage() {
 
   return (
     <div className="min-h-screen bg-[#0B0F1A] text-slate-200">
+    {/* //  <div className="min-h-screen bg-[#0B0F1A] text-slate-200 -mx-8"> */}
+
+
       <Header />
 
       <main className="max-w-7xl mx-auto px-6 py-8 space-y-8">
+      {/* <main className="w-full px-8 py-8 space-y-8"> */}
+
         <Tabs active={activeTab} setActive={setActiveTab} />
 
         <div className="bg-[#11172C] border border-white/10 rounded-xl p-6">
@@ -84,18 +92,35 @@ function SemesterSection() {
     // setList(await res.json());
     const res = await fetch(`${API_URL}/admin/ssb/semester`, authHeader());
     const json = await res.json();
-    // setList(json.data || []);
-    setList(json.data);
+    setList(json.data || []);
+
   }
 
-  async function remove(code: string) {
+  // async function remove(code: string) {
+  //   const backup = list;
+  //   setList(list.filter(s => s.code !== code));
+
+  //   try {
+  //     await fetch(`${API_URL}/admin/ssb/semester/${code}`, {
+  //       method: "DELETE",
+  //       ...authHeader(),
+  //     });
+  //   } catch {
+  //     setList(backup);
+  //   }
+  // }
+  async function remove(code?: string) {
+    if (!code) return; // 🚫 prevent blank delete
+  
     const backup = list;
     setList(list.filter(s => s.code !== code));
-
+  
     try {
       await fetch(`${API_URL}/admin/ssb/semester/${code}`, {
         method: "DELETE",
-        ...authHeader(),
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       });
     } catch {
       setList(backup);
@@ -148,13 +173,16 @@ function BranchSection() {
   }
 
   async function remove(code: string) {
+    if (!code) return; // 🚫 prevent blank delete
     const backup = list;
     setList(list.filter(b => b.code !== code));
 
     try {
       await fetch(`${API_URL}/admin/ssb/branch/${code}`, {
         method: "DELETE",
-        ...authHeader(),
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       });
     } catch {
       setList(backup);
@@ -236,13 +264,16 @@ function SubjectSection() {
   }, [filterSem, filterBranch]);
 
   async function remove(code: string) {
+    
     const backup = subjects;
     setSubjects(subjects.filter(s => s.code !== code));
 
     try {
       await fetch(`${API_URL}/admin/ssb/subject/${code}`, {
         method: "DELETE",
-        ...authHeader(),
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       });
     } catch {
       setSubjects(backup);
@@ -256,7 +287,7 @@ function SubjectSection() {
         <Select value={filterBranch} onChange={setFilterBranch} options={branches} />
       </div>
 
-      <Table headers={["Code", "Short", "Full Name", "Semester", "Branch", "Actions"]}>
+      <Table headers={["Code", "Short", "Full Name", "Semester", "Branch", "Type", "Credit", "max_marks", "Actions"]}>
         {subjects.map(s => (
           <tr key={s.code}>
             <Td>{s.code}</Td>
@@ -264,6 +295,9 @@ function SubjectSection() {
             <Td>{s.full_name}</Td>
             <Td>{s.semester_code}</Td>
             <Td>{s.branch_code}</Td>
+            <Td>{s.subject_type}</Td>
+            <Td>{s.subject_credit}</Td>
+            <Td>{s.max_marks}</Td>
             <Td>
               <ActionBtn onClick={() => { setEdit(s); setOpen(true); }}>Edit</ActionBtn>
               <ActionBtn danger onClick={() => remove(s.code)}>Delete</ActionBtn>
@@ -301,7 +335,9 @@ const Loader = () => (
 
 const Header = () => (
   <header className="border-b border-white/10 bg-[#0F1629]">
-    <div className="max-w-7xl mx-auto px-6 py-4">
+    {/* <div className=" mx-auto px-6 py-4"> */}
+    <div className="w-full px-8 py-4">
+
       <h1 className="text-xl font-bold text-white">Academic Structure</h1>
       <p className="text-xs text-slate-400">Semester • Branch • Subject</p>
     </div>
@@ -362,35 +398,19 @@ const ActionBtn = ({ children, danger, ...p }: any) => (
   </button>
 );
 
-// const Select = ({ options, value, onChange }: any) => (
-//   <select
-//     value={value}
-//     onChange={e => onChange(e.target.value)}
-//     className="bg-[#0F1629] border border-white/10 px-4 py-2 rounded"
-//   >
-//     <option value="">All</option>
-//     {/* {options.map((o: any) => ( */}
-//       {Array.isArray(options) && options.map(o => (
-//       <option key={o.code} value={o.code}>{o.code}</option>
-//     ))}
-//   </select>
-// );
-const Select = ({ options = [], value, onChange }: any) => (
+const Select = ({ options, value, onChange }: any) => (
   <select
     value={value}
     onChange={e => onChange(e.target.value)}
     className="bg-[#0F1629] border border-white/10 px-4 py-2 rounded"
   >
     <option value="">All</option>
-    {Array.isArray(options) &&
-      options.map(o => (
-        <option key={o.code} value={o.code}>
-          {o.code}
-        </option>
-      ))}
+    {/* {options.map((o: any) => ( */}
+      {Array.isArray(options) && options.map(o => (
+      <option key={o.code} value={o.code}>{o.code}</option>
+    ))}
   </select>
 );
-
 
 /* =====================================================
    MODALS (simple, clean)
@@ -463,7 +483,8 @@ function SemesterModal({ data, onClose, onSaved }: any) {
         onChange={e => setName(e.target.value)}
       />
 
-      <button onClick={submit} className="btn-primary w-full mt-4">
+      <button  disabled={!code || !name}
+          onClick={submit} className="btn-primary w-full mt-4 disabled:opacity-40">
         Save
       </button>
     </Modal>
@@ -529,7 +550,8 @@ function BranchModal({ data, onClose, onSaved }: any) {
         onChange={e => setFullName(e.target.value)}
       />
 
-      <button onClick={submit} className="btn-primary w-full mt-4">
+      <button  disabled={!code || !shortName || !fullName}
+          onClick={submit} className="btn-primary w-full mt-4 disabled:opacity-40">
         Save
       </button>
     </Modal>
@@ -545,8 +567,15 @@ function SubjectModal({ data, semesters, branches, onClose, onSaved }: any) {
   const [fullName, setFullName] = useState(data?.full_name || "");
   const [semester, setSemester] = useState(data?.semester_code || "");
   const [branch, setBranch] = useState(data?.branch_code || "");
+  const [subject_type, setsubject_type] = useState(data?.subject_type || "");
+  const [subject_credit, setsubject_credit] = useState(data?.subject_credit || "");
+  const [max_marks, setmax_marks] = useState(data?.max_marks || "");
 
   async function submit() {
+    if (!code || !shortName || !fullName || !semester || !branch || !subject_type || !max_marks) {
+      alert("All fields are required");
+      return;
+    }
     const method = data ? "PUT" : "POST";
     const url = data
       ? `${API_URL}/admin/ssb/subject/${data.code}`
@@ -564,6 +593,9 @@ function SubjectModal({ data, semesters, branches, onClose, onSaved }: any) {
         full_name: fullName,
         semester_code: semester,
         branch_code: branch,
+        subject_type: subject_type,
+        subject_credit: subject_credit,
+        max_marks: max_marks
       }),
     });
 
@@ -599,8 +631,10 @@ function SubjectModal({ data, semesters, branches, onClose, onSaved }: any) {
         onChange={e => setFullName(e.target.value)}
       />
 
+  <div className="grid grid-cols-2 gap-3">
       <select
-        className="input mb-3"
+        // className="input mb-3"
+        className="input"
         value={semester}
         onChange={e => setSemester(e.target.value)}
       >
@@ -620,8 +654,35 @@ function SubjectModal({ data, semesters, branches, onClose, onSaved }: any) {
           <option key={b.code} value={b.code}>{b.code}</option>
         ))}
       </select>
+  </div>
 
-      <button onClick={submit} className="btn-primary w-full mt-4">
+  <div className="grid grid-cols-2 gap-3">
+      <select className="input" value={subject_type}
+          onChange={e => setsubject_type(e.target.value)}>
+          <option value="">Subject type</option>
+          <option>Theory</option>
+          <option>Practical</option>
+        </select>
+
+        <select className="input" value={max_marks}
+            onChange={e => setmax_marks(e.target.value)}>
+            <option value="">Max Marks</option>
+            <option>100</option>
+            <option>50</option>
+          </select>
+  </div>
+
+      <input
+        className="input"
+        placeholder="Subject Credit"
+        value={subject_credit}
+        // only int or float
+        type = "Number"       
+        onChange={e => setsubject_credit(e.target.value)}
+      />
+
+      <button  disabled={!code || !shortName || !fullName || !semester || !branch}
+            onClick={submit} className="btn-primary w-full mt-4 disabled:opacity-40">
         Save
       </button>
     </Modal>
@@ -629,9 +690,4 @@ function SubjectModal({ data, semesters, branches, onClose, onSaved }: any) {
 }
 
 
-
-
-
-// form → POST / PUT → close → refresh
-// If you want, next step I’ll provide them cleanly.
 

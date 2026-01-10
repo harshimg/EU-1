@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { API_URL } from "@/lib/api";
+import ReactSelect from "react-select";
+
+
 
 /* =====================================================
    TYPES
@@ -294,7 +297,25 @@ function SubjectSection() {
             <Td>{s.short_name}</Td>
             <Td>{s.full_name}</Td>
             <Td>{s.semester_code}</Td>
-            <Td>{s.branch_code}</Td>
+            {/* <Td>{s.branch_code}</Td> */}
+            <Td>
+  <div className="flex flex-wrap gap-1">
+    {Array.isArray(s.branch_code)
+      ? s.branch_code.map((b: string) => (
+          <span
+            key={b}
+            className="px-2 py-0.5 text-xs rounded bg-slate-200 text-slate-700"
+          >
+            {b}
+          </span>
+        ))
+      : (
+        <span className="px-2 py-0.5 text-xs rounded bg-slate-200 text-slate-700">
+          {s.branch_code}
+        </span>
+      )}
+  </div>
+</Td>
             <Td>{s.subject_type}</Td>
             <Td>{s.subject_credit}</Td>
             <Td>{s.max_marks}</Td>
@@ -560,22 +581,43 @@ function BranchModal({ data, onClose, onSaved }: any) {
 
 
 
-//🟣 SubjectModal
+// //🟣 SubjectModal
+
 function SubjectModal({ data, semesters, branches, onClose, onSaved }: any) {
   const [code, setCode] = useState(data?.code || "");
   const [shortName, setShortName] = useState(data?.short_name || "");
   const [fullName, setFullName] = useState(data?.full_name || "");
   const [semester, setSemester] = useState(data?.semester_code || "");
-  const [branch, setBranch] = useState(data?.branch_code || "");
+
+  const [branchCodes, setBranchCodes] = useState<string[]>(
+    Array.isArray(data?.branch_code) ? data.branch_code : data?.branch_code ? [data.branch_code] : []
+  );
+
   const [subject_type, setsubject_type] = useState(data?.subject_type || "");
   const [subject_credit, setsubject_credit] = useState(data?.subject_credit || "");
   const [max_marks, setmax_marks] = useState(data?.max_marks || "");
 
+
+  const branchOptions = branches.map((b: any) => ({
+    value: b.code,
+    label: `${b.code} – ${b.short_name}`,
+  }));
+  
+
   async function submit() {
-    if (!code || !shortName || !fullName || !semester || !branch || !subject_type || !max_marks) {
+    if (
+      !code ||
+      !shortName ||
+      !fullName ||
+      !semester ||
+      branchCodes.length === 0 ||
+      !subject_type ||
+      !max_marks
+    ) {
       alert("All fields are required");
       return;
     }
+
     const method = data ? "PUT" : "POST";
     const url = data
       ? `${API_URL}/admin/ssb/subject/${data.code}`
@@ -592,10 +634,10 @@ function SubjectModal({ data, semesters, branches, onClose, onSaved }: any) {
         short_name: shortName,
         full_name: fullName,
         semester_code: semester,
-        branch_code: branch,
-        subject_type: subject_type,
-        subject_credit: subject_credit,
-        max_marks: max_marks
+        branch_code: branchCodes, 
+        subject_type,
+        subject_credit,
+        max_marks,
       }),
     });
 
@@ -605,89 +647,90 @@ function SubjectModal({ data, semesters, branches, onClose, onSaved }: any) {
 
   return (
     <Modal onClose={onClose}>
+      <div className="max-h-[85vh] overflow-y-auto pr-1">
       <h3 className="text-lg font-semibold mb-4 text-white">
         {data ? "Edit Subject" : "Add Subject"}
       </h3>
 
-      <input
-        className="input mb-3"
-        placeholder="Code"
-        value={code}
-        disabled={!!data}
+      <input className="input mb-3" placeholder="Code"
+        value={code} disabled={!!data}
         onChange={e => setCode(e.target.value)}
       />
 
-      <input
-        className="input mb-3"
-        placeholder="Short Name"
+      <input className="input mb-3" placeholder="Short Name"
         value={shortName}
         onChange={e => setShortName(e.target.value)}
       />
 
-      <input
-        className="input"
-        placeholder="Full Name"
+      <input className="input mb-3" placeholder="Full Name"
         value={fullName}
         onChange={e => setFullName(e.target.value)}
       />
 
-  <div className="grid grid-cols-2 gap-3">
-      <select
-        // className="input mb-3"
-        className="input"
-        value={semester}
-        onChange={e => setSemester(e.target.value)}
-      >
-        <option value="">Select Semester</option>
-        {semesters.map((s: any) => (
-          <option key={s.code} value={s.code}>{s.code}</option>
-        ))}
-      </select>
+      
+       {/* 🔥 MULTI BRANCH SELECT */}
+       <div className="mb-3">
+          <label className="block text-sm text-gray-300 mb-1">
+            Branch(es)
+          </label>
 
-      <select
-        className="input"
-        value={branch}
-        onChange={e => setBranch(e.target.value)}
-      >
-        <option value="">Select Branch</option>
-        {branches.map((b: any) => (
-          <option key={b.code} value={b.code}>{b.code}</option>
-        ))}
-      </select>
-  </div>
+          <ReactSelect
+            isMulti
+            options={branchOptions}
+            value={branchOptions.filter(opt =>
+              branchCodes.includes(opt.value)
+            )}
+            onChange={(selected: any) =>
+              setBranchCodes(selected.map((s: any) => s.value))
+            }
+            placeholder="Select or search one or more branches"
+            className="text-black"
+            classNamePrefix="react-select"
+          />
+        </div>
 
-  <div className="grid grid-cols-2 gap-3">
-      <select className="input" value={subject_type}
+      <div className="grid grid-cols-2 gap-3">
+        <select className="input" value={semester}
+          onChange={e => setSemester(e.target.value)}>
+          <option value="">Select Semester</option>
+          {semesters.map((s: any) => (
+            <option key={s.code} value={s.code}>{s.code}</option>
+          ))}
+        </select>
+
+        <select className="input" value={subject_type}
           onChange={e => setsubject_type(e.target.value)}>
           <option value="">Subject type</option>
           <option>Theory</option>
           <option>Practical</option>
         </select>
+      </div>
 
+
+
+      <div className="grid grid-cols-2 gap-3">
         <select className="input" value={max_marks}
-            onChange={e => setmax_marks(e.target.value)}>
-            <option value="">Max Marks</option>
-            <option>100</option>
-            <option>50</option>
-          </select>
-  </div>
+          onChange={e => setmax_marks(e.target.value)}>
+          <option value="">Max Marks</option>
+          <option>100</option>
+          <option>50</option>
+        </select>
 
-      <input
-        className="input"
-        placeholder="Subject Credit"
+        <input className="input" placeholder="Subject Credit"
+        type="number"
         value={subject_credit}
-        // only int or float
-        type = "Number"       
         onChange={e => setsubject_credit(e.target.value)}
-      />
+        />
+      </div>
 
-      <button  disabled={!code || !shortName || !fullName || !semester || !branch}
-            onClick={submit} className="btn-primary w-full mt-4 disabled:opacity-40">
+      <button
+        onClick={submit}
+        className="btn-primary w-full mt-4"
+      >
         Save
       </button>
-    </Modal>
+    </div>
+  </Modal>
   );
 }
-
-
 
