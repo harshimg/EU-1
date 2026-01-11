@@ -47,6 +47,13 @@ async def delete_semester(code: str):
     await db_instance.db.semesters.delete_one({"code": code})
     return {"success": True}
 
+async def count_semester():
+    sem_count = await db_instance.db.semesters.count_documents({})
+    return {
+        "success": True,
+        "data": int(sem_count)
+    }
+
 
 # ======================================================
 # BRANCH
@@ -93,6 +100,13 @@ async def update_branch(code: str, body):
 async def delete_branch(code: str):
     await db_instance.db.branches.delete_one({"code": code})
     return {"success": True}
+
+async def count_branch():
+    br_count = await db_instance.db.branches.count_documents({})
+    return {
+        "success": True,
+        "data": int(br_count)
+    }
 
 
 # ======================================================
@@ -214,6 +228,13 @@ async def delete_subject(code: str):
     await db_instance.db.subjects.delete_one({"code": code})
     return {"success": True}
 
+async def count_subject():
+    sub_count = await db_instance.db.subjects.count_documents({})
+    return {
+        "success": True,
+        "data": int(sub_count)
+    }
+
 
 #=============================================
 #----------PAPERS-----------------------------
@@ -289,7 +310,12 @@ async def delete_paper(paper_id: str):
     return {"success": True,"message": "Paper deleted successfully"}
 
 
-
+async def count_papers():
+    paper_count = await db_instance.db.papers.count_documents({})
+    return {
+        "success": True,
+        "data": int(paper_count)
+    }
 
 
 

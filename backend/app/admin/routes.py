@@ -22,6 +22,10 @@ async def edit_semester(code: str, body: dict):
 async def remove_semester(code: str):
     return await delete_semester(code)
 
+@router.get("/ssb/semester/count", dependencies=[Depends(admin_required)])
+async def countsemester():
+    return await count_semester()
+
 
 # ---------- BRANCH ----------
 @router.post("/ssb/branch", dependencies=[Depends(admin_required)])
@@ -39,6 +43,10 @@ async def edit_branch(code: str, body: dict):
 @router.delete("/ssb/branch/{code}", dependencies=[Depends(admin_required)])
 async def remove_branch(code: str):
     return await delete_branch(code)
+
+@router.get("/ssb/branch/count", dependencies=[Depends(admin_required)])
+async def countbranch():
+    return await count_branch()
 
 
 # ---------- SUBJECT ----------
@@ -60,6 +68,10 @@ async def edit_subject(code: str, body: dict):
 @router.delete("/ssb/subject/{code}", dependencies=[Depends(admin_required)])
 async def remove_subject(code: str):
     return await delete_subject(code)
+
+@router.get("/ssb/subject/count", dependencies=[Depends(admin_required)])
+async def countsubject():
+    return await count_subject()
 
 
 #----------------PAPERS-------------------------------
@@ -99,6 +111,10 @@ async def edit_paper(paper_id: str, body: dict):
 @router.delete("/papers/{paper_id}", dependencies=[Depends(admin_required)])
 async def remove_paper(paper_id: str):
     return await delete_paper(paper_id)
+
+@router.get("/ssb/papers/count", dependencies=[Depends(admin_required)])
+async def countpapers():
+    return await count_papers()
 
 
 
