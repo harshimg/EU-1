@@ -1,9 +1,10 @@
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
+import numbers
 from fastapi import HTTPException
 
 from app.database import db_instance
 from app.utils.email_sender import send_otp_email
-from .utils import hash_password, verify_password, generate_otp, create_access_token, validate_user_email
+from .utils import hash_password,hash_otp, verify_password, generate_otp, create_access_token, validate_user_email
 
 
 # ======================================================
@@ -120,3 +121,107 @@ async def login_user(email, password):
         "semester": user.get("semester"),
         "branch": user.get("branch")
     }
+
+
+async def send_otp(email):
+
+    if not email:
+        return {"success": True, "message": "OTP was sent on your email"}
+
+    user = await db_instance.db.users.find_one({"email": email})
+
+    # Always return success (anti-enumeration)
+    if not user:
+        return {"success": True, "message": "OTP was sent on your email"}
+
+    # 🔒 Invalidate previous OTPs
+    await db_instance.db.password_otps.update_many(
+        {"user_id": user["_id"], "used": False},
+        {"$set": {"used": True}}
+    )
+
+    otp = generate_otp()
+    otp_hash = hash_otp(otp)
+
+    await db_instance.db.password_otps.insert_one({
+        "user_id": user["_id"],
+        "otp_hash": otp_hash,
+        "expires_at": datetime.now(timezone.utc) + timedelta(minutes=10),
+        "attempts": 0,
+        "used": False,
+        "created_at": datetime.now(timezone.utc)
+    })
+
+    # 📧 Send email (Google SMTP already used by you)
+    send_ok = send_otp_email(email, otp)
+
+    if not send_ok:
+        return {"success": False, "message": "Failed to send OTP"}
+
+    return {
+        "success": True,
+        "message": "OTP was sent on your email."
+    }
+
+async def change_password(email, otp, new_password):
+
+    if not all([email, otp, new_password]):
+        raise HTTPException(status_code=400, detail="Invalid request")
+
+    user = await db_instance.db.users.find_one({"email": email})
+    if not user:
+        raise HTTPException(status_code=400, detail="Invalid email, Create new account if not registered")
+
+    otp_hash = hash_otp(otp)
+
+    record = await db_instance.db.password_otps.find_one({
+        "user_id": user["_id"],
+        # "otp_hash": otp_hash,           # gives query result even user enterd wrong otp
+        "used": False
+    })
+
+    if not record:
+        raise HTTPException(status_code=400, detail="Invalid or expired OTP")
+
+    #  Expiry check
+    now_utc_naive = datetime.now(timezone.utc).replace(tzinfo=None)
+    if record["expires_at"] < now_utc_naive:
+        await db_instance.db.password_otps.update_one(
+            {"_id": record["_id"]},
+            {"$inc": {"attempts": 1}}
+        )
+        raise HTTPException(status_code=400, detail="OTP expired")
+
+    #  Attempt limit
+    if record["attempts"] >= 5:
+        await db_instance.db.password_otps.update_one(
+            {"_id": record["_id"]},
+            {"$inc": {"attempts": 1}}
+        )
+        raise HTTPException(status_code=400, detail="Maximum OTP request reached")
+
+    #  Wrong OTP
+    if record["otp_hash"] != otp_hash:
+        await db_instance.db.password_otps.update_one(
+            {"_id": record["_id"]},
+            {"$inc": {"attempts": 1}}
+        )
+        raise HTTPException(status_code=400, detail="Invalid OTP")
+
+    # Update password
+    hashed_pw = hash_password(new_password)
+
+    await db_instance.db.users.update_one(
+        {"_id": user["_id"]},
+        {"$set": {"password_hash": hashed_pw}}
+    )
+
+    # Invalidate OTP
+    await db_instance.db.password_otps.update_one(
+        {"_id": record["_id"]},
+        {"$set": {"used": True}}
+    )
+
+
+    return {"success": True, "message": "Password reset successful"}
+

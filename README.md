@@ -10,3 +10,6 @@ uvicorn app.main:app --reload
 
 
 npm install react-select
+
+time = datetime.now(timezone.utc).replace(tzinfo=None)
+

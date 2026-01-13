@@ -1,4 +1,5 @@
 import random
+import hashlib
 # from jose import jwt
 from jose import jwt, JWTError
 from datetime import datetime, timedelta, timezone
@@ -15,6 +16,11 @@ pwd_ctx = CryptContext(schemes=["bcrypt_sha256"], deprecated="auto")
 # -------------------------------------
 def hash_password(password: str) -> str:
     return pwd_ctx.hash(password)
+
+
+def hash_otp(otp: str) -> str:
+    return hashlib.sha256(otp.encode()).hexdigest()
+
 
 def verify_password(password: str, hashed: str) -> bool:
     return pwd_ctx.verify(password, hashed)

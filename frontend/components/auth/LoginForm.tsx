@@ -8,7 +8,7 @@ import GoogleLoginButton from "./GoogleLoginButton";
 // import {API_URL} from "@lib/api";
 
 
-export default function LoginForm({ showSignup, hide }: any) {
+export default function LoginForm({ showSignup, showForgot, hide }: any) {
   const { login } = useAuth();
   const router = useRouter();
 
@@ -89,6 +89,14 @@ export default function LoginForm({ showSignup, hide }: any) {
           Sign up
         </button>
       </p>
+      <p className="text-sm mt-2 text-center">
+  <button
+    className="text-primary"
+    onClick={showForgot}
+  >
+    Forgot password?
+  </button>
+</p>
     </div>
   );
 }

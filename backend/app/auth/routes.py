@@ -1,6 +1,7 @@
+from unittest import result
 from fastapi import APIRouter, HTTPException
 from .models import SignupModel, VerifyOtpModel, LoginModel
-from .controller import initiate_signup, verify_otp, login_user
+from .controller import initiate_signup, verify_otp, login_user, send_otp, change_password
 
 router = APIRouter()   
 
@@ -31,5 +32,32 @@ async def login_route(body: LoginModel):
 
     if not result.get("success", False):
         raise HTTPException(status_code=400, detail=result["message"])
+
+    return result
+
+
+@router.post("/forgot-password")
+async def forgot_password(body: dict):
+    email = body.get("email")
+
+    result = await send_otp(email)
+
+    if not result.get("success", False):
+            raise HTTPException(status_code=400, detail=result["message"])
+
+    return result
+
+
+@router.post("/reset-password")
+async def reset_password(body: dict):
+    email = body.get("email")
+    otp = body.get("otp")
+    new_password = body.get("new_password")
+
+
+    result = await change_password(email, otp, new_password)
+
+    if not result.get("success", False):
+            raise HTTPException(status_code=400, detail=result["message"])
 
     return result

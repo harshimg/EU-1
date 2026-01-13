@@ -7,7 +7,7 @@ from app.config import settings
 def send_otp_email(to_email: str, otp: str):
     # msg = MIMEText(f"Your OTP for alpha result Study Platform is: {otp}")
     msg = EmailMessage()
-    msg['Subject'] = "alpha result Study Platform - Email Verification OTP"
+    msg['Subject'] = "alpha result - Email Verification OTP"
     msg['From'] = settings.SMTP_EMAIL
     msg['To'] = to_email
     msg.set_content(
