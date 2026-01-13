@@ -143,5 +143,12 @@ export async function apiPut(path: string, data: any) {
   });
 }
 
+export async function apiPatch(path: string, data: any) {
+  return apiFetch(path, {
+    method: "PATCH",
+    body: JSON.stringify(data)
+  });
+}
+
 
 

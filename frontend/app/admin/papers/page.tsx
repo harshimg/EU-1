@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/auth";
 import { API_URL } from "@/lib/api";
 
 /* ================= TYPES ================= */
@@ -35,6 +36,7 @@ interface Paper {
 
 export default function AdminPapersPage() {
   const router = useRouter();
+  const { user, loading, logout } = useAuth();
 
   const [semesters, setSemesters] = useState<Semester[]>([]);
   const [branches, setBranches] = useState<Branch[]>([]);
@@ -47,6 +49,17 @@ export default function AdminPapersPage() {
 
   const [open, setOpen] = useState(false);
   const [edit, setEdit] = useState<Paper | null>(null);
+
+
+    // 🔐 HARD GUARD (client-side)
+    useEffect(() => {
+      if (!loading && (!user || (user.role !== "admin" && user.role !== "superalpha"))) {
+        router.replace("/");
+      }
+    }, [user, loading, router]);
+
+    
+
 
   /* ---------- Load Semester & Branch ---------- */
   useEffect(() => {

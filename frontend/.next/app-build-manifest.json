@@ -1,9 +1,9 @@
 {
   "pages": {
-    "/admin/ssb/page": [
+    "/sa/users/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/admin/ssb/page.js"
+      "static/chunks/app/sa/users/page.js"
     ],
     "/layout": [
       "static/chunks/webpack.js",
@@ -11,50 +11,20 @@
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
     ],
-    "/(user)/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(user)/page.js"
-    ],
-    "/(user)/pyq/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(user)/pyq/page.js"
-    ],
-    "/(user)/cgpa/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(user)/cgpa/page.js"
-    ],
-    "/admin/papers/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/admin/papers/page.js"
-    ],
-    "/admin/papers/layout": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/admin/papers/layout.js"
-    ],
-    "/(user)/about/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(user)/about/page.js"
-    ],
     "/(user)/account/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/(user)/account/page.js"
     ],
-    "/admin/page": [
+    "/admin/ssb/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/admin/page.js"
+      "static/chunks/app/admin/ssb/page.js"
     ],
-    "/_not-found/page": [
+    "/(user)/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/_not-found/page.js"
+      "static/chunks/app/(user)/page.js"
     ]
   }
 }

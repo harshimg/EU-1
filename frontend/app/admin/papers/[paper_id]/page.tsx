@@ -21,7 +21,7 @@ export default function AdminPaperQuestionsPage() {
 
   /* ADMIN GUARD */
   useEffect(() => {
-    if (!loading && (!user || user.role !== "admin")) {
+    if (!loading && (!user || (user.role !== "admin" && user.role !== "superalpha"))) {
       router.replace("/");
     }
   }, [user, loading, router]);
@@ -77,7 +77,8 @@ export default function AdminPaperQuestionsPage() {
     );
   }
 
-  if (!user || user.role !== "admin") return null;
+  
+  if (!user || (user.role !== "admin" && user.role !== "superalpha")) return null;
 
   return (
     <div className="min-h-screen bg-[#0B0F1A] text-slate-200">

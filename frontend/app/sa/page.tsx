@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { apiGet, apiPut } from "@/lib/api";
 
-import Footer from "@/components/footer/Footer";
 
 /* =====================================================
    ADMIN DASHBOARD PAGE
@@ -21,14 +20,13 @@ export default function AdminDashboardPage() {
 
   // 🔐 HARD GUARD (client-side)
   useEffect(() => {
-    if (!loading && (!user || (user.role !== "admin" && user.role !== "superalpha"))) {
+    if (!loading && (!user || user.role !== "superalpha")) {
       router.replace("/");
     }
   }, [user, loading, router]);
 
   useEffect(() => {
-    if (!user || (user.role !== "admin" && user.role !== "superalpha")) return;
-    {
+    if (user?.role === "superalpha") {
     count_semester();
     count_branch();
     count_subject();
@@ -39,7 +37,7 @@ export default function AdminDashboardPage() {
 
   function count_semester(){
     if (loading) return;              // ⛔ wait for auth to resolve
-    if (!user || (user.role !== "admin" && user.role !== "superalpha")) return;
+    if (!user || user.role !== "superalpha") return;
      apiGet("/admin/ssb/semester/count")
     .then(json => {
       setsem_count(json.data)
@@ -48,7 +46,7 @@ export default function AdminDashboardPage() {
 
   function count_branch(){
     if (loading) return;              // ⛔ wait for auth to resolve
-    if (!user || (user.role !== "admin" && user.role !== "superalpha")) return;
+    if (!user || user.role !== "superalpha") return;
      apiGet("/admin/ssb/branch/count")
     .then(json => {
       setbranch_count(json.data)
@@ -57,7 +55,7 @@ export default function AdminDashboardPage() {
 
   function count_subject(){
     if (loading) return;              // ⛔ wait for auth to resolve
-    if (!user || (user.role !== "admin" && user.role !== "superalpha")) return;
+    if (!user || user.role !== "superalpha") return;
      apiGet("/admin/ssb/subject/count")
     .then(json => {
       setsubject_count(json.data)
@@ -66,7 +64,7 @@ export default function AdminDashboardPage() {
 
   function count_paper(){
     if (loading) return;              // ⛔ wait for auth to resolve
-    if (!user || (user.role !== "admin" && user.role !== "superalpha")) return;
+    if (!user || user.role !== "superalpha") return;
      apiGet("/admin/ssb/papers/count")
     .then(json => {
       setpaper_count(json.data)
@@ -84,7 +82,7 @@ export default function AdminDashboardPage() {
   }
 
   // ❌ Not admin (extra safety)
-  if (!user || (user.role !== "admin" && user.role !== "superalpha")) {
+  if (!user || user.role !== "superalpha") {
     return null;
   }
 
