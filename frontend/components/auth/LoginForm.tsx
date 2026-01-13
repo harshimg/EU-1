@@ -89,9 +89,11 @@ export default function LoginForm({ showSignup, showForgot, hide }: any) {
           Sign up
         </button>
       </p>
+
+      
       <p className="text-sm mt-2 text-center">
   <button
-    className="text-primary"
+    className="text-primary font-semibold ml-1"
     onClick={showForgot}
   >
     Forgot password?

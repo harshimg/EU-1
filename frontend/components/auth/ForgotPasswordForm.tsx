@@ -57,9 +57,10 @@ export default function ForgotPasswordForm({
 
       <div className="text-sm mt-4 flex justify-between">
         <button
-          className="text-primary"
+          className="flex items-center gap-1 text-primary font-semibold"
           onClick={showLogin}
         >
+          <span aria-hidden>←</span>
           Back to login
         </button>
       </div>
