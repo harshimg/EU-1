@@ -79,11 +79,25 @@ export default function Navbar() {
           {/* <Link href="/result" className="block">Result</Link> */}
           <Link href="/about" className="block">About</Link>
 
-          {!user && (
-            <button onClick={showLogin} className="btn-primary w-full">
+          {!user ? (
+            <button onClick={showLogin} className="btn-primary">
               Sign In
             </button>
+          ) : (
+            <Link href="/account" className="block">Account</Link>
           )}
+
+
+          {/* {!user ? (
+            <button onClick={showLogin} className="btn-primary">
+              Sign In
+            </button>
+          ) : (
+            // <ProfileMenu user={user} />
+            <ProfileMenu user={user} />
+          )} */}
+          
+          
         </div>
       )}
     </header>

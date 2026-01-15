@@ -6,6 +6,7 @@ import { apiGet, apiPut } from "@/lib/api";
 
 export default function AccountPage() {
   const { user, loading, refreshUser } = useAuth();
+  const { logout } = useAuth();
 
   const [profile, setProfile] = useState<any>(null);
   const [semesters, setSemesters] = useState<any[]>([]);
@@ -81,6 +82,12 @@ export default function AccountPage() {
         <ProfileField label="Branch" value={profile?.branch} />
         <ProfileField label="Semester" value={profile?.semester} />
         <ProfileField label="Mobile" value={profile?.mobile} />
+        <button
+            onClick={logout}
+            className="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50"
+          >
+            Logout
+          </button>
 
         <button
           onClick={() => setShowModal(true)}
@@ -147,3 +154,4 @@ function ProfileField({ label, value }: any) {
     </div>
   );
 }
+
