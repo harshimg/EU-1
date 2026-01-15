@@ -97,78 +97,50 @@ export default function AccountPage() {
     );
   }
 
-
-
-
-
   return (
-    <div className="min-h-screen bg-slate-100 px-4 py-10">
-      <div className="max-w-xl mx-auto bg-white rounded-2xl shadow-sm border p-6 space-y-8">
-  
+    <div className="min-h-screen bg-slate-100 px-4 py-8">
+      <div className="max-w-xl mx-auto bg-white rounded-2xl shadow p-6 space-y-6">
+
         {/* HEADER */}
-        <div className="text-center">
-          <h1 className="text-xl font-semibold text-slate-900">My Account</h1>
+        <div>
+          <h1 className="text-xl font-semibold">My Account</h1>
           <p className="text-sm text-slate-500">
             Manage your academic profile
           </p>
         </div>
-  
-        {/* BASIC INFO */}
-        <section className="space-y-3">
-          <h3 className="text-xs font-semibold uppercase text-slate-400">
-            Personal Information
-          </h3>
-  
-          <ProfileField label="Name" value={profile?.name} />
-          <ProfileField label="Email" value={profile?.email} />
-          <ProfileField label="Registration No." value={profile?.reg_no} />
-          <ProfileField label="Mobile" value={profile?.mobile} />
-        </section>
-  
-        {/* ACADEMIC INFO */}
-        <section className="space-y-3">
-          <h3 className="text-xs font-semibold uppercase text-slate-400">
-            Academic Information
-          </h3>
-  
-          <ProfileField label="Branch" value={profile?.branch} />
-          <ProfileField label="Semester" value={profile?.semester} />
-  
-          <button
-            onClick={() => setShowModal(true)}
-            className="w-full btn-primary mt-2"
-          >
-            Update Semester / Branch
-          </button>
-        </section>
-  
-        {/* DANGER ZONE */}
-        <section className="pt-4 border-t">
-          <button
-            onClick={() => {
-              logout();
-              router.push("/");
-            }}
-            className="w-full flex items-center justify-center gap-2
-                       px-4 py-3 rounded-lg text-sm
-                       text-red-600 bg-red-50 hover:bg-red-100"
+
+        {/* PROFILE */}
+        <ProfileField label="Name" value={profile?.name} />
+        <ProfileField label="Email" value={profile?.email} />
+        <ProfileField label="Registration No." value={profile?.reg_no} />
+        <ProfileField label="Branch" value={profile?.branch} />
+        <ProfileField label="Semester" value={profile?.semester} />
+        <ProfileField label="Mobile" value={profile?.mobile} />
+        <button
+            onClick={() => {logout(),  router.push("/");}}  
+            className="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50"
           >
             Logout
-          </button>
-        </section>
-  
+        </button>
+
+        <button
+          onClick={() => setShowModal(true)}
+          className="w-full btn-primary"
+        >
+          Change Semester
+        </button>
       </div>
-  
+
       {/* ================= MODAL ================= */}
       {showModal && (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center px-4">
           <div className="bg-white rounded-2xl w-full max-w-sm p-6 space-y-4">
-  
+
             <h3 className="text-lg font-semibold">Update Academic Profile</h3>
             <p className="text-sm text-slate-500">
-              Select your current semester and branch
+              Choose your current semester
             </p>
-  
+
             <select
               className="input w-full"
               value={semester}
@@ -181,28 +153,30 @@ export default function AccountPage() {
                 </option>
               ))}
             </select>
-  
+
             <select
               className="input w-full"
               value={branch}
               onChange={e => setbranch(e.target.value)}
             >
-              <option value="">Select branch</option>
+              <option value="">Select Branch</option>
               {branches.map(b => (
                 <option key={b.code} value={b.code}>
                   {b.code} – {b.short_name}
                 </option>
               ))}
             </select>
-  
+
             <div className="flex gap-3 pt-3">
+              {/*  VISIBLE CANCEL */}
               <button
                 onClick={() => setShowModal(false)}
-                className="flex-1 py-2 rounded-lg border text-slate-700 bg-slate-100 hover:bg-slate-200"
+                className="flex-1 py-2 rounded-lg border border-slate-300
+                           text-slate-700 bg-slate-100 hover:bg-slate-200"
               >
                 Cancel
               </button>
-  
+
               <button
                 onClick={updateProfile}
                 disabled={!semester || !branch || saving}
@@ -216,11 +190,6 @@ export default function AccountPage() {
       )}
     </div>
   );
-  
-
-
-
-  
 }
 
 /* ---------------- FIELD ---------------- */
@@ -231,8 +200,5 @@ function ProfileField({ label, value }: any) {
       <span className="font-medium">{value || "-"}</span>
     </div>
   );
-
-
-  
 }
 

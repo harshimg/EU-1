@@ -13,6 +13,10 @@ async def get_account(user=Depends(get_current_user)):
 async def update_semester(body: dict, user=Depends(get_current_user)):
     return await update_semester_ctrl(user["user_id"], body)
 
+@router.put("/account/edit", dependencies=[Depends(user_required)])
+async def update_semester(body: dict, user=Depends(get_current_user)):
+    return await update_account_ctrl(user["user_id"], body)
+
 
 
 @router.get("/semester", dependencies=[Depends(user_required)])

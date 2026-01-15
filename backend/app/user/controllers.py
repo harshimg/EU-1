@@ -33,6 +33,28 @@ async def update_semester_ctrl(user_id, body):
 
     return {"success": True, "message": "Semester updated successfully"}
 
+async def update_account_ctrl(user_id, body):
+    semester = body.get("semester")
+    branch = body.get("branch")
+
+    if not semester:
+        raise HTTPException(status_code=400, detail="Semester is required")
+    if not branch:
+        raise HTTPException(status_code=400, detail="Branch is required")
+
+    await db_instance.db.users.update_one(
+        {"_id": ObjectId(user_id)},
+        {
+            "$set": {
+                "semester": semester,
+                "branch": branch,
+                "updated_at": datetime.now(timezone.utc)
+            }
+        }
+    )
+
+    return {"success": True, "message": "Semester updated successfully"}
+
 
 
 

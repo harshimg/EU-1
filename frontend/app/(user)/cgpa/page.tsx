@@ -5,7 +5,7 @@ import { apiGet, apiPost } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 
 export default function SgpaPage() {
-  const { user, loading } = useAuth();
+  const { user, loading, refreshUser } = useAuth();
 
   /* ---------------- CORE STATE ---------------- */
   const [semester, setSemester] = useState<string>("");
@@ -58,6 +58,7 @@ const canCalculate =
 
   /* ---------------- INIT FROM USER (ONCE) ---------------- */
   useEffect(() => {
+    await refreshUser();
     if (user?.semester && user?.branch) {
       setSemester(user.semester);
       setBranch(user.branch);

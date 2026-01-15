@@ -3,11 +3,13 @@
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/lib/auth";
+import { useRouter } from "next/navigation";
 
 export default function ProfileMenu({ user }: any) {
   const [open, setOpen] = useState(false);
   const { logout } = useAuth();
   const menuRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   // Close on outside click (desktop)
   useEffect(() => {
@@ -78,11 +80,11 @@ export default function ProfileMenu({ user }: any) {
           </Link>
 
           <button
-            onClick={logout}
+            onClick={() => {logout(),  router.push("/");}}  
             className="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50"
           >
             Logout
-          </button>
+        </button>
         </div>
       )}
 
