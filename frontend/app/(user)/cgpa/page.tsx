@@ -58,7 +58,7 @@ const canCalculate =
 
   /* ---------------- INIT FROM USER (ONCE) ---------------- */
   useEffect(() => {
-    await refreshUser();
+  
     if (user?.semester && user?.branch) {
       setSemester(user.semester);
       setBranch(user.branch);
