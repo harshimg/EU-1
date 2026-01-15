@@ -123,7 +123,9 @@ export default function AccountPage() {
           <ProfileField label="Email" value={profile?.email} />
           <ProfileField label="Registration No." value={profile?.reg_no} />
           <ProfileField label="Mobile" value={profile?.mobile} />
+          {(profile?.role === "admin" || profile?.role === "superalpha") && (
           <ProfileField label="Admin id" value={profile?.admin_userid} />
+          )}
         </section>
   
         {/* ACADEMIC INFO */}
