@@ -387,7 +387,23 @@ function PanelLeft({ subjects, papers, activeSubject, activePaper, onSubject, on
   return (
     <div className="p-4 space-y-4 text-sm">
       <h3 className="font-semibold">Subjects</h3>
-      {subjects.map((s: any) => (
+      {/* {subjects.map((s: any) => (
+        <button
+          key={s._id}
+          onClick={() => onSubject(s)}
+          className={`block w-full text-left px-3 py-2 rounded ${
+            activeSubject?.code === s.code
+              ? "bg-indigo-100 text-indigo-700"
+              : "hover:bg-slate-100"
+          }`}
+        >
+          {s.short_name}
+        </button>
+      ))} */}
+
+    {subjects
+      .filter((s: any) => s.subject_type === "Theory")
+      .map((s: any) => (
         <button
           key={s._id}
           onClick={() => onSubject(s)}
@@ -400,6 +416,9 @@ function PanelLeft({ subjects, papers, activeSubject, activePaper, onSubject, on
           {s.short_name}
         </button>
       ))}
+
+
+
 
       <h3 className="font-semibold mt-4">Papers</h3>
       {papers.map((p: any) => (
