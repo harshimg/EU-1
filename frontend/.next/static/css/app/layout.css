@@ -589,18 +589,6 @@
   .gap-10 {
     gap: calc(var(--spacing) * 10);
   }
-  .gap-20 {
-    gap: calc(var(--spacing) * 20);
-  }
-  .gap-50 {
-    gap: calc(var(--spacing) * 50);
-  }
-  .gap-80 {
-    gap: calc(var(--spacing) * 80);
-  }
-  .gap-800 {
-    gap: calc(var(--spacing) * 800);
-  }
   .space-y-1 {
     :where(& > :not(:last-child)) {
       --tw-space-y-reverse: 0;
@@ -1047,9 +1035,6 @@
   }
   .text-black {
     color: var(--color-black);
-  }
-  .text-blue-600 {
-    color: var(--color-blue-600);
   }
   .text-blue-700 {
     color: var(--color-blue-700);

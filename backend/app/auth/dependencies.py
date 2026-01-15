@@ -42,11 +42,17 @@ async def admin_required(
             detail="Invalid or expired token",
         )
 
-    if payload.get("role") != "admin" and payload.get("role") != "superalpha":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Admin access required",
-        )
+    # if payload.get("role") != "admin" and payload.get("role") != "superalpha":
+    #     raise HTTPException(
+    #         status_code=status.HTTP_403_FORBIDDEN,
+    #         detail="Admin access required",
+    #     )
+
+    if payload["role"] not in ["admin", "superalpha"]:
+        raise HTTPException(403, "Admin access required")
+
+    if not payload.get("admin_userid"):
+        raise HTTPException(403, "Admin ID missing")
 
     return payload  # optional, useful if needed later
 

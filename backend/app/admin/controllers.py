@@ -1,13 +1,14 @@
 from datetime import datetime, timezone
 from app.database import db_instance
 from app.utils.mongo_serializer import mongo_to_json
+from app.utils.datetime import utcnow
 from fastapi import HTTPException, status
 
 # ======================================================
 # SEMESTER
 # ======================================================
 
-async def create_semester(body):
+async def create_semester(body, admin):
 
     code = body["code"]
     existing = await db_instance.db.semesters.find_one({"code": code})
@@ -18,12 +19,13 @@ async def create_semester(body):
             
         )
 
-
+    now = utcnow()
     await db_instance.db.semesters.insert_one({
         "code": body["code"],
         "name": body["name"],
-        "created_at": datetime.now(timezone.utc),
-        "updated_at": None
+        "created_at": now,
+        "updated_at": now,
+        "admin_userids": [admin["admin_userid"]]
     })
     return {"success": True}
 
@@ -31,14 +33,18 @@ async def list_semesters():
     sem = await db_instance.db.semesters.find().sort("code", 1).to_list(100)
     return {"success": True, 'data': mongo_to_json(sem)}
 
-async def update_semester(code: str, body):
+async def update_semester(code: str, body, admin):
     await db_instance.db.semesters.update_one(
         {"code": code},
         {
             "$set": {
                 "name": body["name"],
-                "updated_at": datetime.now(timezone.utc)
+                "updated_at": utcnow()
+            },
+            "$addToSet": {
+                "admin_userids": admin["admin_userid"]
             }
+
         }
     )
     return {"success": True}
@@ -59,7 +65,7 @@ async def count_semester():
 # BRANCH
 # ======================================================
 
-async def create_branch(body):
+async def create_branch(body, admin):
 
     code = body["code"]
     existing = await db_instance.db.branches.find_one({"code": code})
@@ -75,8 +81,9 @@ async def create_branch(body):
         "code": body["code"],
         "short_name": body["short_name"],
         "full_name": body["full_name"],
-        "created_at": datetime.now(timezone.utc),
-        "updated_at": None
+        "created_at": utcnow(),
+        "updated_at": utcnow(),
+        "admin_userids": [admin["admin_userid"]]
     })
     return {"success": True}
 
@@ -84,14 +91,17 @@ async def list_branches():
     branch =  await db_instance.db.branches.find().sort("code", 1).to_list(100)
     return {"success": True, 'data': mongo_to_json(branch)}
 
-async def update_branch(code: str, body):
+async def update_branch(code: str, body, admin):
     await db_instance.db.branches.update_one(
         {"code": code},
         {
             "$set": {
                 "short_name": body["short_name"],
                 "full_name": body["full_name"],
-                "updated_at": datetime.now(timezone.utc)
+                "updated_at": utcnow()
+            },
+            "$addToSet": {
+                "admin_userids": admin["admin_userid"]
             }
         }
     )
@@ -113,7 +123,7 @@ async def count_branch():
 # SUBJECT
 # ======================================================
 
-async def create_subject(body):
+async def create_subject(body, admin):
 
     code = body["code"]
     existing = await db_instance.db.subjects.find_one({"code": code})
@@ -163,7 +173,8 @@ async def create_subject(body):
         "subject_credit": body["subject_credit"],
         "max_marks": max_marks,
         "created_at": datetime.now(timezone.utc),
-        "updated_at": None
+        "updated_at": utcnow(),
+        "admin_userids": [admin["admin_userid"]]
     })
     return {"success": True}
 
@@ -177,7 +188,7 @@ async def list_subjects(semester=None, branch=None):
     subject =  await db_instance.db.subjects.find(query).sort("code", 1).to_list(200)
     return {"success": True, 'data': mongo_to_json(subject)}
 
-async def update_subject(code: str, body):
+async def update_subject(code: str, body, admin):
 
     subject_type = body["subject_type"]
     max_marks = int(body["max_marks"])
@@ -218,7 +229,10 @@ async def update_subject(code: str, body):
                 "subject_type": subject_type,
                 "subject_credit": body["subject_credit"],
                 "max_marks": max_marks,
-                "updated_at": datetime.now(timezone.utc)
+                "updated_at": utcnow()
+            },
+            "$addToSet": {
+                "admin_userids": admin["admin_userid"]
             }
         }
     )
@@ -248,15 +262,28 @@ from app.utils.mongo_serializer import mongo_to_json
 
 
 
-async def create_paper(body: dict):
+async def create_paper(body: dict, admin):
+    # doc = {
+    #     "subject_code": body["subject_code"],   # auto same as subject
+    #     "name": body["name"],
+    #     "type": body["type"],                   # MID / END / QUIZ / PRACTICE
+    #     "year": body["year"],
+    #     "description": body.get("description", ""),
+    #     "created_at": datetime.now(timezone.utc).isoformat(),  # ✅ FIXED
+    #     "questions" : []
+    # }
+
+
     doc = {
-        "subject_code": body["subject_code"],   # auto same as subject
+        "subject_code": body["subject_code"],
         "name": body["name"],
-        "type": body["type"],                   # MID / END / QUIZ / PRACTICE
+        "type": body["type"],          # MID / END / QUIZ / PRACTICE
         "year": body["year"],
         "description": body.get("description", ""),
-        "created_at": datetime.now(timezone.utc).isoformat(),  # ✅ FIXED
-        "questions" : []
+        "questions": [],
+        "admin_userids": [admin["admin_userid"]],
+        "created_at": utcnow(),
+        "updated_at": utcnow(),
     }
 
     res = await db_instance.db.papers.insert_one(doc)
@@ -270,7 +297,7 @@ async def create_paper(body: dict):
 async def list_papers(subject_code: str):
     docs = await db_instance.db.papers.find(
         {"subject_code": subject_code}
-    ).sort("created_at", -1).to_list(None)
+    ).sort("year", -1).to_list(None)
 
     return {"success": True,
         "data": mongo_to_json(docs)
@@ -289,7 +316,8 @@ async def get_paper_with_questions(paper_id: str):
 
 
 
-async def update_paper(paper_id: str, body: dict):
+async def update_paper(paper_id: str, body: dict, admin):
+
     await db_instance.db.papers.update_one(
         {"_id": ObjectId(paper_id)},
         {
@@ -298,6 +326,10 @@ async def update_paper(paper_id: str, body: dict):
                 "type": body["type"],
                 "year": body["year"],
                 "description": body.get("description", ""),
+                "updated_at": utcnow(),
+            },
+            "$addToSet": {
+                "admin_userids": admin["admin_userid"]
             }
         }
     )
@@ -329,42 +361,87 @@ def papers_col():
 
 
 
-async def add_question_ctrl(paper_id, body):
+async def add_question_ctrl(paper_id, body, admin):
     # if body.get("sub_questions"):
     #     total = sum(sq["marks"] for sq in body["sub_questions"])
     #     if total != body["marks"]:
     #         raise ValueError("Marks mismatch")
 
-    papers_col().update_one(
+    body["admin_userids"] = [admin["admin_userid"]]
+    body["updated_at"] = utcnow()
+
+    await papers_col().update_one(
         {"_id": ObjectId(paper_id)},
-        {"$push": {"questions": body}}
+        {
+            "$push": {"questions": body}
+        }
     )
     return {"message": "Question added"}
 
-async def update_question_ctrl(paper_id, q_no, body):
-    papers_col().update_one(
+# async def update_question_ctrl(paper_id, q_no, body, admin):
+#     await papers_col().update_one(
+#         {"_id": ObjectId(paper_id), "questions.q_no": q_no},
+#         {
+#             "$set": {"questions.$": body, "updated_at": utcnow()},
+#             "$addToSet": {"questions.$.admin_userids": admin["admin_userid"]},
+#         }
+#     )
+#     return {"message": "Question updated"}
+
+
+async def update_question_ctrl(paper_id, q_no, body, admin):
+    paper = await papers_col().find_one(
         {"_id": ObjectId(paper_id), "questions.q_no": q_no},
-        {"$set": {"questions.$": body}}
+        {"questions.$": 1}
     )
+
+    if not paper or not paper.get("questions"):
+        raise HTTPException(404, "Question not found")
+
+    existing = paper["questions"][0]
+    now = utcnow()
+
+    # merge dynamic payload safely
+    updated_question = {
+        **existing,
+        **body,
+        "updated_at": now,
+    }
+
+    # preserve + extend admin list
+    admins = set(existing.get("admin_userids", []))
+    admins.add(admin["admin_userid"])
+    updated_question["admin_userids"] = list(admins)
+
+    await papers_col().update_one(
+        {"_id": ObjectId(paper_id), "questions.q_no": q_no},
+        {"$set": {"questions.$": updated_question}}
+    )
+
     return {"message": "Question updated"}
 
-async def delete_question_ctrl(paper_id, q_no):
-    papers_col().update_one(
+
+
+async def delete_question_ctrl(paper_id, q_no, admin):
+    await papers_col().update_one(
         {"_id": ObjectId(paper_id)},
         {"$pull": {"questions": {"q_no": q_no}}}
     )
     return {"message": "Question deleted"}
 
 # ---------------- SUB QUESTIONS ----------------
-async def add_sub_question_ctrl(paper_id, q_no, body):
-    papers_col().update_one(
+async def add_sub_question_ctrl(paper_id, q_no, body, admin):
+    await papers_col().update_one(
         {"_id": ObjectId(paper_id), "questions.q_no": q_no},
-        {"$push": {"questions.$.sub_questions": body}}
+        {
+            "$push": {"questions.$.sub_questions": body},
+
+        }
     )
     return {"message": "Sub-question added"}
 
-async def delete_sub_question_ctrl(paper_id, q_no, sq_no):
-    papers_col().update_one(
+async def delete_sub_question_ctrl(paper_id, q_no, sq_no, admin):
+    await papers_col().update_one(
         {"_id": ObjectId(paper_id), "questions.q_no": q_no},
         {"$pull": {"questions.$.sub_questions": {"sq_no": sq_no}}}
     )

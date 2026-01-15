@@ -101,14 +101,15 @@ async def login_user(email, password):
         return {"success": False, "message": "Invalid credentials"}
 
     if not verify_password(password, user["password_hash"]):
-        return {"success": False, "message": "Invalid credentials"}
+        return {"success": False, "message": "Wrong Password"}
 
     token, expires_at = create_access_token(
         user_id=str(user["_id"]),
-        role=user["role"],                     # "user" or "admin"
-        semester=user.get("semester"),         # None for admin
-        branch=user.get("branch"),             # None for admin
-        login_type=user.get("login_type", "password")
+        role=user["role"],                          # user | admin | superalpha
+        semester=user.get("semester"),
+        branch=user.get("branch"),
+        login_type=user.get("login_type", "password"),
+        admin_userid=user.get("admin_userid"),      # None for normal users
     )
 
     return {
@@ -119,7 +120,8 @@ async def login_user(email, password):
         "user_id": str(user["_id"]),
         "role": user["role"],
         "semester": user.get("semester"),
-        "branch": user.get("branch")
+        "branch": user.get("branch"),
+        "admin_userid": user.get("admin_userid")   # frontend may need it
     }
 
 

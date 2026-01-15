@@ -36,17 +36,40 @@ def generate_otp() -> str:
 # -------------------------------------
 # JWT Token Creation
 # -------------------------------------
-def create_access_token(user_id: str, role: str, semester: int, branch: str, login_type: str):
+def create_access_token(
+    user_id: str,
+    role: str,
+    semester: int | None = None,
+    branch: str | None = None,
+    login_type: str | None = None,
+    admin_userid: str | None = None,
+):
     expire_at = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
 
     payload = {
         "user_id": user_id,
         "role": role,
-        "semester": semester,
-        "branch": branch,
-        "login_type": login_type,
-        "exp": expire_at
+        "exp": expire_at,
     }
+
+       # Optional claims
+    if semester is not None:
+        payload["semester"] = semester
+
+    if branch is not None:
+        payload["branch"] = branch
+
+    if login_type is not None:
+        payload["login_type"] = login_type
+
+    if admin_userid is not None:
+        payload["admin_userid"] = admin_userid
+
+    token = jwt.encode(
+        payload,
+        settings.JWT_SECRET_KEY,
+        algorithm=settings.JWT_ALGORITHM,
+    )
 
     token = jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
     
@@ -104,6 +127,19 @@ async def get_current_user_optional(
     return payload
 
 
+async def get_current_admin(
+    user = Depends(get_current_user)
+):
+    if user["role"] not in ["admin", "superalpha"]:
+        raise HTTPException(403, "Admin access required")
+
+    # if not user.get("admin_userid"):
+    #     raise HTTPException(403, "Admin ID missing")
+
+    return user
+
+
+
 
 def validate_user_email(email: str):
 
@@ -116,3 +152,4 @@ def validate_user_email(email: str):
         status_code=400,
         detail=str(e)
         )
+

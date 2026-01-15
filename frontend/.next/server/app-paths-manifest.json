@@ -1,7 +1,8 @@
 {
-  "/(user)/account/page": "app/(user)/account/page.js",
-  "/(user)/page": "app/(user)/page.js",
+  "/(user)/cgpa/page": "app/(user)/cgpa/page.js",
   "/admin/page": "app/admin/page.js",
-  "/(user)/pyq/page": "app/(user)/pyq/page.js",
-  "/(user)/cgpa/page": "app/(user)/cgpa/page.js"
+  "/admin/ssb/page": "app/admin/ssb/page.js",
+  "/(user)/page": "app/(user)/page.js",
+  "/admin/papers/page": "app/admin/papers/page.js",
+  "/admin/papers/[paper_id]/page": "app/admin/papers/[paper_id]/page.js"
 }
