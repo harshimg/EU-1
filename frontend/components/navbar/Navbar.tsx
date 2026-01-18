@@ -8,10 +8,59 @@ import { useAuth } from "@/lib/auth";
 import { useAuthModal } from "@/components/auth/AuthModal";
 import ProfileMenu from "./ProfileMenu";
 
+import { usePathname } from "next/navigation";
+
+
+type NavLink = {
+  href: string;
+  label: string;
+};
+
+const USER_NAV: NavLink[] = [
+  { href: "/", label: "Home" },
+  { href: "/pyq", label: "PYQs" },
+  { href: "/cgpa", label: "CGPA" },
+  { href: "/about", label: "About" },
+];
+
+const ADMIN_NAV: NavLink[] = [
+  { href: "/admin", label: "Admin Dashboard" },
+  { href: "/admin/ssb", label: "Subject" },
+  { href: "/admin/papers", label: "Paper" },
+];
+
+
 export default function Navbar() {
   const { user } = useAuth();
   const { showLogin } = useAuthModal();
   const [open, setOpen] = useState(false);
+
+  const pathname = usePathname();
+  
+  const role = user?.role ?? "guest";
+  const isAdmin = role === "admin" || role === "superalpha";
+  const isAdminArea = pathname.startsWith("/admin");
+  
+  
+  let links: NavLink[] = USER_NAV;
+
+  if (isAdmin) {
+    if (isAdminArea) {
+      // Admin mode
+      links = [
+        { href: "/", label: "Study" },
+        ...ADMIN_NAV,
+      ];
+    } else {
+      // Study mode
+      links = [
+        ...USER_NAV,
+        { href: "/admin", label: "Admin Dashboard" },
+      ];
+    }
+  }
+
+
 
   return (
     <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md shadow-sm">
@@ -42,13 +91,26 @@ export default function Navbar() {
         </Link>
 
         {/* NAV LINKS */}
-        <nav className="hidden md:flex gap-8 font-medium text-slate-700">
+          <nav className="hidden md:flex gap-8 font-medium text-slate-700">
+            {links.map(link => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="hover:text-[#5B2EBD]"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+
+
+        {/* <nav className="hidden md:flex gap-8 font-medium text-slate-700">
           <Link href="/" className="hover:text-[#5B2EBD]">Home</Link>
           <Link href="/pyq" className="hover:text-[#5B2EBD]">PYQs</Link>
-          <Link href="/cgpa" className="hover:text-[#5B2EBD]">CGPA</Link>
+          <Link href="/cgpa" className="hover:text-[#5B2EBD]">CGPA</Link> */}
           {/* <Link href="/result" className="hover:text-[#5B2EBD]">Result</Link> */}
-          <Link href="/about" className="hover:text-[#5B2EBD]">About</Link>
-        </nav>
+          {/* <Link href="/about" className="hover:text-[#5B2EBD]">About</Link>
+        </nav> */}
 
         {/* AUTH */}
         <div className="hidden md:flex">
@@ -86,16 +148,6 @@ export default function Navbar() {
           ) : (
             <Link href="/account" className="block">Account</Link>
           )}
-
-
-          {/* {!user ? (
-            <button onClick={showLogin} className="btn-primary">
-              Sign In
-            </button>
-          ) : (
-            // <ProfileMenu user={user} />
-            <ProfileMenu user={user} />
-          )} */}
           
           
         </div>

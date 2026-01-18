@@ -114,7 +114,21 @@ export default function AdminPaperQuestionsPage() {
               <h3 className="font-semibold">
                 Q{q.q_no} • {q.marks} • {q.structure}/{q.nature}
               </h3>
-              <div className="flex gap-4 text-sm">
+              
+              <div className="flex gap-6 text-sm">
+
+                  <h4 className="text-xs text-slate-500">
+                    by{" "}
+                    {q.admin_userids?.map((id: string) => (
+                      <span
+                        key={id}
+                        className="inline-block mr-1 px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 font-medium"
+                      >
+                        {id}
+                      </span>
+                    ))}
+                  </h4>
+
                 <button
                   onClick={() =>
                     setEditor(JSON.parse(JSON.stringify(q)))

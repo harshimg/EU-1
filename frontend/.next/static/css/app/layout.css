@@ -362,6 +362,9 @@
   .mt-\[18px\] {
     margin-top: 18px;
   }
+  .mr-1 {
+    margin-right: calc(var(--spacing) * 1);
+  }
   .mr-2 {
     margin-right: calc(var(--spacing) * 2);
   }
@@ -464,9 +467,6 @@
   .w-10 {
     width: calc(var(--spacing) * 10);
   }
-  .w-20 {
-    width: calc(var(--spacing) * 20);
-  }
   .w-24 {
     width: calc(var(--spacing) * 24);
   }
@@ -529,9 +529,6 @@
   }
   .grid-cols-\[1fr_72px_72px\] {
     grid-template-columns: 1fr 72px 72px;
-  }
-  .grid-cols-\[1fr_80px_80px\] {
-    grid-template-columns: 1fr 80px 80px;
   }
   .grid-cols-\[1fr_85px\] {
     grid-template-columns: 1fr 85px;
