@@ -148,6 +148,18 @@ export default function Navbar() {
           ) : (
             <Link href="/account" className="block">Account</Link>
           )}
+
+
+            {/* {links.map(link => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="hover:text-[#5B2EBD]"
+              >
+                {link.label}
+              </Link>
+            ))} */}
+
           
           
         </div>

@@ -30,6 +30,47 @@ export default function PYQPage() {
 
   const resizing = useRef<"left" | "right" | null>(null);
 
+  const flatQuestions = (() => {
+    if (!paper) return [];
+  
+    const list: { q: any; sq?: any }[] = [];
+  
+    paper.questions.forEach((q: any) => {
+      if (q.sub_questions?.length) {
+        q.sub_questions.forEach((sq: any) => {
+          list.push({ q, sq });
+        });
+      } else {
+        list.push({ q });
+      }
+    });
+  
+    return list;
+  })();
+  
+  const currentIndex = activeQ
+  ? flatQuestions.findIndex(item =>
+      item.q.q_no === activeQ.q.q_no &&
+      (item.sq?.sq_no ?? null) === (activeQ.sq?.sq_no ?? null)
+    )
+  : -1;
+
+
+  function goPrev() {
+    if (currentIndex > 0) {
+      setActiveQ(flatQuestions[currentIndex - 1]);
+    }
+  }
+  
+  function goNext() {
+    if (currentIndex < flatQuestions.length - 1) {
+      setActiveQ(flatQuestions[currentIndex + 1]);
+    }
+  }
+  
+  
+
+
   useEffect(() => {
     if (!loading && !user) {
       showLogin();
@@ -253,6 +294,34 @@ useEffect(() => {
           </div>
         )}
 
+
+{/* Next & and Previous button */}
+<div className="flex justify-between items-center pt-6 mt-6">
+  <button
+    onClick={goPrev}
+    disabled={currentIndex <= 0}
+    className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
+               bg-white text-slate-700 border border-slate-300
+               hover:bg-slate-100
+               disabled:opacity-40 disabled:cursor-not-allowed"
+  >
+    ← Previous
+  </button>
+
+  <button
+    onClick={goNext}
+    disabled={currentIndex >= flatQuestions.length - 1}
+    className="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium
+               bg-indigo-600 text-white shadow-sm
+               hover:bg-indigo-700
+               disabled:opacity-40 disabled:cursor-not-allowed"
+  >
+    Next →
+  </button>
+</div>
+
+
+
         {current && (
           <div className="bg-white rounded-xl shadow-md p-4 md:p-6 space-y-6">
             <h3 className="text-xl font-semibold">
@@ -309,6 +378,33 @@ useEffect(() => {
                 </div>
               </div>
             )}
+
+{/* Next & and Previous button */}
+<div className="flex justify-between items-center pt-6 mt-6">
+  <button
+    onClick={goPrev}
+    disabled={currentIndex <= 0}
+    className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
+               bg-white text-slate-700 border border-slate-300
+               hover:bg-slate-100
+               disabled:opacity-40 disabled:cursor-not-allowed"
+  >
+    ← Previous
+  </button>
+
+  <button
+    onClick={goNext}
+    disabled={currentIndex >= flatQuestions.length - 1}
+    className="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium
+               bg-indigo-600 text-white shadow-sm
+               hover:bg-indigo-700
+               disabled:opacity-40 disabled:cursor-not-allowed"
+  >
+    Next →
+  </button>
+</div>
+
+
 
             
           </div>
