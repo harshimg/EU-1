@@ -2,10 +2,15 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/lib/auth";
-import { API_URL } from "@/lib/api";
+import { API_URL, apiGet, apiPost } from "@/lib/api";
+import { useAuthModal } from "@/components/auth/AuthModal";
+
+
 
 export default function PYQPage() {
   const { user, loading } = useAuth();
+  const { showLogin  } = useAuthModal();
+
 
   const [subjects, setSubjects] = useState<any[]>([]);
   const [papers, setPapers] = useState<any[]>([]);
@@ -25,56 +30,132 @@ export default function PYQPage() {
 
   const resizing = useRef<"left" | "right" | null>(null);
 
+  useEffect(() => {
+    if (!loading && !user) {
+      showLogin();
+    }
+  }, [user, loading]);
+
+  // {!user && !loading && (
+  //   <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+  //     <div className="bg-white rounded-xl p-6 shadow-xl text-center">
+  //       <p className="text-slate-700 mb-3">Please sign in to view PYQs</p>
+  //       <button
+  //         onClick={showLogin}
+  //         className="btn-primary"
+  //       >
+  //         Sign In
+  //       </button>
+  //     </div>
+  //   </div>
+  // )}
+  
+
+
+
   /* ---------------- FETCH SUBJECTS ---------------- */
   useEffect(() => {
     if (!user) return;
 
-    fetch(
-      `${API_URL}/user/subjects?semester_code=${user.semester}&branch_code=${user.branch}`,
-      { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-    )
-      .then(res => res.json())
-      .then(json => {
-        setSubjects(json.data || []);
-        if (json.data?.length) setActiveSubject(json.data[0]);
-      });
-  }, [user]);
+  //   fetch(
+  //     `${API_URL}/user/subjects?semester_code=${user.semester}&branch_code=${user.branch}`,
+  //     { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+  //   )
+
+    
+
+
+  //     .then(res => res.json())
+  //     .then(json => {
+  //       setSubjects(json.data || []);
+  //       if (json.data?.length) setActiveSubject(json.data[0]);
+  //     });
+  // }, [user]);
+
+
+
+  apiGet(
+    `/user/subjects?semester_code=${user.semester}&branch_code=${user.branch}`
+  )
+    .then(json => {
+      setSubjects(json.data || []);
+      if (json.data?.length) setActiveSubject(json.data[0]);
+    })
+    .catch(err => {
+      console.error(err.message);
+    });
+}, [user]);
+
 
   /* ---------------- FETCH PAPERS ---------------- */
-  useEffect(() => {
-    if (!activeSubject) return;
+  // useEffect(() => {
+  //   if (!activeSubject) return;
 
-    fetch(
-      `${API_URL}/user/papers?subject_code=${activeSubject.code}`,
-      { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-    )
-      .then(res => res.json())
-      .then(json => {
-        setPapers(json.data || []);
-        if (json.data?.length) setActivePaper(json.data[0]);
-      });
-  }, [activeSubject]);
+  //   fetch(
+  //     `${API_URL}/user/papers?subject_code=${activeSubject.code}`,
+  //     { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+  //   )
+  //     .then(res => res.json())
+  //     .then(json => {
+  //       setPapers(json.data || []);
+  //       if (json.data?.length) setActivePaper(json.data[0]);
+  //     });
+  // }, [activeSubject]);
+
+/* ---------------- FETCH PAPERS ---------------- */
+useEffect(() => {
+  if (!activeSubject) return;
+
+  apiGet(`/user/papers?subject_code=${activeSubject.code}`)
+    .then(json => {
+      setPapers(json.data || []);
+      if (json.data?.length) setActivePaper(json.data[0]);
+    })
+    .catch(err => console.error(err.message));
+}, [activeSubject]);
+
 
   /* ---------------- FETCH PAPER ---------------- */
-  useEffect(() => {
-    if (!activePaper) return;
+  // useEffect(() => {
+  //   if (!activePaper) return;
 
-    fetch(`${API_URL}/user/paper/${activePaper._id}`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+  //   fetch(`${API_URL}/user/paper/${activePaper._id}`, {
+  //     headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+  //   })
+  //     .then(res => res.json())
+  //     .then(json => {
+  //       setPaper(json.data);
+  //       const q = json.data?.questions?.[0];
+  //       if (q) {
+  //         setActiveQ(
+  //           q.sub_questions?.length
+  //             ? { q, sq: q.sub_questions[0] }
+  //             : { q }
+  //         );
+  //       }
+  //     });
+  // }, [activePaper]);
+
+  /* ---------------- FETCH PAPER ---------------- */
+useEffect(() => {
+  if (!activePaper) return;
+
+  apiGet(`/user/paper/${activePaper._id}`)
+    .then(json => {
+      setPaper(json.data);
+
+      const q = json.data?.questions?.[0];
+      if (q) {
+        setActiveQ(
+          q.sub_questions?.length
+            ? { q, sq: q.sub_questions[0] }
+            : { q }
+        );
+      }
     })
-      .then(res => res.json())
-      .then(json => {
-        setPaper(json.data);
-        const q = json.data?.questions?.[0];
-        if (q) {
-          setActiveQ(
-            q.sub_questions?.length
-              ? { q, sq: q.sub_questions[0] }
-              : { q }
-          );
-        }
-      });
-  }, [activePaper]);
+    .catch(err => console.error(err.message));
+}, [activePaper]);
+
 
   /* ---------------- DESKTOP RESIZE ---------------- */
   useEffect(() => {
@@ -99,44 +180,45 @@ export default function PYQPage() {
     };
   }, []);
 
-  if (loading || !user) {
-    return <div className="h-screen flex items-center justify-center">Loading…</div>;
-  }
+
+  const current = activeQ?.sq ?? activeQ?.q;
 
   return (
     <div className="h-screen overflow-hidden bg-slate-100 flex flex-col md:flex-row">
+      {!user && !loading && (
+  <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+    <div className="bg-white rounded-xl p-6 shadow-xl text-center">
+      <p className="text-slate-700 mb-3">Please sign in to view PYQs</p>
+      <button
+        onClick={showLogin}
+        className="btn-primary"
+      >
+        Sign In
+      </button>
+    </div>
+  </div>
+)}
 
-      {/* MOBILE TOP BAR
-      <div className="md:hidden flex justify-between items-center p-3 bg-white border-b">
-        <button onClick={() => setShowLeftMobile(true)} className="btn-outline">
-          Change Subjects/paper
-        </button>
-        <button onClick={() => setShowRightMobile(true)} className="btn-outline">
-          Change Question
-        </button>
-      </div> */}
 
       {/* MOBILE TOP BAR */}
-<div className="md:hidden sticky top-0 z-30 flex justify-between items-center gap-3 px-3 py-3 
-                bg-gradient-to-r from-indigo-600 to-blue-600 border-b border-black/10 shadow-md">
-  <button
-    onClick={() => setShowLeftMobile(true)}
-    className="flex-1 text-center py-2 rounded-lg text-sm font-medium 
-               bg-white/90 text-indigo-700 shadow active:scale-[0.98]"
-  >
-    Subjects / Papers
-  </button>
+      <div className="md:hidden sticky top-0 z-30 flex justify-between items-center gap-3 px-3 py-3 
+                      bg-gradient-to-r from-indigo-600 to-blue-600 border-b border-black/10 shadow-md">
+        <button
+          onClick={() => setShowLeftMobile(true)}
+          className="flex-1 text-center py-2 rounded-lg text-sm font-medium 
+                     bg-white/90 text-indigo-700 shadow"
+        >
+          Subjects / Papers
+        </button>
 
-  <button
-    onClick={() => setShowRightMobile(true)}
-    className="flex-1 text-center py-2 rounded-lg text-sm font-medium 
-               bg-white/90 text-blue-700 shadow active:scale-[0.98]"
-  >
-    Questions
-  </button>
-</div>
-
-      
+        <button
+          onClick={() => setShowRightMobile(true)}
+          className="flex-1 text-center py-2 rounded-lg text-sm font-medium 
+                     bg-white/90 text-blue-700 shadow"
+        >
+          Questions
+        </button>
+      </div>
 
       {/* LEFT PANEL (DESKTOP) */}
       <aside
@@ -153,7 +235,7 @@ export default function PYQPage() {
         />
       </aside>
 
-      {/* LEFT RESIZER (DESKTOP) */}
+      {/* LEFT RESIZER */}
       <div
         className="hidden md:block w-[4px] cursor-col-resize"
         onMouseDown={() => (resizing.current = "left")}
@@ -171,34 +253,75 @@ export default function PYQPage() {
           </div>
         )}
 
-        {activeQ && (
+        {current && (
           <div className="bg-white rounded-xl shadow-md p-4 md:p-6 space-y-6">
             <h3 className="text-xl font-semibold">
-              Q{activeQ.q.q_no}
-              {activeQ.sq && ` (${activeQ.sq.sq_no})`}
+              Q{activeQ?.q.q_no}
+              {activeQ?.sq && ` (${activeQ.sq.sq_no})`}
+
+              {/* MAIN QUESTION HEADING (for multi) */}
+            {activeQ?.q?.heading && (
+            <div className="text-slate-700 font-medium bg-slate-50 border-l-4 border-slate-300 px-4 py-2 rounded">
+                {activeQ.q.heading}
+            </div>
+            )}
+
             </h3>
 
-            <p className="whitespace-pre-wrap">
-              {activeQ.sq ? activeQ.sq.question_md : activeQ.q.question_md}
-            </p>
+            <p className="whitespace-pre-wrap">{current.question_md}</p>
 
-            {(activeQ.sq?.solution_md || activeQ.q.solution_md) && (
-              <div className="bg-indigo-50 border-l-4 border-indigo-400 p-4 rounded">
-                <strong className="block mb-1">Solution</strong>
-                {activeQ.sq?.solution_md || activeQ.q.solution_md}
+            {/* ✅ OBJECTIVE OPTIONS */}
+            {Array.isArray(current.options) && (
+              <div className="space-y-2">
+                {current.options.map((op: string, i: number) => {
+                  const isCorrect = current.correct_index === i;
+                  return (
+                    <div
+                      key={i}
+                      className={`p-3 rounded border ${
+                        isCorrect
+                          ? "bg-green-50 border-green-400 text-green-800"
+                          : "bg-slate-50 border-slate-200"
+                      }`}
+                    >
+                      <strong>{String.fromCharCode(65 + i)}.</strong> {op}
+                      {isCorrect && (
+                        <span className="ml-2 text-xs font-semibold">
+                          ✓ Correct
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             )}
+
+            {/* SOLUTION */}
+            {current.solution_md && (
+              <div className="bg-indigo-50 border-l-4 border-indigo-400 p-4 rounded">
+                <strong className="block mb-1">Solution</strong>
+                {/* <div className="whitespace-pre-wrap"> */}
+                <div className="mt-2 text-sm-400 whitespace-pre-wrap">
+                {/* <div className="mt-3 rounded-lg bg-emerald-50 border border-emerald-200 
+                px-4 py-3 text-emerald-900 text-sm leading-relaxed 
+                whitespace-pre-wrap"> */}
+                  {current.solution_md}
+                </div>
+              </div>
+            )}
+
+            
           </div>
         )}
       </main>
 
-      {/* RIGHT RESIZER (DESKTOP) */}
+      {/* RIGHT RESIZER */}
       <div
         className="hidden md:block w-[4px] cursor-col-resize"
         onMouseDown={() => (resizing.current = "right")}
       />
 
-      {/* RIGHT PANEL (DESKTOP) */}
+      {/* RIGHT PANEL */}
       {paper && (
         <aside
           className="hidden md:block h-full overflow-y-auto border-l bg-white"
@@ -208,7 +331,7 @@ export default function PYQPage() {
         </aside>
       )}
 
-      {/* MOBILE LEFT DRAWER */}
+      {/* MOBILE LEFT */}
       {showLeftMobile && (
         <MobileDrawer onClose={() => setShowLeftMobile(false)}>
           <PanelLeft
@@ -228,7 +351,7 @@ export default function PYQPage() {
         </MobileDrawer>
       )}
 
-      {/* MOBILE RIGHT DRAWER */}
+      {/* MOBILE RIGHT */}
       {showRightMobile && paper && (
         <MobileDrawer onClose={() => setShowRightMobile(false)}>
           <PanelRight
@@ -264,7 +387,23 @@ function PanelLeft({ subjects, papers, activeSubject, activePaper, onSubject, on
   return (
     <div className="p-4 space-y-4 text-sm">
       <h3 className="font-semibold">Subjects</h3>
-      {subjects.map((s: any) => (
+      {/* {subjects.map((s: any) => (
+        <button
+          key={s._id}
+          onClick={() => onSubject(s)}
+          className={`block w-full text-left px-3 py-2 rounded ${
+            activeSubject?.code === s.code
+              ? "bg-indigo-100 text-indigo-700"
+              : "hover:bg-slate-100"
+          }`}
+        >
+          {s.short_name}
+        </button>
+      ))} */}
+
+    {subjects
+      .filter((s: any) => s.subject_type === "Theory")
+      .map((s: any) => (
         <button
           key={s._id}
           onClick={() => onSubject(s)}
@@ -278,6 +417,9 @@ function PanelLeft({ subjects, papers, activeSubject, activePaper, onSubject, on
         </button>
       ))}
 
+
+
+
       <h3 className="font-semibold mt-4">Papers</h3>
       {papers.map((p: any) => (
         <button
@@ -289,7 +431,7 @@ function PanelLeft({ subjects, papers, activeSubject, activePaper, onSubject, on
               : "hover:bg-slate-100"
           }`}
         >
-          {p.year}   {p.name}
+          {p.year} {p.name}
         </button>
       ))}
     </div>
@@ -297,7 +439,7 @@ function PanelLeft({ subjects, papers, activeSubject, activePaper, onSubject, on
 }
 
 /* ---------------- RIGHT PANEL ---------------- */
-function PanelRight({ paper, activeQ, onSelect }: any) {
+function duplicatePanelRight({ paper, activeQ, onSelect }: any) {
   return (
     <div className="p-4 text-sm">
       <h3 className="font-semibold mb-3">Questions</h3>
@@ -338,3 +480,57 @@ function PanelRight({ paper, activeQ, onSelect }: any) {
     </div>
   );
 }
+
+
+/* ---------------- RIGHT PANEL ---------------- */
+function PanelRight({ paper, activeQ, onSelect }: any) {
+  return (
+    <div className="p-4 text-sm">
+      <h3 className="font-semibold mb-3">Questions</h3>
+
+      {paper.questions.map((q: any) => {
+        const isMainActive = activeQ?.q.q_no === q.q_no;
+
+        return (
+          <div key={q.q_no} className="mb-2">
+            {/* MAIN QUESTION */}
+            <button
+              onClick={() => onSelect({ q })}
+              className={`block w-full text-left px-2 py-1 rounded font-medium ${
+                isMainActive && !activeQ?.sq
+                  ? "bg-indigo-100 text-indigo-700"
+                  : "hover:bg-slate-100"
+              }`}
+            >
+              Q{q.q_no}
+            </button>
+
+            {/* SUB-QUESTIONS → ONLY FOR ACTIVE MAIN QUESTION */}
+            {isMainActive &&
+              q.sub_questions?.map((sq: any) => {
+                const isSubActive =
+                  activeQ?.q.q_no === q.q_no &&
+                  activeQ?.sq?.sq_no === sq.sq_no;
+
+                return (
+                  <button
+                    key={sq.sq_no}
+                    onClick={() => onSelect({ q, sq })}
+                    className={`block w-full text-left ml-4 px-2 py-1 rounded ${
+                      isSubActive
+                        ? "bg-blue-100 text-blue-700"
+                        : "hover:bg-slate-100 text-slate-600"
+                    }`}
+                  >
+                    ({sq.sq_no})
+                  </button>
+                );
+              })}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+

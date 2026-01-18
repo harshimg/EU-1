@@ -495,7 +495,14 @@ function PanelRight({ paper, activeQ, onSelect }: any) {
           <div key={q.q_no} className="mb-2">
             {/* MAIN QUESTION */}
             <button
-              onClick={() => onSelect({ q })}
+              // onClick={() => onSelect({ q })}
+              onClick={() => {
+                if (q.sub_questions?.length) {
+                  onSelect({ q, sq: q.sub_questions[0] });
+                } else {
+                  onSelect({ q });
+                }
+              }}
               className={`block w-full text-left px-2 py-1 rounded font-medium ${
                 isMainActive && !activeQ?.sq
                   ? "bg-indigo-100 text-indigo-700"
