@@ -7,11 +7,18 @@ import { AuthModalProvider } from "@/components/auth/AuthModal";
 export const metadata = {
   title: "Alpha Result — PYQ & Solutions",
   description: "Study tools & past year questions",
+  icons: {
+    // icon: "/favicon.ico",
+    apple: "/apple-icon.png",
+  },
 };
 
 export default function RootLayout({ children }: any) {
   return (
     <html lang="en">
+      <head>
+        {/* <title> Alpha Result</title> */}
+      </head>
       <body className="bg-[#F9FAFF] min-h-screen">
 
         <AuthProvider>

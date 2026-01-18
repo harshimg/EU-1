@@ -1307,11 +1307,6 @@
       }
     }
   }
-  .active\:scale-\[0\.98\] {
-    &:active {
-      scale: 0.98;
-    }
-  }
   .disabled\:cursor-not-allowed {
     &:disabled {
       cursor: not-allowed;

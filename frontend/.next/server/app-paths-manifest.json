@@ -1,7 +1,4 @@
 {
-  "/admin/page": "app/admin/page.js",
   "/(user)/page": "app/(user)/page.js",
-  "/(user)/pyq/page": "app/(user)/pyq/page.js",
-  "/(user)/about/page": "app/(user)/about/page.js",
-  "/admin/papers/[paper_id]/page": "app/admin/papers/[paper_id]/page.js"
+  "/favicon.ico/route": "app/favicon.ico/route.js"
 }

@@ -71,8 +71,8 @@ export default function Navbar() {
           <div >
             
             <Image
-                src="/logo2.png"
-                alt="Alpha Result Logo"
+                src="/ar_logo2.png"
+                alt="Alpha Result"
                 width={44}
                 height={44}
                 className="object-contain"
