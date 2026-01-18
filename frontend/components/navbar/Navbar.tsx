@@ -133,13 +133,25 @@ export default function Navbar() {
       </div>
 
       {/* MOBILE MENU */}
+{/* MOBILE MENU */}
       {open && (
         <div className="md:hidden bg-white border-t px-6 py-4 space-y-4">
-          <Link href="/" className="block">Home</Link>
+            {links.map(link => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setOpen(false)} // close menu on click
+                    className="block text-slate-700 hover:text-[#5B2EBD]"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+
+          {/* <Link href="/" className="block">Home</Link>
           <Link href="/pyq" className="block">PYQs</Link>
-          <Link href="/cgpa" className="block">CGPA</Link>
+          <Link href="/cgpa" className="block">CGPA</Link> */}
           {/* <Link href="/result" className="block">Result</Link> */}
-          <Link href="/about" className="block">About</Link>
+          {/* <Link href="/about" className="block">About</Link> */}
 
           {!user ? (
             <button onClick={showLogin} className="btn-primary">
@@ -148,20 +160,7 @@ export default function Navbar() {
           ) : (
             <Link href="/account" className="block">Account</Link>
           )}
-
-
-            {/* {links.map(link => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="hover:text-[#5B2EBD]"
-              >
-                {link.label}
-              </Link>
-            ))} */}
-
-          
-          
+      
         </div>
       )}
     </header>
