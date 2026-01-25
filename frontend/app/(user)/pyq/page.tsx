@@ -438,51 +438,77 @@ useEffect(() => {
         )}
 
 
-          {viewMode === "all" && paper && (
-            <div className="bg-white rounded-xl shadow-md p-4 md:p-6
-                            max-h-[70vh] overflow-y-auto space-y-4">
+{viewMode === "all" && paper && (
+  <div className="bg-white rounded-xl shadow-md p-4 md:p-6
+                  max-h-[70vh] overflow-y-auto space-y-4">
 
-              <h3 className="text-lg font-semibold text-slate-700">
-                All Questions
-              </h3>
+    <h3 className="text-lg font-semibold text-slate-700">
+      All Questions
+    </h3>
 
-              {paper.questions.map((q: any) => (
-                <div key={q.q_no} className="pb-4 bg-slate-50/50 rounded-lg px-3">
+    {paper.questions.map((q: any) => (
+      <div
+        key={q.q_no}
+        className="pb-4 bg-slate-50/50 rounded-lg px-3 space-y-2"
+      >
+        {/* MAIN QUESTION */}
+        <button
+          onClick={() => {
+            if (q.sub_questions?.length) {
+              setActiveQ({ q, sq: q.sub_questions[0] });
+            } else {
+              setActiveQ({ q });
+            }
+            setViewMode("solution");
+          }}
+          className="block w-full text-left font-medium text-slate-800
+                     hover:text-indigo-600"
+        >
+          Q{q.q_no}. {q.question_md}
+        </button>
 
-                  {/* MAIN QUESTION */}
-                  <button
-                    onClick={() => {
-                      if (q.sub_questions?.length) {
-                        setActiveQ({ q, sq: q.sub_questions[0] });
-                      } else {
-                        setActiveQ({ q });
-                      }
-                      setViewMode("solution");
-                    }}
-                    className="block w-full text-left font-medium text-slate-800
-                              hover:text-indigo-600"
-                  >
-                    Q{q.q_no}. {q.question_md}
-                  </button>
+        {/* MAIN QUESTION OPTIONS (OBJECTIVE) */}
+        {Array.isArray(q.options) && (
+          <div className="ml-4 space-y-1 text-sm text-slate-600">
+            {q.options.map((op: string, i: number) => (
+              <div key={i}>
+                {String.fromCharCode(65 + i)}. {op}
+              </div>
+            ))}
+          </div>
+        )}
 
-                  {/* SUB QUESTIONS */}
-                  {q.sub_questions?.map((sq: any) => (
-                    <button
-                      key={sq.sq_no}
-                      onClick={() => {
-                        setActiveQ({ q, sq });
-                        setViewMode("solution");
-                      }}
-                      className="block w-full text-left ml-4 mt-1
-                                text-sm text-slate-600 hover:text-blue-600"
-                    >
-                      ({sq.sq_no}) {sq.question_md}
-                    </button>
-                  ))}
-                </div>
-              ))}
-            </div>
-          )}
+        {/* SUB QUESTIONS */}
+        {q.sub_questions?.map((sq: any) => (
+          <div key={sq.sq_no} className="ml-4 space-y-1">
+            <button
+              onClick={() => {
+                setActiveQ({ q, sq });
+                setViewMode("solution");
+              }}
+              className="block w-full text-left mt-2
+                         text-sm text-slate-700 hover:text-blue-600"
+            >
+              ({sq.sq_no}) {sq.question_md}
+            </button>
+
+            {/* SUB QUESTION OPTIONS (OBJECTIVE) */}
+            {Array.isArray(sq.options) && (
+              <div className="ml-4 space-y-1 text-xs text-slate-500">
+                {sq.options.map((op: string, i: number) => (
+                  <div key={i}>
+                    {String.fromCharCode(65 + i)}. {op}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    ))}
+  </div>
+)}
+
 
 
 
