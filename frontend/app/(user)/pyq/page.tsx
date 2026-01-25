@@ -16,6 +16,9 @@ export default function PYQPage() {
   const [papers, setPapers] = useState<any[]>([]);
   const [paper, setPaper] = useState<any | null>(null);
 
+  const [viewMode, setViewMode] = useState<"solution" | "all">("solution");
+
+
   const [activeSubject, setActiveSubject] = useState<any | null>(null);
   const [activePaper, setActivePaper] = useState<any | null>(null);
   const [activeQ, setActiveQ] = useState<{ q: any; sq?: any } | null>(null);
@@ -295,35 +298,62 @@ useEffect(() => {
         )}
 
 
-{/* Next & and Previous button */}
-<div className="flex justify-between items-center pt-6 mt-6">
-  <button
-    onClick={goPrev}
-    disabled={currentIndex <= 0}
-    className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
-               bg-white text-slate-700 border border-slate-300
-               hover:bg-slate-100
-               disabled:opacity-40 disabled:cursor-not-allowed"
-  >
-    ← Previous
-  </button>
+  
+{/* VIEW TOGGLE */}
+<div className="flex justify-center mb-4">
+  <div className="flex bg-slate-100 rounded-lg p-1">
+    <button
+      onClick={() => setViewMode("solution")}
+      className={`px-4 py-1.5 rounded-md text-sm font-medium transition
+        ${viewMode === "solution"
+          ? "bg-white shadow text-indigo-600"
+          : "text-slate-600 hover:text-slate-800"}`}
+    >
+      Solution
+    </button>
 
-  <button
-    onClick={goNext}
-    disabled={currentIndex >= flatQuestions.length - 1}
-    className="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium
-               bg-indigo-600 text-white shadow-sm
-               hover:bg-indigo-700
-               disabled:opacity-40 disabled:cursor-not-allowed"
-  >
-    Next →
-  </button>
+    <button
+      onClick={() => setViewMode("all")}
+      className={`px-4 py-1.5 rounded-md text-sm font-medium transition
+        ${viewMode === "all"
+          ? "bg-white shadow text-indigo-600"
+          : "text-slate-600 hover:text-slate-800"}`}
+    >
+      All Questions
+    </button>
+  </div>
 </div>
 
 
 
-        {current && (
+        {viewMode === "solution" && current && (
           <div className="bg-white rounded-xl shadow-md p-4 md:p-6 space-y-6">
+
+            {/* Next & and Previous button */}
+            <div className="flex justify-between items-center pt-6 mt-6">
+              <button
+                onClick={goPrev}
+                disabled={currentIndex <= 0}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
+                          bg-white text-slate-700 border border-slate-300
+                          hover:bg-slate-100
+                          disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                ← Previous
+              </button>
+              
+              <button
+                onClick={goNext}
+                disabled={currentIndex >= flatQuestions.length - 1}
+                className="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium
+                          bg-indigo-600 text-white shadow-sm
+                          hover:bg-indigo-700
+                          disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Next →
+              </button>
+            </div>
+
             <h3 className="text-xl font-semibold">
               Q{activeQ?.q.q_no}
               {activeQ?.sq && ` (${activeQ.sq.sq_no})`}
@@ -379,36 +409,83 @@ useEffect(() => {
               </div>
             )}
 
-{/* Next & and Previous button */}
-<div className="flex justify-between items-center pt-6 mt-6">
-  <button
-    onClick={goPrev}
-    disabled={currentIndex <= 0}
-    className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
-               bg-white text-slate-700 border border-slate-300
-               hover:bg-slate-100
-               disabled:opacity-40 disabled:cursor-not-allowed"
-  >
-    ← Previous
-  </button>
+                  {/* Next & and Previous button */}
+                  <div className="flex justify-between items-center pt-6 mt-6">
+                    <button
+                      onClick={goPrev}
+                      disabled={currentIndex <= 0}
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
+                                bg-white text-slate-700 border border-slate-300
+                                hover:bg-slate-100
+                                disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      ← Previous
+                    </button>
 
-  <button
-    onClick={goNext}
-    disabled={currentIndex >= flatQuestions.length - 1}
-    className="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium
-               bg-indigo-600 text-white shadow-sm
-               hover:bg-indigo-700
-               disabled:opacity-40 disabled:cursor-not-allowed"
-  >
-    Next →
-  </button>
-</div>
-
-
-
+                    <button
+                      onClick={goNext}
+                      disabled={currentIndex >= flatQuestions.length - 1}
+                      className="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium
+                                bg-indigo-600 text-white shadow-sm
+                                hover:bg-indigo-700
+                                disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      Next →
+                    </button>
+                  </div>
             
           </div>
         )}
+
+
+          {viewMode === "all" && paper && (
+            <div className="bg-white rounded-xl shadow-md p-4 md:p-6
+                            max-h-[70vh] overflow-y-auto space-y-4">
+
+              <h3 className="text-lg font-semibold text-slate-700">
+                All Questions
+              </h3>
+
+              {paper.questions.map((q: any) => (
+                <div key={q.q_no} className="pb-4 bg-slate-50/50 rounded-lg px-3">
+
+                  {/* MAIN QUESTION */}
+                  <button
+                    onClick={() => {
+                      if (q.sub_questions?.length) {
+                        setActiveQ({ q, sq: q.sub_questions[0] });
+                      } else {
+                        setActiveQ({ q });
+                      }
+                      setViewMode("solution");
+                    }}
+                    className="block w-full text-left font-medium text-slate-800
+                              hover:text-indigo-600"
+                  >
+                    Q{q.q_no}. {q.question_md}
+                  </button>
+
+                  {/* SUB QUESTIONS */}
+                  {q.sub_questions?.map((sq: any) => (
+                    <button
+                      key={sq.sq_no}
+                      onClick={() => {
+                        setActiveQ({ q, sq });
+                        setViewMode("solution");
+                      }}
+                      className="block w-full text-left ml-4 mt-1
+                                text-sm text-slate-600 hover:text-blue-600"
+                    >
+                      ({sq.sq_no}) {sq.question_md}
+                    </button>
+                  ))}
+                </div>
+              ))}
+            </div>
+          )}
+
+
+
       </main>
 
       {/* RIGHT RESIZER */}

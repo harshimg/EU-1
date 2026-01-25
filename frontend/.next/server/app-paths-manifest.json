@@ -1,7 +1,7 @@
 {
+  "/_not-found/page": "app/_not-found/page.js",
   "/(user)/page": "app/(user)/page.js",
-  "/admin/page": "app/admin/page.js",
-  "/(user)/account/page": "app/(user)/account/page.js",
+  "/(user)/pyq/page": "app/(user)/pyq/page.js",
   "/(user)/result/page": "app/(user)/result/page.js",
-  "/(user)/pyq/page": "app/(user)/pyq/page.js"
+  "/favicon.ico/route": "app/favicon.ico/route.js"
 }
