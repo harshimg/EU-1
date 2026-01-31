@@ -25,8 +25,7 @@ origins = [
     "https://alpharesult.vercel.app",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    "https://vigilon.vercel.app",           # production
-    "https://alpharesult.vercel.app",
+    "https://alpharesult.in",
 ]    
 
 # CORS (Allows frontend to call backend)
