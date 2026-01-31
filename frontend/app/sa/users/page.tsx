@@ -230,3 +230,4 @@ const Table = ({ headers, children }: {
   </div>
 );
 
+
