@@ -32,7 +32,7 @@ origins = [
 # CORS (Allows frontend to call backend)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # change later to your frontend domain
+    allow_origins=origins,  # change later to your frontend domain
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
