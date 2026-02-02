@@ -78,7 +78,7 @@ def watermark_scanned_page(page, logo_path):
     except:
         footer_font = ImageFont.load_default()
 
-    footer_width = footer_draw.textlength(footer_text, font=footer_font)
+    footer_width = int(footer_draw.textlength(footer_text, font=footer_font))
 
     footer_draw.text(
         ((w - footer_width) / 2, h - footer_font_size * 2),

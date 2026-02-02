@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, UploadFile, File
 from app.auth.dependencies import admin_required
 from app.auth.utils import get_current_admin
 from app.admin.controllers import *
@@ -142,4 +142,18 @@ async def add_sub_question(paper_id: str, q_no: int, body: dict, admin = Depends
 @router.delete("/papers/{paper_id}/questions/{q_no}/sub/{sq_no}")
 async def delete_sub_question(paper_id: str, q_no: int, sq_no: str, admin = Depends(get_current_admin)):
     return await delete_sub_question_ctrl(paper_id, q_no, sq_no, admin)
+
+
+
+
+
+
+#============PDf Microservice======================
+@router.post("/process-pdf")
+async def process_pdf(
+    file: UploadFile = File(...),
+    admin=Depends(get_current_admin),
+    ):
+
+    return await call_pdf_service(file, admin)
 

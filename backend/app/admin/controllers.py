@@ -2,7 +2,11 @@ from datetime import datetime, timezone
 from app.database import db_instance
 from app.utils.mongo_serializer import mongo_to_json
 from app.utils.datetime import utcnow
-from fastapi import HTTPException, status
+from app.config import settings
+from fastapi import HTTPException, status, UploadFile
+
+import httpx
+
 
 # ======================================================
 # SEMESTER
@@ -446,3 +450,66 @@ async def delete_sub_question_ctrl(paper_id, q_no, sq_no, admin):
         {"$pull": {"questions.$.sub_questions": {"sq_no": sq_no}}}
     )
     return {"message": "Sub-question deleted"}
+
+
+    #============PDf Microservice======================
+
+async def call_pdf_service(file: UploadFile, admin):
+
+    admin_id = str(admin.get("admin_userid"))
+    if not admin_id:
+        raise HTTPException(status_code=403, detail="Admin ID missing")
+    
+    try:
+        async with httpx.AsyncClient(
+            timeout=settings.PDF_SERVICE_TIMEOUT
+        ) as client:
+
+            files = {
+                "file": (
+                    file.filename,
+                    await file.read(),
+                    "application/pdf"
+                )
+            }
+
+            headers = {
+                "Authorization": f"Bearer {settings.PDF_SERVICE_KEY}",
+                "admin_id": str(admin_id),   # REQUIRED by PDF service
+            }
+
+            response = await client.post(
+                f"{settings.PDF_SERVICE_BASE_URL}/process-pdf",
+                files=files,
+                headers=headers,
+            )
+
+            if response.status_code != 200:
+                raise HTTPException(
+                    status_code=502,
+                    detail="PDF service failed to process file",
+                )
+
+            # Extract filename from Content-Disposition
+            content_disposition = response.headers.get("content-disposition", "")
+            filename = "alpharesult_processed.pdf"
+
+            if "filename=" in content_disposition:
+                filename = content_disposition.split("filename=")[-1].strip('"')
+
+            return {
+                "stream": response.aiter_bytes(),
+                "filename": filename,
+            }
+
+    except httpx.TimeoutException:
+        raise HTTPException(
+            status_code=504,
+            detail="PDF processing service timeout",
+        )
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"PDF processing error: {str(e)}",
+        )

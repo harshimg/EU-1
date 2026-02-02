@@ -26,4 +26,9 @@ class Settings:
     GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
     GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI")
 
+    #PDF microservice
+    PDF_SERVICE_BASE_URL= os.getenv("PDF_SERVICE_BASE_URL")
+    PDF_SERVICE_KEY= os.getenv("PDF_SERVICE_KEY")
+    PDF_SERVICE_TIMEOUT= os.getenv("PDF_SERVICE_TIMEOUT")
+
 settings = Settings()
