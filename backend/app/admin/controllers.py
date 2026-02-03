@@ -4,8 +4,11 @@ from app.utils.mongo_serializer import mongo_to_json
 from app.utils.datetime import utcnow
 from app.config import settings
 from fastapi import HTTPException, status, UploadFile
+from fastapi.responses import StreamingResponse     
 
 import httpx
+
+ar_pdf_url =settings.PDF_SERVICE_BASE_URL
 
 
 # ======================================================
@@ -456,30 +459,44 @@ async def delete_sub_question_ctrl(paper_id, q_no, sq_no, admin):
 
 async def call_pdf_service(file: UploadFile, admin):
 
+    admin_id="AR1"
     admin_id = str(admin.get("admin_userid"))
     if not admin_id:
         raise HTTPException(status_code=403, detail="Admin ID missing")
     
     try:
         async with httpx.AsyncClient(
-            timeout=settings.PDF_SERVICE_TIMEOUT
+            timeout=float(settings.PDF_SERVICE_TIMEOUT)
         ) as client:
+
+            # files = {
+            #     "file": (
+            #         file.filename,
+            #         await file.read(),
+            #         "application/pdf"
+            #     )
+            # }
 
             files = {
                 "file": (
                     file.filename,
-                    await file.read(),
+                    file.file,
                     "application/pdf"
                 )
             }
 
+            # headers = {
+            #     "Authorization": f"Bearer {settings.PDF_SERVICE_KEY}",
+            #     "admin_id": str(admin_id),   # REQUIRED by PDF service
+            # }
+
             headers = {
+                "admin-id": str(admin_id),   # REQUIRED by PDF service
                 "Authorization": f"Bearer {settings.PDF_SERVICE_KEY}",
-                "admin_id": str(admin_id),   # REQUIRED by PDF service
             }
 
             response = await client.post(
-                f"{settings.PDF_SERVICE_BASE_URL}/process-pdf",
+                f"{ar_pdf_url}/admin/process-pdf",
                 files=files,
                 headers=headers,
             )
@@ -487,20 +504,30 @@ async def call_pdf_service(file: UploadFile, admin):
             if response.status_code != 200:
                 raise HTTPException(
                     status_code=502,
-                    detail="PDF service failed to process file",
+                   detail=f"PDF service error {response.status_code}: {response.text}",
                 )
 
+             # FIX: Stream the content back to the user
+            return StreamingResponse(
+                response.aiter_bytes(),  # Stream chunks to keep memory usage low
+                media_type="application/pdf",
+                headers={
+                    "Content-Disposition": f"attachment; filename=processed_{file.filename}"
+                }
+            )
+
             # Extract filename from Content-Disposition
-            content_disposition = response.headers.get("content-disposition", "")
-            filename = "alpharesult_processed.pdf"
+            # content_disposition = response.headers.get("content-disposition", "")
+            # filename = "alpharesult_processed.pdf"
 
-            if "filename=" in content_disposition:
-                filename = content_disposition.split("filename=")[-1].strip('"')
+            # if "filename=" in content_disposition:
+            #     filename = content_disposition.split("filename=")[-1].strip('"')
 
-            return {
-                "stream": response.aiter_bytes(),
-                "filename": filename,
-            }
+            # return {
+            #     "stream": response.aiter_bytes(),
+            #     "filename": filename,
+            # }
+            # return response
 
     except httpx.TimeoutException:
         raise HTTPException(
@@ -513,3 +540,6 @@ async def call_pdf_service(file: UploadFile, admin):
             status_code=500,
             detail=f"PDF processing error: {str(e)}",
         )
+
+    except:
+        pass

@@ -1,6 +1,7 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
+  "/(user)/page": "app/(user)/page.js",
+  "/(user)/cgpa/page": "app/(user)/cgpa/page.js",
   "/admin/pdf/page": "app/admin/pdf/page.js",
-  "/admin/page": "app/admin/page.js",
-  "/(user)/account/page": "app/(user)/account/page.js"
+  "/favicon.ico/route": "app/favicon.ico/route.js"
 }

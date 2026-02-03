@@ -154,6 +154,6 @@ async def process_pdf(
     file: UploadFile = File(...),
     admin=Depends(get_current_admin),
     ):
-
+    # admin=Depends(get_current_admin),
     return await call_pdf_service(file, admin)
 
