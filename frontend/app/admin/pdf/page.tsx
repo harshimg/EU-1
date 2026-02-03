@@ -41,7 +41,8 @@ export default function AdminPDFPage() {
 
       // ✅ Extract filename from response
       const disposition = res.headers.get("content-disposition");
-      let filename = "ar_pdf.pdf";
+      // let filename = "ar_pdf.pdf";
+      let filename = disposition?.split("filename=")[1].replace(/"/g, "");
 
       if (disposition && disposition.includes("filename=")) {
         filename = disposition.split("filename=")[1].replace(/"/g, "");

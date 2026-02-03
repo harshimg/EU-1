@@ -29,9 +29,6 @@ async def process_pdf_api(
 
     process_pdf(input_path, output_path)
 
-    # ❌ TEMPORARILY COMMENT THIS
-    # background_tasks.add_task(cleanup_temp_dir, temp_dir)
-
     original_name = os.path.splitext(file.filename)[0]
     download_name = f"{original_name}_ar.pdf"
 

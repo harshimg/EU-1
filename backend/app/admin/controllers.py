@@ -469,26 +469,14 @@ async def call_pdf_service(file: UploadFile, admin):
             timeout=float(settings.PDF_SERVICE_TIMEOUT)
         ) as client:
 
-            # files = {
-            #     "file": (
-            #         file.filename,
-            #         await file.read(),
-            #         "application/pdf"
-            #     )
-            # }
-
             files = {
                 "file": (
                     file.filename,
-                    file.file,
+                    await file.read(),
                     "application/pdf"
                 )
             }
 
-            # headers = {
-            #     "Authorization": f"Bearer {settings.PDF_SERVICE_KEY}",
-            #     "admin_id": str(admin_id),   # REQUIRED by PDF service
-            # }
 
             headers = {
                 "admin-id": str(admin_id),   # REQUIRED by PDF service
@@ -508,26 +496,20 @@ async def call_pdf_service(file: UploadFile, admin):
                 )
 
              # FIX: Stream the content back to the user
+            content_disposition = response.headers.get("content-disposition")
+
+            headers = {
+                "Access-Control-Expose-Headers": "Content-Disposition"
+            }
+
+            if content_disposition:
+                headers["Content-Disposition"] = content_disposition
+
             return StreamingResponse(
                 response.aiter_bytes(),  # Stream chunks to keep memory usage low
                 media_type="application/pdf",
-                headers={
-                    "Content-Disposition": f"attachment; filename=processed_{file.filename}"
-                }
+                headers=headers
             )
-
-            # Extract filename from Content-Disposition
-            # content_disposition = response.headers.get("content-disposition", "")
-            # filename = "alpharesult_processed.pdf"
-
-            # if "filename=" in content_disposition:
-            #     filename = content_disposition.split("filename=")[-1].strip('"')
-
-            # return {
-            #     "stream": response.aiter_bytes(),
-            #     "filename": filename,
-            # }
-            # return response
 
     except httpx.TimeoutException:
         raise HTTPException(
@@ -541,5 +523,3 @@ async def call_pdf_service(file: UploadFile, admin):
             detail=f"PDF processing error: {str(e)}",
         )
 
-    except:
-        pass
