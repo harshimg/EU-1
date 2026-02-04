@@ -355,7 +355,7 @@ useEffect(() => {
             </div>
 
             <h3 className="text-xl font-semibold">
-              Q{activeQ?.q.q_no}
+              Q/week{activeQ?.q.q_no}
               {activeQ?.sq && ` (${activeQ.sq.sq_no})`}
 
               {/* MAIN QUESTION HEADING (for multi) */}
@@ -641,7 +641,7 @@ function PanelLeft({ subjects, papers, activeSubject, activePaper, onSubject, on
 function duplicatePanelRight({ paper, activeQ, onSelect }: any) {
   return (
     <div className="p-4 text-sm">
-      <h3 className="font-semibold mb-3">Questions</h3>
+      <h3 className="font-semibold mb-3">Questions / Week</h3>
       {paper.questions.map((q: any) => (
         <div key={q.q_no} className="mb-2">
           <button
