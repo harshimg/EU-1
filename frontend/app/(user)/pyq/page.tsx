@@ -688,7 +688,7 @@ function PanelRight({ paper, activeQ, onSelect }: any) {
   return (
     <div className="p-4 text-sm">
       <h3 className="font-semibold mb-3">
-        {paper?.type === "NPTEL" ? "Week" : "Q"}
+        {paper?.type === "NPTEL" ? "Week" : "Questions"}
       </h3>
 
       {paper.questions.map((q: any) => {
