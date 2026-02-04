@@ -355,7 +355,7 @@ useEffect(() => {
             </div>
 
             <h3 className="text-xl font-semibold">
-              Q/week{activeQ?.q.q_no}
+              Q/week.{activeQ?.q.q_no}
               {activeQ?.sq && ` (${activeQ.sq.sq_no})`}
 
               {/* MAIN QUESTION HEADING (for multi) */}
@@ -464,7 +464,7 @@ useEffect(() => {
           className="block w-full text-left font-medium text-slate-800
                      hover:text-indigo-600"
         >
-          Q{q.q_no}. {q.question_md}
+          Q/week.{q.q_no}. {q.question_md}
         </button>
 
         {/* MAIN QUESTION OPTIONS (OBJECTIVE) */}
