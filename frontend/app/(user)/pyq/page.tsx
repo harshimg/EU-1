@@ -15,6 +15,8 @@ export default function PYQPage() {
   const [subjects, setSubjects] = useState<any[]>([]);
   const [papers, setPapers] = useState<any[]>([]);
   const [paper, setPaper] = useState<any | null>(null);
+  const QUESTION_LABEL = paper?.type === "NPTEL" ? "Week" : "Q";
+
 
   const [viewMode, setViewMode] = useState<"solution" | "all">("solution");
 
@@ -355,7 +357,7 @@ useEffect(() => {
             </div>
 
             <h3 className="text-xl font-semibold">
-              Q/week.{activeQ?.q.q_no}
+              {QUESTION_LABEL}-{activeQ?.q.q_no}
               {activeQ?.sq && ` (${activeQ.sq.sq_no})`}
 
               {/* MAIN QUESTION HEADING (for multi) */}
@@ -464,7 +466,7 @@ useEffect(() => {
           className="block w-full text-left font-medium text-slate-800
                      hover:text-indigo-600"
         >
-          Q/week.{q.q_no}. {q.question_md}
+          {QUESTION_LABEL}-{q.q_no}. {q.question_md}
         </button>
 
         {/* MAIN QUESTION OPTIONS (OBJECTIVE) */}
@@ -641,7 +643,7 @@ function PanelLeft({ subjects, papers, activeSubject, activePaper, onSubject, on
 function duplicatePanelRight({ paper, activeQ, onSelect }: any) {
   return (
     <div className="p-4 text-sm">
-      <h3 className="font-semibold mb-3">Questions / Week</h3>
+      <h3 className="font-semibold mb-3">Questions</h3>
       {paper.questions.map((q: any) => (
         <div key={q.q_no} className="mb-2">
           <button
@@ -685,7 +687,7 @@ function duplicatePanelRight({ paper, activeQ, onSelect }: any) {
 function PanelRight({ paper, activeQ, onSelect }: any) {
   return (
     <div className="p-4 text-sm">
-      <h3 className="font-semibold mb-3">Questions / Week</h3>
+      <h3 className="font-semibold mb-3">Questions / Week </h3>
 
       {paper.questions.map((q: any) => {
         const isMainActive = activeQ?.q.q_no === q.q_no;
