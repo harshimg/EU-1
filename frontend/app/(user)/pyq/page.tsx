@@ -687,7 +687,9 @@ function duplicatePanelRight({ paper, activeQ, onSelect }: any) {
 function PanelRight({ paper, activeQ, onSelect }: any) {
   return (
     <div className="p-4 text-sm">
-      <h3 className="font-semibold mb-3">Questions / Week </h3>
+      <h3 className="font-semibold mb-3">
+        {paper?.type === "NPTEL" ? "Week" : "Q"}
+      </h3>
 
       {paper.questions.map((q: any) => {
         const isMainActive = activeQ?.q.q_no === q.q_no;
