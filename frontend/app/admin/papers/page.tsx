@@ -297,6 +297,7 @@ function PaperModal({ subject, data, onClose, onSaved }: any) {
           onChange={e => setType(e.target.value)}>
           <option>MID-SEM</option>
           <option>END-SEM</option>
+          <option>NPTEL</option>
           <option>QUIZ</option>
           <option>PRACTICE</option>
         </select>
