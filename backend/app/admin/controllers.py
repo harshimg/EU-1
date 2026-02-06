@@ -4,7 +4,7 @@ from app.utils.mongo_serializer import mongo_to_json
 from app.utils.datetime import utcnow
 from app.config import settings
 from fastapi import HTTPException, status, UploadFile
-from fastapi.responses import StreamingResponse     
+from fastapi.responses import StreamingResponse, Response
 
 import httpx
 
@@ -505,11 +505,20 @@ async def call_pdf_service(file: UploadFile, admin):
             if content_disposition:
                 headers["Content-Disposition"] = content_disposition
 
-            return StreamingResponse(
-                response.aiter_bytes(),  # Stream chunks to keep memory usage low
-                media_type="application/pdf",
-                headers=headers
-            )
+            if "content-length" in response.headers:
+                headers["Content-Length"] = response.headers["content-length"]
+
+            return Response(
+            content=response.content,   # 👈 buffer once
+            media_type="application/pdf",
+            headers=headers
+        )
+
+            # return StreamingResponse(
+            #     response.aiter_bytes(),  # Stream chunks to keep memory usage low
+            #     media_type="application/pdf",
+            #     headers=headers
+            # )
 
     except httpx.TimeoutException:
         raise HTTPException(

@@ -11,15 +11,10 @@
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
     ],
-    "/(user)/result/page": [
+    "/admin/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(user)/result/page.js"
-    ],
-    "/(user)/cgpa/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(user)/cgpa/page.js"
+      "static/chunks/app/admin/page.js"
     ],
     "/admin/pdf/page": [
       "static/chunks/webpack.js",
