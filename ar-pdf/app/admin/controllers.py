@@ -200,38 +200,38 @@ def watermark_digital_page(page):
         "uri": "https://alpharesult.in"
     })
 
-    # 2️⃣ LOGO (VERY LIGHT, UPPER AREA)
-    logo_rect = fitz.Rect(
-    rect.width * 0.34,
-    rect.height * 0.30,   # 🔽 moved down (was 0.12)
-    rect.width * 0.66,
-    rect.height * 0.60   # 🔽 balanced height
-    )
+    # # 2️⃣ LOGO (VERY LIGHT, UPPER AREA)
+    # logo_rect = fitz.Rect(
+    # rect.width * 0.34,
+    # rect.height * 0.30,   # 🔽 moved down (was 0.12)
+    # rect.width * 0.66,
+    # rect.height * 0.60   # 🔽 balanced height
+    # )
 
-    page.insert_image(
-        logo_rect,
-        filename=LOGO_PATH,
-        keep_proportion=True,
-        overlay=True   # unavoidable for digital PDFs
-    )
+    # page.insert_image(
+    #     logo_rect,
+    #     filename=LOGO_PATH,
+    #     keep_proportion=True,
+    #     overlay=True   # unavoidable for digital PDFs
+    # )
 
     # 3️⃣ DIAGONAL TEXT (LIGHT BLUE, LARGE)
-    tw = fitz.TextWriter(rect)
+    # tw = fitz.TextWriter(rect)
 
-    tw.append(
-        fitz.Point(rect.width * 0.04, rect.height * 0.65),
-        "alpharesult.in",
-        fontsize=64
-    )
+    # tw.append(
+    #     fitz.Point(rect.width * 0.04, rect.height * 0.65),
+    #     "alpharesult.in",
+    #     fontsize=64
+    # )
 
-    matrix = fitz.Matrix(1, 1).prerotate(45)
+    # matrix = fitz.Matrix(1, 1).prerotate(45)
 
-    tw.write_text(
-        page,
-        color=(0.82, 0.88, 0.96),  # VERY light blue
-        morph=(fitz.Point(rect.width / 2, rect.height / 2), matrix),
-        overlay=True
-    )
+    # tw.write_text(
+    #     page,
+    #     color=(0.82, 0.88, 0.96),  # VERY light blue
+    #     morph=(fitz.Point(rect.width / 2, rect.height / 2), matrix),
+    #     overlay=True
+    # )
 
     # 4️⃣ FOOTER (SUBTLE BLUE)
     page.insert_text(
@@ -286,7 +286,7 @@ def process_pdf(input_pdf_path: str, output_pdf_path: str):
             new_doc.insert_pdf(doc, from_page=page.number, to_page=page.number)
             new_page = new_doc[-1]  # last inserted page
 
-            add_alpharesult_header(new_page)
+            # add_alpharesult_header(new_page)
             watermark_digital_page(new_page)
 
 
