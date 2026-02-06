@@ -28,6 +28,7 @@ const ADMIN_NAV: NavLink[] = [
   { href: "/admin", label: "Admin Dashboard" },
   { href: "/admin/ssb", label: "Subject" },
   { href: "/admin/papers", label: "Paper" },
+  { href: "/admin/pdf", label: "Pdf" },
 ];
 
 
