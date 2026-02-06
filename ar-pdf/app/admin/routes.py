@@ -1,5 +1,5 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, Header
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 import os
 from fastapi import BackgroundTasks
 
@@ -9,6 +9,13 @@ from app.admin.controllers import process_pdf
 from app.security import verify_api_key
 
 router = APIRouter()
+
+
+
+def iter_file(path: str):
+    with open(path, "rb") as f:
+        while chunk := f.read(1024 * 1024):  # 1MB chunks
+            yield chunk
 
 @router.post("/process-pdf")
 async def process_pdf_api(
@@ -32,9 +39,18 @@ async def process_pdf_api(
     original_name = os.path.splitext(file.filename)[0]
     download_name = f"{original_name}_ar.pdf"
 
-    return FileResponse(
-        output_path,
-        media_type="application/pdf",
-        filename=download_name
+
+    return StreamingResponse(
+    iter_file(output_path),
+    media_type="application/pdf",
+    headers={
+        "Content-Disposition": f'attachment; filename="{download_name}"'
+        }
     )
+    
+    # return FileResponse(
+    #     output_path,
+    #     media_type="application/pdf",
+    #     filename=download_name
+    # )
 
