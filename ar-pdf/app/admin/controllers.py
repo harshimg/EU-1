@@ -15,7 +15,8 @@ def is_scanned_page(page):
 #----To add logo and watermark in scanned pdf
 def watermark_scanned_page(page, logo_path):
     # pix = page.get_pixmap(dpi=300)
-    pix = page.get_pixmap(dpi=200)
+    # pix = page.get_pixmap(dpi=200)
+    pix = page.get_pixmap(dpi=150)
     base = Image.frombytes("RGB", [pix.width, pix.height], pix.samples).convert("RGBA")
 
     w, h = base.size

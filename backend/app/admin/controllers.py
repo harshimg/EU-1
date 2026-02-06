@@ -500,7 +500,7 @@ async def call_pdf_service(file: UploadFile, admin):
 
             headers = {
                 "Access-Control-Expose-Headers": "Content-Disposition"
-            }
+            } 
 
             if content_disposition:
                 headers["Content-Disposition"] = content_disposition
@@ -531,4 +531,5 @@ async def call_pdf_service(file: UploadFile, admin):
             status_code=500,
             detail=f"PDF processing error: {str(e)}",
         )
+
 
