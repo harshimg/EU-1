@@ -179,6 +179,7 @@ async def create_subject(body, admin):
         "subject_type": subject_type,
         "subject_credit": body["subject_credit"],
         "max_marks": max_marks,
+        "all_paper_pdf": body.get("all_paper_pdf"),
         "created_at": datetime.now(timezone.utc),
         "updated_at": utcnow(),
         "admin_userids": [admin["admin_userid"]]
@@ -236,6 +237,7 @@ async def update_subject(code: str, body, admin):
                 "subject_type": subject_type,
                 "subject_credit": body["subject_credit"],
                 "max_marks": max_marks,
+                "all_paper_pdf": body.get("all_paper_pdf"),
                 "updated_at": utcnow()
             },
             "$addToSet": {

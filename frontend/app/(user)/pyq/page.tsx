@@ -376,8 +376,8 @@ useEffect(() => {
       target="_blank"
       rel="noopener noreferrer"
       className="px-4 py-1.5 rounded-lg text-sm font-medium
-                 bg-indigo-600 text-white
-                 hover:bg-indigo-700 transition"
+                 bg-gradient-to-r from-indigo-600 to-blue-600
+                 text-white shadow hover:opacity-90 transition"
     >
       Download PDF
     </a>
@@ -650,38 +650,50 @@ function PanelLeft({ subjects, papers, activeSubject, activePaper, onSubject, on
   return (
     <div className="p-4 space-y-4 text-sm">
       <h3 className="font-semibold">Subjects</h3>
-      {/* {subjects.map((s: any) => (
-        <button
-          key={s._id}
-          onClick={() => onSubject(s)}
-          className={`block w-full text-left px-3 py-2 rounded ${
-            activeSubject?.code === s.code
-              ? "bg-indigo-100 text-indigo-700"
-              : "hover:bg-slate-100"
+
+      {subjects
+  .filter((s: any) => s.subject_type === "Theory")
+  .map((s: any) => {
+    const isActive = activeSubject?.code === s.code;
+
+    return (
+      <div
+        key={s._id}
+        className={`flex items-center justify-between px-3 py-2 rounded
+          ${isActive
+            ? "bg-indigo-100"
+            : "hover:bg-slate-100"
           }`}
+      >
+        {/* SUBJECT BUTTON */}
+        <button
+          onClick={() => onSubject(s)}
+          className={`text-left font-medium
+            ${isActive
+              ? "text-indigo-700"
+              : "text-slate-700"
+            }`}
         >
           {s.short_name}
         </button>
-      ))} */}
 
-    {subjects
-      .filter((s: any) => s.subject_type === "Theory")
-      .map((s: any) => (
-        <button
-          key={s._id}
-          onClick={() => onSubject(s)}
-          className={`block w-full text-left px-3 py-2 rounded ${
-            activeSubject?.code === s.code
-              ? "bg-indigo-100 text-indigo-700"
-              : "hover:bg-slate-100"
-          }`}
-        >
-          {s.short_name}
-        </button>
-      ))}
-
-
-
+        {/* SHOW PDF ONLY FOR ACTIVE SUBJECT */}
+        {isActive && s?.all_paper_pdf && (
+          <a
+            href={s.all_paper_pdf}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="text-xs px-3 py-1 rounded-md
+                       bg-indigo-600 text-white
+                       hover:bg-indigo-700 transition"
+          >
+           Download PDF
+          </a>
+        )}
+      </div>
+    );
+  })}
 
       <h3 className="font-semibold mt-4">Papers</h3>
       {papers.map((p: any) => (

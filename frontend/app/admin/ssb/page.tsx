@@ -33,7 +33,8 @@ interface Subject {
   branch_code: string;
   subject_type: string;
   subject_credit: number;
-  max_marks: number
+  max_marks: number;
+  all_paper_pdf: string;
 }
 
 /* =====================================================
@@ -290,7 +291,7 @@ function SubjectSection() {
         <Select value={filterBranch} onChange={setFilterBranch} options={branches} />
       </div>
 
-      <Table headers={["Code", "Short", "Full Name", "Semester", "Branch", "Type", "Credit", "max_marks", "Actions"]}>
+      <Table headers={["Code", "Short", "Full Name", "Semester", "Branch", "Type", "Credit", "max_marks", "view", "Actions"]}>
         {subjects.map(s => (
           <tr key={s.code}>
             <Td>{s.code}</Td>
@@ -319,6 +320,7 @@ function SubjectSection() {
             <Td>{s.subject_type}</Td>
             <Td>{s.subject_credit}</Td>
             <Td>{s.max_marks}</Td>
+            <Td>{s.all_paper_pdf || "Na"}</Td>
             <Td>
               <ActionBtn onClick={() => { setEdit(s); setOpen(true); }}>Edit</ActionBtn>
               <ActionBtn danger onClick={() => remove(s.code)}>Delete</ActionBtn>
@@ -596,6 +598,7 @@ function SubjectModal({ data, semesters, branches, onClose, onSaved }: any) {
   const [subject_type, setsubject_type] = useState(data?.subject_type || "");
   const [subject_credit, setsubject_credit] = useState(data?.subject_credit || "");
   const [max_marks, setmax_marks] = useState(data?.max_marks || "");
+  const [all_paper_pdf, setall_paper_pdf] = useState(data?.all_paper_pdf || "")
 
 
   const branchOptions = branches.map((b: any) => ({
@@ -638,6 +641,7 @@ function SubjectModal({ data, semesters, branches, onClose, onSaved }: any) {
         subject_type,
         subject_credit,
         max_marks,
+        all_paper_pdf,
       }),
     });
 
@@ -721,6 +725,12 @@ function SubjectModal({ data, semesters, branches, onClose, onSaved }: any) {
         value={subject_credit}
         onChange={e => setsubject_credit(e.target.value)}
         />
+      </div>
+
+      <div>
+        <input className="input" placeholder="All paper pdf link"
+        type="string" value={all_paper_pdf}
+        onChange={e => setall_paper_pdf(e.target.value)} />
       </div>
 
       <button

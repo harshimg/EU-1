@@ -1452,6 +1452,13 @@
       }
     }
   }
+  .hover\:opacity-90 {
+    &:hover {
+      @media (hover: hover) {
+        opacity: 90%;
+      }
+    }
+  }
   .hover\:file\:bg-indigo-100 {
     &:hover {
       @media (hover: hover) {
