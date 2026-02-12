@@ -301,7 +301,7 @@ useEffect(() => {
 
 
   
-{/* VIEW TOGGLE */}
+{/* VIEW TOGGLE
 <div className="flex justify-center mb-4">
   <div className="flex bg-slate-100 rounded-lg p-1">
     <button
@@ -323,8 +323,70 @@ useEffect(() => {
     >
       All Questions
     </button>
+
+    {paper?.paper_pdf && (
+  <a
+    href={paper.paper_pdf}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="inline-block mt-3 px-4 py-2 rounded-lg text-sm font-medium
+               bg-blue-600 text-white hover:bg-green-700"
+  >
+    Download PDF
+  </a>
+)}
+
   </div>
+</div> */}
+
+
+{/* VIEW TOGGLE + DOWNLOAD */}
+<div className="flex items-center justify-between mb-4">
+
+  {/* LEFT SPACER (keeps toggle centered) */}
+  <div className="w-24" />
+
+  {/* CENTER TOGGLE */}
+  <div className="flex bg-slate-100 rounded-lg p-1">
+    <button
+      onClick={() => setViewMode("solution")}
+      className={`px-4 py-1.5 rounded-md text-sm font-medium transition
+        ${viewMode === "solution"
+          ? "bg-white shadow text-indigo-600"
+          : "text-slate-600 hover:text-slate-800"}`}
+    >
+      Solution
+    </button>
+
+    <button
+      onClick={() => setViewMode("all")}
+      className={`px-4 py-1.5 rounded-md text-sm font-medium transition
+        ${viewMode === "all"
+          ? "bg-white shadow text-indigo-600"
+          : "text-slate-600 hover:text-slate-800"}`}
+    >
+      All Questions
+    </button>
+  </div>
+
+  {/* RIGHT DOWNLOAD BUTTON */}
+  {paper?.paper_pdf ? (
+    <a
+      href={paper.paper_pdf} // recommended backend route
+      target="_blank"
+      rel="noopener noreferrer"
+      className="px-4 py-1.5 rounded-lg text-sm font-medium
+                 bg-indigo-600 text-white
+                 hover:bg-indigo-700 transition"
+    >
+      Download PDF
+    </a>
+  ) : (
+    <div className="w-24" />
+  )}
+
 </div>
+
 
 
 

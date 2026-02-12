@@ -270,16 +270,6 @@ from app.utils.mongo_serializer import mongo_to_json
 
 
 async def create_paper(body: dict, admin):
-    # doc = {
-    #     "subject_code": body["subject_code"],   # auto same as subject
-    #     "name": body["name"],
-    #     "type": body["type"],                   # MID / END / QUIZ / PRACTICE
-    #     "year": body["year"],
-    #     "description": body.get("description", ""),
-    #     "created_at": datetime.now(timezone.utc).isoformat(),  # ✅ FIXED
-    #     "questions" : []
-    # }
-
 
     doc = {
         "subject_code": body["subject_code"],
@@ -287,6 +277,7 @@ async def create_paper(body: dict, admin):
         "type": body["type"],          # MID / END / QUIZ / PRACTICE
         "year": body["year"],
         "description": body.get("description", ""),
+        "paper_pdf": body.get("paper_pdf", ""),
         "questions": [],
         "admin_userids": [admin["admin_userid"]],
         "created_at": utcnow(),
@@ -333,6 +324,7 @@ async def update_paper(paper_id: str, body: dict, admin):
                 "type": body["type"],
                 "year": body["year"],
                 "description": body.get("description", ""),
+                "paper_pdf": body.get("paper_pdf", ""),
                 "updated_at": utcnow(),
             },
             "$addToSet": {

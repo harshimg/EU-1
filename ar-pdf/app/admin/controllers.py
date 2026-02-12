@@ -259,7 +259,7 @@ def process_pdf(input_pdf_path: str, output_pdf_path: str):
             final_img.save(
                 buf,
                 format="JPEG",
-                quality=80,
+                quality=60  #80,
                 subsampling=2,
                 optimize=True
             )

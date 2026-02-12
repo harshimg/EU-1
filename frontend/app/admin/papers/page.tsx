@@ -30,6 +30,7 @@ interface Paper {
   type: string;
   year: number;
   description?: string;
+  paper_pdf?: string;
 }
 
 /* ================= PAGE ================= */
@@ -156,6 +157,7 @@ export default function AdminPapersPage() {
               <Th>Type</Th>
               <Th>Year</Th>
               <Th>Description</Th>
+              <Th>Pdf</Th>
               <Th>Actions</Th>
             </tr>
           </thead>
@@ -179,6 +181,7 @@ export default function AdminPapersPage() {
                 <Td>{p.type}</Td>
                 <Td>{p.year}</Td>
                 <Td>{p.description || "-"}</Td>
+                <Td>{p.paper_pdf || "Na"}</Td>
                 <Td>
                   <ActionBtn onClick={() => { setEdit(p); setOpen(true); }}>Edit</ActionBtn>
                   <ActionBtn danger onClick={() => remove(p._id)}>Delete</ActionBtn>
@@ -254,6 +257,7 @@ function PaperModal({ subject, data, onClose, onSaved }: any) {
   const [type, setType] = useState(data?.type || "END-SEM");
   const [year, setYear] = useState(data?.year || new Date().getFullYear());
   const [desc, setDesc] = useState(data?.description || "");
+  const [paper_pdf, setpaper_pdf] = useState(data?.paper_pdf || "")
 
   async function submit() {
     if (!name || !type || !year) return;
@@ -276,6 +280,7 @@ function PaperModal({ subject, data, onClose, onSaved }: any) {
         type,
         year,
         description: desc,
+        paper_pdf,
       }),
     });
 
@@ -309,12 +314,15 @@ function PaperModal({ subject, data, onClose, onSaved }: any) {
           placeholder="Description (optional)"
           value={desc} onChange={e => setDesc(e.target.value)} />
 
+        <input type="string" className="input mb-3" placeholder="Pdf link"
+          value={paper_pdf} onChange={e => setpaper_pdf(e.target.value)} />
+
         <button onClick={submit}
           disabled={!name}
           className="btn-primary w-full disabled:opacity-40">
           Save
         </button>
-
+    
         <button onClick={onClose}
           className="text-xs text-slate-400 mt-3 w-full">
           Cancel
