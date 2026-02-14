@@ -32,7 +32,8 @@ export default function RootLayout({ children }: any) {
 
               {/* PAGE CONTENT */}
               <main className="flex-1">
-                <div className="container py-10">{children}</div>
+                {/* <div className="container py-10">{children}</div> */}
+                {children}
               </main>
 
               {/* FOOTER */}
