@@ -1,4 +1,7 @@
 {
-  "/admin/ssb/page": "app/admin/ssb/page.js",
-  "/(user)/pyq/page": "app/(user)/pyq/page.js"
+  "/(user)/pyq/page": "app/(user)/pyq/page.js",
+  "/(user)/page": "app/(user)/page.js",
+  "/(user)/result/page": "app/(user)/result/page.js",
+  "/(user)/cgpa/page": "app/(user)/cgpa/page.js",
+  "/admin/page": "app/admin/page.js"
 }
