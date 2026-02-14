@@ -1,9 +1,9 @@
 {
   "pages": {
-    "/(user)/pyq/page": [
+    "/admin/ssb/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(user)/pyq/page.js"
+      "static/chunks/app/admin/ssb/page.js"
     ],
     "/layout": [
       "static/chunks/webpack.js",
@@ -11,20 +11,10 @@
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
     ],
-    "/admin/papers/page": [
+    "/(user)/pyq/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/admin/papers/page.js"
-    ],
-    "/admin/papers/layout": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/admin/papers/layout.js"
-    ],
-    "/admin/ssb/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/admin/ssb/page.js"
+      "static/chunks/app/(user)/pyq/page.js"
     ]
   }
 }

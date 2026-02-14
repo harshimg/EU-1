@@ -4,6 +4,15 @@ import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { API_URL, apiGet, apiPost } from "@/lib/api";
 import { useAuthModal } from "@/components/auth/AuthModal";
+import {
+  MobileTabs,
+  SubjectSelector,
+  PaperSelector,
+  QuestionSelector,
+} from "@/components/pyq/mobile";
+import { useSwipeable } from "react-swipeable";
+
+
 
 
 
@@ -30,6 +39,24 @@ export default function PYQPage() {
   const [rightW, setRightW] = useState(100);
 
   /* Mobile drawers */
+  const [activeTab, setActiveTab] = useState<
+  "subjects" | "papers" | "questions"
+>("questions");
+
+const handlers = useSwipeable({
+  onSwipedLeft: () => {
+    if (activeTab === "subjects") setActiveTab("papers");
+    else if (activeTab === "papers") setActiveTab("questions");
+  },
+  onSwipedRight: () => {
+    if (activeTab === "questions") setActiveTab("papers");
+    else if (activeTab === "papers") setActiveTab("subjects");
+  },
+  trackMouse: true,
+});
+
+
+
   const [showLeftMobile, setShowLeftMobile] = useState(false);
   const [showRightMobile, setShowRightMobile] = useState(false);
 
@@ -234,7 +261,7 @@ useEffect(() => {
       {!user && !loading && (
   <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/30 backdrop-blur-sm">
     <div className="bg-white rounded-xl p-6 shadow-xl text-center">
-      <p className="text-slate-700 mb-3">Please sign in to view PYQs</p>
+      <p className="text-slate-700 mb-3">Please sign in to view PYQs & Solution</p>
       <button
         onClick={showLogin}
         className="btn-primary"
@@ -245,9 +272,49 @@ useEffect(() => {
   </div>
 )}
 
+      {/* MOBILE  Navigation for Subjects, papers, Quetions */}
+      <div {...handlers}>
+
+<MobileTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+
+{activeTab === "subjects" && (
+  <SubjectSelector
+    subjects={subjects}
+    activeSubject={activeSubject}
+    onSelect={(s) => {
+      setActiveSubject(s);
+      setActiveTab("papers"); // auto switch
+    }}
+  />
+)}
+
+{activeTab === "papers" && (
+  <PaperSelector
+    papers={papers}
+    activePaper={activePaper}
+    onSelect={(p) => {
+      setActivePaper(p);
+      setActiveTab("questions"); // auto switch
+    }}
+  />
+)}
+
+{activeTab === "questions" && (
+  <QuestionSelector
+    paper={paper}
+    activeQ={activeQ}
+    onSelect={setActiveQ}
+  />
+)}
+
+</div>
+
+
+
+
 
       {/* MOBILE TOP BAR */}
-      <div className="md:hidden sticky top-0 z-30 flex justify-between items-center gap-3 px-3 py-3 
+      {/* <div className="md:hidden sticky top-0 z-30 flex justify-between items-center gap-3 px-3 py-3 
                       bg-gradient-to-r from-indigo-600 to-blue-600 border-b border-black/10 shadow-md">
         <button
           onClick={() => setShowLeftMobile(true)}
@@ -264,7 +331,7 @@ useEffect(() => {
         >
           Questions
         </button>
-      </div>
+      </div> */}
 
       {/* LEFT PANEL (DESKTOP) */}
       <aside
@@ -628,7 +695,10 @@ useEffect(() => {
         </MobileDrawer>
       )}
     </div>
-  );
+
+
+
+  );   //return
 }
 
 /* ---------------- MOBILE DRAWER ---------------- */
@@ -677,7 +747,7 @@ function PanelLeft({ subjects, papers, activeSubject, activePaper, onSubject, on
           {s.short_name}
         </button>
 
-        {/* SHOW PDF ONLY FOR ACTIVE SUBJECT */}
+        {/* SHOW Download PDF ONLY FOR ACTIVE SUBJECT */}
         {isActive && s?.all_paper_pdf && (
           <a
             href={s.all_paper_pdf}
