@@ -273,7 +273,7 @@ useEffect(() => {
 )}
 
       {/* MOBILE  Navigation for Subjects, papers, Quetions */}
-      <div {...handlers}>
+      <div >
 
 <MobileTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 

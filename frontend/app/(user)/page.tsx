@@ -21,7 +21,7 @@ export default function HomePage() {
                text-white border border-white/20 shadow-2xl"
   >
     {/* Subtle Glow Effect */}
-    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.15),transparent_60%)]" />
+    {/* <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.15),transparent_60%)]" /> */}
 
     <div className="relative max-w-6xl mx-auto px-6 py-20 md:py-24 text-center">
 
