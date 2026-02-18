@@ -1,6 +1,4 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
   "/(user)/page": "app/(user)/page.js",
-  "/favicon.ico/route": "app/favicon.ico/route.js",
   "/(user)/pyq/page": "app/(user)/pyq/page.js"
 }

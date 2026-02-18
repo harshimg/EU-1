@@ -729,36 +729,34 @@ function PanelLeft({ subjects, papers, activeSubject, activePaper, onSubject, on
     return (
       <div
         key={s._id}
-        className={`flex items-center justify-between px-3 py-2 rounded
-          ${isActive
-            ? "bg-indigo-100"
-            : "hover:bg-slate-100"
+        onClick={() => onSubject(s)}   // ✅ CLICK ANYWHERE
+        className={`flex items-center justify-between px-3 py-2 rounded cursor-pointer transition
+          ${
+            isActive
+              ? "bg-indigo-100"
+              : "hover:bg-slate-100"
           }`}
       >
-        {/* SUBJECT BUTTON */}
-        <button
-          onClick={() => onSubject(s)}
-          className={`text-left font-medium
-            ${isActive
-              ? "text-indigo-700"
-              : "text-slate-700"
-            }`}
+        {/* SUBJECT NAME */}
+        <span
+          className={`font-medium
+            ${isActive ? "text-indigo-700" : "text-slate-700"}`}
         >
           {s.short_name}
-        </button>
+        </span>
 
-        {/* SHOW Download PDF ONLY FOR ACTIVE SUBJECT */}
+        {/* DOWNLOAD PDF BUTTON */}
         {isActive && s?.all_paper_pdf && (
           <a
             href={s.all_paper_pdf}
             target="_blank"
             rel="noopener noreferrer"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}  // ✅ Prevent subject activation
             className="text-xs px-3 py-1 rounded-md
                        bg-indigo-600 text-white
                        hover:bg-indigo-700 transition"
           >
-           Download PDF
+            Download PDF
           </a>
         )}
       </div>
