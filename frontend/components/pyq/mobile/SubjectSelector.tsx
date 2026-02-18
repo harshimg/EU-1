@@ -31,7 +31,9 @@ useEffect(() => {
     ref={containerRef}
     className="md:hidden flex overflow-x-auto no-scrollbar gap-2 px-3 py-2 bg-slate-50"
     >
-      {subjects.map(s => (
+      {subjects
+       .filter((s: any) => s.subject_type === "Theory")
+      .map(s => (
         <button
           key={s.code}
           onClick={() => onSelect(s)}

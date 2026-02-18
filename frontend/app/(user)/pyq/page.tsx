@@ -275,37 +275,37 @@ useEffect(() => {
       {/* MOBILE  Navigation for Subjects, papers, Quetions */}
       <div >
 
-<MobileTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+          <MobileTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
-{activeTab === "subjects" && (
-  <SubjectSelector
-    subjects={subjects}
-    activeSubject={activeSubject}
-    onSelect={(s) => {
-      setActiveSubject(s);
-      setActiveTab("papers"); // auto switch
-    }}
-  />
-)}
+          {activeTab === "subjects" && (
+            <SubjectSelector
+              subjects={subjects}
+              activeSubject={activeSubject}
+              onSelect={(s) => {
+                setActiveSubject(s);
+                setActiveTab("papers"); // auto switch
+              }}
+            />
+          )}
 
-{activeTab === "papers" && (
-  <PaperSelector
-    papers={papers}
-    activePaper={activePaper}
-    onSelect={(p) => {
-      setActivePaper(p);
-      setActiveTab("questions"); // auto switch
-    }}
-  />
-)}
+          {activeTab === "papers" && (
+            <PaperSelector
+              papers={papers}
+              activePaper={activePaper}
+              onSelect={(p) => {
+                setActivePaper(p);
+                setActiveTab("questions"); // auto switch
+              }}
+            />
+          )}
 
-{activeTab === "questions" && (
-  <QuestionSelector
-    paper={paper}
-    activeQ={activeQ}
-    onSelect={setActiveQ}
-  />
-)}
+          {activeTab === "questions" && (
+            <QuestionSelector
+              paper={paper}
+              activeQ={activeQ}
+              onSelect={setActiveQ}
+            />
+          )}
 
 </div>
 

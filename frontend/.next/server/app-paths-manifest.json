@@ -1,5 +1,5 @@
 {
   "/(user)/page": "app/(user)/page.js",
-  "/(user)/contact-us/page": "app/(user)/contact-us/page.js",
-  "/(user)/pyq/page": "app/(user)/pyq/page.js"
+  "/(user)/pyq/page": "app/(user)/pyq/page.js",
+  "/(user)/contact-us/page": "app/(user)/contact-us/page.js"
 }
