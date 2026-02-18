@@ -178,7 +178,7 @@ export default function ContactPage() {
                                         after:h-[2px] after:w-0 after:bg-green-600
                                         after:transition-all after:duration-300
                                         group-hover:after:w-full">
-                        WhatsApp Channel
+                        WhatsApp
                         </span>
                     </div>
 

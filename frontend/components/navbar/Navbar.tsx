@@ -18,7 +18,8 @@ type NavLink = {
 
 const USER_NAV: NavLink[] = [
   { href: "/", label: "Home" },
-  { href: "/pyq", label: "PYQs" },
+  { href: "/pyq/download", label: "PYQs" },
+  { href: "/pyq", label: "Solution" },
   { href: "/result", label: "Result"},
   { href: "/cgpa", label: "CGPA" },
   { href: "/about", label: "About" },

@@ -95,12 +95,76 @@ export default function ResultPage() {
 
     {/* INPUT FORM (HIDDEN ON PRINT) */}
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-white p-4 rounded-xl shadow print:hidden">
-      <input
+
+      {/* REGISTRATION INPUT WITH INC / DEC */}
+<div className="grid grid-cols-[auto_1fr_auto] gap-3 items-center md:col-span-4">
+
+{/* DECREMENT BUTTON */}
+<button
+  type="button"
+  disabled={loading}
+  onClick={() => {
+    if (!regNo) return;
+    const num = Number(regNo);
+    if (!isNaN(num) && num > 1) {
+      const newReg = String(num - 1);
+      setRegNo(newReg);
+      setTimeout(fetchResult, 100);
+    }
+  }}
+  className="h-14 w-16 rounded-xl
+             bg-purple-600 hover:bg-emerald-700
+             shadow-lg flex items-center justify-center
+             transition active:scale-95 disabled:opacity-50"
+>
+  <span className="text-yellow-400 text-2xl font-bold">▼</span>
+</button>
+
+{/* INPUT */}
+<input
+  type="number"
+  className="input h-14 text-center text-lg font-semibold"
+  placeholder="Registration No"
+  value={regNo}
+  onChange={e => {
+    const value = e.target.value;
+    if (/^\d*$/.test(value)) {
+      setRegNo(value);
+    }
+  }}
+/>
+
+{/* INCREMENT BUTTON */}
+<button
+  type="button"
+  disabled={loading}
+  onClick={() => {
+    if (!regNo) return;
+    const num = Number(regNo);
+    if (!isNaN(num)) {
+      const newReg = String(num + 1);
+      setRegNo(newReg);
+      setTimeout(fetchResult, 100);
+    }
+  }}
+  className="h-14 w-16 rounded-xl
+             bg-purple-600 hover:bg-emerald-70
+             shadow-lg flex items-center justify-center
+             transition active:scale-95 disabled:opacity-50"
+>
+  <span className="text-yellow-400 text-2xl font-bold">▲</span>
+</button>
+
+</div>
+
+
+
+      {/* <input
         className="input"
         placeholder="Registration No"
         value={regNo}
         onChange={e => setRegNo(e.target.value)}
-      />
+      /> */}
 
       <select
         className="input"

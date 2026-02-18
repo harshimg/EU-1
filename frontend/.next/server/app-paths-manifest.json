@@ -2,6 +2,7 @@
   "/_not-found/page": "app/_not-found/page.js",
   "/(user)/page": "app/(user)/page.js",
   "/(user)/pyq/page": "app/(user)/pyq/page.js",
-  "/(user)/contact-us/page": "app/(user)/contact-us/page.js",
-  "/(user)/pyq/download/page": "app/(user)/pyq/download/page.js"
+  "/admin/page": "app/admin/page.js",
+  "/(user)/account/page": "app/(user)/account/page.js",
+  "/(user)/result/page": "app/(user)/result/page.js"
 }
