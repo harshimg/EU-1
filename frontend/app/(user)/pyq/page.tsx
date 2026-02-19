@@ -256,6 +256,21 @@ useEffect(() => {
 
   const current = activeQ?.sq ?? activeQ?.q;
 
+  // const isUnavailable =
+  // !current?.question_md &&
+  // !current?.solution_md &&
+  // (!current?.options || current.options.length === 0);
+
+  // const isUnavailable = !current;
+
+  const isUnavailable =
+  !current ||
+  !current.question_md ||
+  current.question_md.trim().length === 0;
+
+
+
+
   return (
     <div className="h-screen overflow-hidden bg-slate-100 flex flex-col md:flex-row">
       {!user && !loading && (
@@ -453,6 +468,139 @@ useEffect(() => {
   )}
 
 </div>
+
+
+
+
+{viewMode === "solution" &&  (
+  <div className="bg-white rounded-xl shadow-md p-4 md:p-6 space-y-6">
+
+    {/* Top Navigation */}
+    <div className="flex justify-between items-center pt-6 mt-6">
+      <button
+        onClick={goPrev}
+        disabled={currentIndex <= 0}
+        className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
+                   bg-white text-slate-700 border border-slate-300
+                   hover:bg-slate-100
+                   disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        ← Previous
+      </button>
+
+      <button
+        onClick={goNext}
+        disabled={currentIndex >= flatQuestions.length - 1}
+        className="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium
+                   bg-indigo-600 text-white shadow-sm
+                   hover:bg-indigo-700
+                   disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        Next →
+      </button>
+    </div>
+
+    {/* 🚨 AVAILABLE SOON BLOCK */}
+    {isUnavailable ? (
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+
+        <div className="text-5xl font-bold text-indigo-600 tracking-wide">
+          AVAILABLE SOON
+        </div>
+
+        {/* <p className="mt-4 text-slate-500 text-sm max-w-md">
+          This question and its solution are currently being prepared.
+          Please check back later.
+        </p> */}
+
+      </div>
+    ) : (
+      <>
+        {/* QUESTION TITLE */}
+        <h3 className="text-xl font-semibold">
+          {QUESTION_LABEL}-{activeQ?.q.q_no}
+          {activeQ?.sq && ` (${activeQ.sq.sq_no})`}
+        </h3>
+
+        {/* HEADING (if multi) */}
+        {activeQ?.q?.heading && (
+          <div className="text-slate-700 font-medium bg-slate-50 border-l-4 border-slate-300 px-4 py-2 rounded">
+            {activeQ.q.heading}
+          </div>
+        )}
+
+        {/* QUESTION TEXT */}
+        {current.question_md && (
+          <p className="whitespace-pre-wrap">
+            {current.question_md}
+          </p>
+        )}
+
+        {/* OBJECTIVE OPTIONS */}
+        {Array.isArray(current.options) && (
+          <div className="space-y-2">
+            {current.options.map((op: string, i: number) => {
+              const isCorrect = current.correct_index === i;
+              return (
+                <div
+                  key={i}
+                  className={`p-3 rounded border ${
+                    isCorrect
+                      ? "bg-green-50 border-green-400 text-green-800"
+                      : "bg-slate-50 border-slate-200"
+                  }`}
+                >
+                  <strong>{String.fromCharCode(65 + i)}.</strong> {op}
+                  {isCorrect && (
+                    <span className="ml-2 text-xs font-semibold">
+                      ✓ Correct
+                    </span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* SOLUTION */}
+        {current.solution_md && (
+          <div className="bg-indigo-50 border-l-4 border-indigo-400 p-4 rounded">
+            <strong className="block mb-1">Solution</strong>
+            <div className="mt-2 whitespace-pre-wrap">
+              {current.solution_md}
+            </div>
+          </div>
+        )}
+      </>
+    )}
+
+    {/* Bottom Navigation */}
+    <div className="flex justify-between items-center pt-6 mt-6">
+      <button
+        onClick={goPrev}
+        disabled={currentIndex <= 0}
+        className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
+                   bg-white text-slate-700 border border-slate-300
+                   hover:bg-slate-100
+                   disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        ← Previous
+      </button>
+
+      <button
+        onClick={goNext}
+        disabled={currentIndex >= flatQuestions.length - 1}
+        className="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium
+                   bg-indigo-600 text-white shadow-sm
+                   hover:bg-indigo-700
+                   disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        Next →
+      </button>
+    </div>
+
+  </div>
+)}
 
 
 
