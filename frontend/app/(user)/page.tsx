@@ -43,7 +43,7 @@ export default function HomePage() {
       <div className="mt-10 flex justify-center gap-4 flex-wrap">
 
         <Link
-          href="/pyq"
+          href="/pyq/download"
           className="px-8 py-3 rounded-xl bg-white text-[#5B2EBD]
                      font-semibold shadow-lg
                      hover:scale-105 hover:shadow-xl
@@ -51,6 +51,18 @@ export default function HomePage() {
         >
           Explore PYQs
         </Link>
+
+        <Link
+          href="/pyq"
+          className="px-8 py-3 rounded-xl bg-white text-[#5B2EBD]
+                     font-semibold shadow-lg
+                     hover:scale-105 hover:shadow-xl
+                     transition duration-200"
+        >
+          Solution
+        </Link>
+
+        
 
         <Link
           href="/result"
