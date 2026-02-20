@@ -4,6 +4,8 @@ import Navbar from "@/components/navbar/Navbar";
 import Footer from "@/components/footer/Footer";
 import { AuthModalProvider } from "@/components/auth/AuthModal";
 
+import { Analytics } from "@vercel/analytics/next"
+
 export const metadata = {
   title: "Alpha Result — PYQ & Solutions",
   description: "Study tools & past year questions",
@@ -42,6 +44,8 @@ export default function RootLayout({ children }: any) {
 
           </AuthModalProvider>
         </AuthProvider>
+
+        <Analytics />
 
       </body>
     </html>
