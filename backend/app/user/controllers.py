@@ -90,7 +90,7 @@ async def list_subjects(semester_code: int, branch_code: str):
 async def list_papers(subject_code: str):
     cursor = db_instance.db.papers.find(
         {"subject_code": subject_code}
-    ).sort("year, -1")
+    ).sort("year", -1)
 
     docs = await cursor.to_list(length=None)
 
