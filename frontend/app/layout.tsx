@@ -5,6 +5,7 @@ import Footer from "@/components/footer/Footer";
 import { AuthModalProvider } from "@/components/auth/AuthModal";
 
 import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 export const metadata = {
   title: "Alpha Result — PYQ & Solutions",
@@ -46,7 +47,11 @@ export default function RootLayout({ children }: any) {
           </AuthModalProvider>
         </AuthProvider>
 
+        {/*Vercel - Analytics */}
         <Analytics />
+
+        {/* Speed Insights */}
+        <SpeedInsights />
 
       </body>
     </html>
