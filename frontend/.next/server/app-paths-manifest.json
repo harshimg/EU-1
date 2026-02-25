@@ -1,7 +1,19 @@
 {
-  "/admin/ssb/page": "app/admin/ssb/page.js",
-  "/(user)/pyq/page": "app/(user)/pyq/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/(user)/about/page": "app/(user)/about/page.js",
   "/(user)/account/page": "app/(user)/account/page.js",
+  "/(user)/cgpa/page": "app/(user)/cgpa/page.js",
+  "/(user)/contact-us/page": "app/(user)/contact-us/page.js",
   "/(user)/page": "app/(user)/page.js",
+  "/(user)/pyq/download/page": "app/(user)/pyq/download/page.js",
+  "/(user)/pyq/page": "app/(user)/pyq/page.js",
+  "/(user)/result/page": "app/(user)/result/page.js",
+  "/admin/page": "app/admin/page.js",
+  "/admin/pdf/page": "app/admin/pdf/page.js",
+  "/admin/ssb/page": "app/admin/ssb/page.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/sa/page": "app/sa/page.js",
+  "/sa/users/page": "app/sa/users/page.js",
+  "/admin/papers/[paper_id]/page": "app/admin/papers/[paper_id]/page.js",
   "/admin/papers/page": "app/admin/papers/page.js"
 }

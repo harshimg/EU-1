@@ -4,6 +4,9 @@ import { AuthModalProvider } from "@/components/auth/AuthModal";
 import Navbar from "@/components/navbar/Navbar";
 import Footer from "@/components/footer/Footer";
 
+import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
+
 export const metadata = {
   title: "Alpha Result — PYQ & Solutions",
   description: "Past year questions, solutions and study tools for university students",
@@ -28,6 +31,12 @@ export default function RootLayout({ children }: any) {
             <Footer />
           </AuthModalProvider>
         </AuthProvider>
+
+        {/* Vercel - Analytics */}
+        <Analytics />
+
+        {/* Speed Insights */}
+        <SpeedInsights />
       </body>
     </html>
   );
