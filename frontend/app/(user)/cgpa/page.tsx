@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { apiGet, apiPost } from "@/lib/api";
-import { useAuth } from "@/lib/auth";
+import { useAuth } from "@/lib/auth";z
 
 export default function SgpaPage() {
   const { user, loading, refreshUser } = useAuth();

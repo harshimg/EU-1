@@ -49,6 +49,22 @@ export default function RootLayout({ children }: any) {
         </AuthProvider>
 
 
+        {/* Structured Data */}
+        <Script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "EducationalOrganization",
+              name: "Alpha Result",
+              url: "https://alpharesult.in",
+              description:
+                "BEU Previous Year Questions with Solutions and SGPA CGPA Calculator.",
+            }),
+          }}
+        />
+
+
         {/* Google Analytics */}
           <Script
             src="https://www.googletagmanager.com/gtag/js?id=G-PC5PLZKLXR"
