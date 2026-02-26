@@ -1,4 +1,4 @@
-"use client";z
+"use client";
 
 export default function AboutPage() {
   return (
