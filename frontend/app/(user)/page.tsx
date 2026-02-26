@@ -10,7 +10,6 @@ export default function HomePage() {
   const { showLogin, showSignup } = useAuthModal();
   const { user } = useAuth();
 
-  
   return (
     <div className="space-y-20">
 

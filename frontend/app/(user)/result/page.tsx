@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAuth } from "@/lib/auth";z
+import { useAuth } from "@/lib/auth";
 
 const API_BASE =
   "https://beu-bih.ac.in/backend/v1/result/get-result";
