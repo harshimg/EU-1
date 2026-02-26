@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useAuthModal } from "@/components/auth/AuthModal";
 import { useAuth } from "@/lib/auth";
-import { Check } from "lucide-react";zz
+import { Check } from "lucide-react";
 
 export default function HomePage() {
   const { showLogin, showSignup } = useAuthModal();
