@@ -4,7 +4,7 @@ export default function TermsPage() {
   
         <h1 className="text-3xl font-bold">Terms & Conditions</h1>
         <p className="text-sm text-slate-500">
-          Last Updated: {new Date().getFullYear()}
+          Last Updated: February {new Date().getFullYear()}
         </p>
   
         <section className="space-y-4">
@@ -88,11 +88,10 @@ export default function TermsPage() {
             For any legal concerns or copyright matters, contact:
           </p>
           <p className="font-medium">
-            alpharesult@gmail.com
+            alpharesult.in@gmail.com
           </p>
         </section>
   
       </div>
     );
   }
-  

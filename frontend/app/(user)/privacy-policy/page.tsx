@@ -4,7 +4,7 @@ export default function PrivacyPolicyPage() {
   
         <h1 className="text-3xl font-bold">Privacy Policy</h1>
         <p className="text-sm text-slate-500">
-          Last Updated: {new Date().getFullYear()}
+          Last Updated: February {new Date().getFullYear()}
         </p>
   
         <section className="space-y-4">
@@ -91,7 +91,7 @@ export default function PrivacyPolicyPage() {
             please contact us at:
           </p>
           <p className="font-medium">
-            alpharesult@gmail.com
+            alpharesult.in@gmail.com
           </p>
         </section>
   

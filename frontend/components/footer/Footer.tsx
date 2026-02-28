@@ -31,20 +31,21 @@ export default function Footer() {
         <div>
           <h3 className="text-white font-semibold mb-3">Platform</h3>
           <ul className="space-y-2 text-sm">
-            <li><Link href="/pyq" className="hover:text-white">PYQs</Link></li>
+            <li><Link href="/pyq/download" className="hover:text-white">PYQs</Link></li>
+            <li><Link href="/pyq" className="hover:text-white">Solution</Link></li>
             <li><Link href="/result" className="hover:text-white">Result</Link></li>
             <li><Link href="/cgpa" className="hover:text-white">CGPA</Link></li>
             <li><Link href="/about" className="hover:text-white">About</Link></li>
-            <li><Link href="/contact-us" className="hover:text-white">Contact</Link></li>
           </ul>
         </div>
 
         <div>
-          <h3 className="text-white font-semibold mb-3">Resources</h3>
+          <h3 className="text-white font-semibold mb-3">Legal & Support</h3>
           <ul className="space-y-2 text-sm">
-            <li className="hover:text-white cursor-pointer">Help Center</li>
-            <li className="hover:text-white cursor-pointer">Privacy Policy</li>
-            <li className="hover:text-white cursor-pointer">Terms</li>
+            <li><Link href="/privacy-policy" className="hover:text-white cursor-pointer">Privacy Policy</Link></li>
+            <li><Link href="/terms-and-conditions" className="hover:text-white cursor-pointer">Terms & Conditions</Link></li>
+            <li><Link href="/disclaimer" className="hover:text-white cursor-pointer">Disclaimer</Link></li>
+            <li><Link href="/contact-us" className="hover:text-white">Contact Us</Link></li>
           </ul>
         </div>
 
