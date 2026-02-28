@@ -22,6 +22,11 @@ export default function RootLayout({ children }: any) {
     <html lang="en">
       <head>
         {/* <title> Alpha Result</title> */}
+        {/* Google Ads */}
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2796700167884172"
+        crossOrigin="anonymous"></script>
+
+     
       </head>
       <body className="bg-[#F9FAFF] min-h-screen">
 
