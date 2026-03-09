@@ -6,73 +6,36 @@ import { useAuth } from "@/lib/auth";
 const API_BASE =
   "https://beu-bih.ac.in/backend/v1/result/get-result";
 
-const exam_held_months = ["December/2025", "November/2025", "July/2025", "May/2025" ]
+const SEMESTERS = ["I","II","III","IV","V","VI","VII","VIII"];
+
+const MONTHS = [
+  "January","February","March","April","May","June",
+  "July","August","September","October","November","December"
+];
+
+const YEARS = ["2023", "2024", "2025", "2026"];
 
 export default function ResultPage() {
   const { user } = useAuth();
 
   const [regNo, setRegNo] = useState("");
   const [semester, setSemester] = useState("");
-  const [examHeld, setExam_held] = useState("");
+  const [examMonth, setExamMonth] = useState("");
+  const [examYear, setExamYear] = useState("");
 
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState("");
 
+  /* ---------- AUTO-FILL SEMESTER ---------- */
+  useEffect(() => {
+    if (user?.semester) {
+      setSemester(user.semester);
+    }
+  }, [user]);
 
-  // async function fetchResult() {
-  //   if (!regNo || !semester || !examHeld) {
-  //       setError("Please fill all fields");
-  //       return;
-  //     }
-
-  //   setLoading(true);
-  //   setError("");
-  //   setResult(null);
-  
-  //   const examYear = examHeld.split("/")[1] 
-  //   const url = `${API_BASE}?year=${examYear}&redg_no=${regNo}&semester=${semester}&exam_held=${encodeURIComponent(examHeld)}`;
-  
-  //   const MAX_RETRIES = 16;
-  //   const RETRY_DELAY_MS = 800; // 0.8s (safe for BEU server)
-  
-  //   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-  //     try {
-  //       const res = await fetch(url);
-  //       const json = await res.json();
-  
-  //       if (json.status === 200 && json.data) {
-  //         // ✅ SUCCESS → STOP RETRYING
-  //         setResult(json.data);
-  //         setLoading(false);
-  //         return;
-  //       }
-  
-  //       // If server responded but result not ready yet
-  //       if (attempt < MAX_RETRIES) {
-  //         await new Promise(r => setTimeout(r, RETRY_DELAY_MS));
-  //       }
-  //     } catch (err) {
-  //       // Network / CORS / timeout error
-  //       if (attempt < MAX_RETRIES) {
-  //         await new Promise(r => setTimeout(r, RETRY_DELAY_MS));
-  //       }
-  //     }
-  //   }
-  
-  //   // ❌ All retries failed
-  //   setError(
-  //     "Result server is not responding right now. Please try again after some time."
-  //   );
-  //   setLoading(false);
-    
-  // }
-
-  async function fetchResult(regist?: string) {
-    
-    const register = regist || regNo;
-    
-    if (!regNo || !semester || !examHeld) {
+  async function fetchResult() {
+    if (!regNo || !semester || !examMonth || !examYear) {
       setError("Please fill all fields");
       return;
     }
@@ -81,66 +44,47 @@ export default function ResultPage() {
     setError("");
     setResult(null);
   
-    const parts = examHeld.split("/");
-    const examYear = parts.length === 2 ? parts[1] : "";
-  
-    if (!examYear) {
-      setError("Invalid exam session");
-      setLoading(false);
-      return;
-    }
-  
-    const url = `${API_BASE}?year=${examYear}&redg_no=${register}&semester=${semester}&exam_held=${encodeURIComponent(
+    const examHeld = `${examMonth}/${examYear}`;
+    const url = `${API_BASE}?year=${examYear}&redg_no=${regNo}&semester=${semester}&exam_held=${encodeURIComponent(
       examHeld
     )}`;
   
     const MAX_RETRIES = 16;
-    const RETRY_DELAY_MS = 800;
+    const RETRY_DELAY_MS = 800; // 0.8s (safe for BEU server)
   
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       try {
-  
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 10000); // 10s timeout
-  
-        const res = await fetch(url, {
-          signal: controller.signal,
-        });
-  
-        clearTimeout(timeout);
-  
-        if (!res.ok) {
-          throw new Error(`Server error ${res.status}`);
-        }
-  
+        const res = await fetch(url);
         const json = await res.json();
   
-        if (json?.status === 200 && json?.data) {
+        if (json.status === 200 && json.data) {
+          // ✅ SUCCESS → STOP RETRYING
           setResult(json.data);
           setLoading(false);
           return;
         }
   
+        // If server responded but result not ready yet
         if (attempt < MAX_RETRIES) {
           await new Promise(r => setTimeout(r, RETRY_DELAY_MS));
         }
-  
       } catch (err) {
-  
-        if (attempt === MAX_RETRIES) break;
-  
-        await new Promise(r => setTimeout(r, RETRY_DELAY_MS));
+        // Network / CORS / timeout error
+        if (attempt < MAX_RETRIES) {
+          await new Promise(r => setTimeout(r, RETRY_DELAY_MS));
+        }
       }
     }
   
+    // ❌ All retries failed
     setError(
-      "Result server is busy right now. Please try again after some time."
+      "Result server is not responding right now. Please try again after some time."
     );
-  
     setLoading(false);
   }
   
-  
+
+
   return (
   <div className="max-w-6xl mx-auto px-4 py-6">
 
@@ -149,133 +93,120 @@ export default function ResultPage() {
       BEU Examination Result
     </h1>
 
-   {/* INPUT FORM */}
-<div className="bg-white p-5 rounded-xl shadow space-y-5 print:hidden">
+    {/* INPUT FORM (HIDDEN ON PRINT) */}
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-white p-4 rounded-xl shadow print:hidden">
 
-{/* ROW 1 — EXAM HELD */}
-<div>
-  <label className="text-sm font-medium text-gray-600">
-    Exam Held
-  </label>
+      {/* REGISTRATION INPUT WITH INC / DEC */}
+<div className="grid grid-cols-[auto_1fr_auto] gap-3 items-center md:col-span-4">
 
-  <select
-    className="input mt-1 w-full"
-    value={examHeld}
-    onChange={e => setExam_held(e.target.value)}
-  >
-    <option value="">Select Exam Session</option>
-    {exam_held_months.map(eh => (
-      <option key={eh} value={eh}>{eh}</option>
-    ))}
-  </select>
-</div>
+{/* DECREMENT BUTTON */}
+<button
+  type="button"
+  disabled={loading}
+  onClick={() => {
+    if (!regNo) return;
+    const num = Number(regNo);
+    if (!isNaN(num) && num > 1) {
+      const newReg = String(num - 1);
+      setRegNo(newReg);
+      setTimeout(fetchResult, 100);
+    }
+  }}
+  className="h-14 w-16 rounded-xl
+             bg-purple-600 hover:bg-emerald-700
+             shadow-lg flex items-center justify-center
+             transition active:scale-95 disabled:opacity-50"
+>
+  <span className="text-yellow-400 text-2xl font-bold">▼</span>
+</button>
 
+{/* INPUT */}
+<input
+  type="number"
+  className="input h-14 text-center text-lg font-semibold"
+  placeholder="Registration No"
+  value={regNo}
+  onChange={e => {
+    const value = e.target.value;
+    if (/^\d*$/.test(value)) {
+      setRegNo(value);
+    }
+  }}
+/>
 
-{/* ROW 2 — REGISTRATION INPUT */}
-<div className="flex items-center gap-3">
-
-  {/* DECREMENT */}
-  <button
-    type="button"
-    onClick={() => {
-      if (!regNo) return;
-      const num = Number(regNo);
-      if (!isNaN(num) && num > 1) {
-        const newReg = String(num - 1);
-        setRegNo(newReg);
-        fetchResult(newReg);
-      }
-    }}
-    className="h-14 w-14 rounded-lg
-               bg-purple-600 hover:bg-purple-700
-               text-white text-xl font-bold
-               flex items-center justify-center
-               shadow-md transition active:scale-95"
-  >
-    −
-  </button>
-
-
-  {/* INPUT */}
-  <input
-    type="number"
-    className="input h-14 text-center text-lg font-semibold flex-1"
-    placeholder="Registration Number"
-    value={regNo}
-    onChange={e => {
-      const value = e.target.value;
-      if (/^\d*$/.test(value)) {
-        setRegNo(value);
-      }
-    }}
-  />
-
-
-  {/* INCREMENT */}
-  <button
-    type="button"
-    onClick={() => {
-      if (!regNo) return;
-      const num = Number(regNo);
-      if (!isNaN(num)) {
-        const newReg = String(num + 1);
-        setRegNo(newReg);
-        fetchResult(newReg);
-      }
-    }}
-    className="h-14 w-14 rounded-lg
-               bg-purple-600 hover:bg-purple-700
-               text-white text-xl font-bold
-               flex items-center justify-center
-               shadow-md transition active:scale-95"
-  >
-    +
-  </button>
+{/* INCREMENT BUTTON */}
+<button
+  type="button"
+  disabled={loading}
+  onClick={() => {
+    if (!regNo) return;
+    const num = Number(regNo);
+    if (!isNaN(num)) {
+      const newReg = String(num + 1);
+      setRegNo(newReg);
+      setTimeout(fetchResult, 100);
+    }
+  }}
+  className="h-14 w-16 rounded-xl
+             bg-purple-600 hover:bg-emerald-70
+             shadow-lg flex items-center justify-center
+             transition active:scale-95 disabled:opacity-50"
+>
+  <span className="text-yellow-400 text-2xl font-bold">▲</span>
+</button>
 
 </div>
 
 
-{/* ROW 3 — SEMESTER BUTTONS */}
-<div>
-  <p className="text-sm font-medium text-gray-600 mb-2">
-    Select Semester
-  </p>
 
-  <div className="grid grid-cols-4 gap-2">
+      {/* <input
+        className="input"
+        placeholder="Registration No"
+        value={regNo}
+        onChange={e => setRegNo(e.target.value)}
+      /> */}
 
-    {[
-      {label:"SEM 1", val:"I"},
-      {label:"SEM 2", val:"II"},
-      {label:"SEM 3", val:"III"},
-      {label:"SEM 4", val:"IV"},
-      {label:"SEM 5", val:"V"},
-      {label:"SEM 6", val:"VI"},
-      {label:"SEM 7", val:"VII"},
-      {label:"SEM 8", val:"VIII"},
-    ].map(sem => (
+      <select
+        className="input"
+        value={semester}
+        onChange={e => setSemester(e.target.value)}
+      >
+        <option value="">Select Semester</option>
+        {SEMESTERS.map(s => (
+          <option key={s} value={s}>{s}</option>
+        ))}
+      </select>
+
+      <select
+        className="input"
+        value={examMonth}
+        onChange={e => setExamMonth(e.target.value)}
+      >
+        <option value="">Exam Month</option>
+        {MONTHS.map(m => (
+          <option key={m} value={m}>{m}</option>
+        ))}
+      </select>
+
+      <select
+        className="input"
+        value={examYear}
+        onChange={e => setExamYear(e.target.value)}
+      >
+        <option value="">Exam Year</option>
+        {YEARS.map(y => (
+          <option key={y} value={y}>{y}</option>
+        ))}
+      </select>
 
       <button
-        key={sem.val}
-        onClick={() => {
-          setSemester(sem.val);
-          fetchResult();
-        }}
-        className={`h-11 rounded-lg text-sm font-semibold transition
-          ${semester === sem.val
-            ? "bg-blue-600 text-white shadow-md"
-            : "bg-gray-100 hover:bg-blue-50"}
-        `}
+        onClick={fetchResult}
+        disabled={loading}
+        className="btn-primary md:col-span-4"
       >
-        {sem.label}
+        {loading ? "Fetching Result…" : "Get Result"}
       </button>
-
-    ))}
-
-  </div>
-</div>
-
-</div>
-
+    </div>
 
     {/* ERROR (HIDDEN ON PRINT) */}
     {error && (
