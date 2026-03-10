@@ -68,11 +68,12 @@ export default function ResultPage() {
     
   // }
 
-  async function fetchResult(regist?: string) {
+  async function fetchResult(regist?: string, sem?: string) {
     
     const register = regist || regNo;
+    const semesterValue = sem || semester;
     
-    if (!regNo || !semester || !examHeld) {
+    if (!register || !semesterValue || !examHeld) {
       setError("Please fill all fields");
       return;
     }
@@ -90,7 +91,7 @@ export default function ResultPage() {
       return;
     }
   
-    const url = `${API_BASE}?year=${examYear}&redg_no=${register}&semester=${semester}&exam_held=${encodeURIComponent(
+    const url = `${API_BASE}?year=${examYear}&redg_no=${register}&semester=${semesterValue}&exam_held=${encodeURIComponent(
       examHeld
     )}`;
   
@@ -134,7 +135,7 @@ export default function ResultPage() {
     }
   
     setError(
-      "Result server is busy right now. Please try again after some time."
+      "Check Examination (Month/Year) and valid Registration No. or Result server is busy right now. Please try again after some time."
     );
   
     setLoading(false);
@@ -163,7 +164,7 @@ export default function ResultPage() {
     value={examHeld}
     onChange={e => setExam_held(e.target.value)}
   >
-    <option value="">Select Exam Session</option>
+    <option value="">Month/Year</option>
     {exam_held_months.map(eh => (
       <option key={eh} value={eh}>{eh}</option>
     ))}
@@ -258,7 +259,7 @@ export default function ResultPage() {
         key={sem.val}
         onClick={() => {
           setSemester(sem.val);
-          fetchResult();
+          fetchResult(undefined, sem.val);
         }}
         className={`h-11 rounded-lg text-sm font-semibold transition
           ${semester === sem.val
@@ -272,17 +273,33 @@ export default function ResultPage() {
     ))}
 
   </div>
-</div>
 
 </div>
 
+</div>
 
-    {/* ERROR (HIDDEN ON PRINT) */}
-    {error && (
-      <div className="mt-4 bg-red-50 text-red-600 p-3 rounded print:hidden">
-        {error}
-      </div>
-    )}
+
+        {/* ERROR (HIDDEN ON PRINT) */}
+        {error && (
+          <div className="mt-4 bg-red-50 text-red-600 p-3 rounded print:hidden">
+            {error}
+          </div>
+        )}
+
+        {/* Loading */}
+      {loading && (
+        <div className="flex justify-center items-center h-32">
+          <div className="flex items-center gap-2 text-blue-600 font-medium">
+            <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
+            </svg>
+            Fetching result...
+          </div>
+        </div>
+      )}
+
+
+
 
     {/* ================= RESULT SHEET ================= */}
     {result && (
