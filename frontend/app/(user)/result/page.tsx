@@ -3,6 +3,9 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
 
+import BatchResultTable from "@/components/result/BatchResultTable";
+import { fetchBatchResults } from "@/lib/result/fetchBatchResults";
+
 const API_BASE =
   "https://beu-bih.ac.in/backend/v1/result/get-result";
 
@@ -19,6 +22,24 @@ export default function ResultPage() {
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState("");
 
+  // Batch result 
+  const [batchResults,setBatchResults] = useState(null)
+
+  const [resultMode, setResultMode] = useState<"single" | "batch">("single");
+
+  useEffect(()=>{
+
+    if(resultMode === "single"){
+      setBatchResults(null);
+      setSemester(null);
+    }
+    
+    if(resultMode === "batch"){
+      setResult(null);
+      setSemester(null);
+    }
+    
+    },[resultMode]);
 
   // async function fetchResult() {
   //   if (!regNo || !semester || !examHeld) {
@@ -72,6 +93,16 @@ export default function ResultPage() {
     
     const register = regist || regNo;
     const semesterValue = sem || semester;
+
+    if(!examHeld){
+      alert("Please select exam held");
+      return;
+    }
+
+    if(!register){
+      alert("Please enter Registration No.");
+      return;
+    }
     
     if (!register || !semesterValue || !examHeld) {
       setError("Please fill all fields");
@@ -140,6 +171,36 @@ export default function ResultPage() {
   
     setLoading(false);
   }
+
+
+  // Batch Result
+async function loadBatch(semester?: string){
+
+  try {
+
+    if(!examHeld){
+      alert("Please select exam held");
+      return;
+    }
+    
+
+    const examYear = examHeld.split("/")[1]
+    const data = await fetchBatchResults(
+      regNo,
+      semester,
+      examHeld,
+      examYear
+    )
+
+    setBatchResults(data.students)
+
+  } catch (err:any) {
+
+    console.error("Batch fetch error:-----",err.message)
+
+  }
+
+}
   
   
   return (
@@ -170,6 +231,64 @@ export default function ResultPage() {
     ))}
   </select>
 </div>
+
+
+
+{/* tooglle */}
+{/* <div className="flex justify-center mt-4 mb-6">
+  <div className="inline-flex rounded-xl bg-gray-100 p-1 shadow-inner">
+    <button
+      onClick={() => setResultMode("single")}
+      className={`px-5 py-2 text-sm font-semibold rounded-lg transition
+        ${
+          resultMode === "single"
+            ? "bg-white text-blue-600 shadow"
+            : "text-gray-600 hover:text-gray-800"
+        }`}
+    >
+      Single Result
+    </button>
+
+    <button
+      onClick={() => setResultMode("batch")}
+      className={`px-5 py-2 text-sm font-semibold rounded-lg transition
+        ${
+          resultMode === "batch"
+            ? "bg-white text-blue-600 shadow"
+            : "text-gray-600 hover:text-gray-800"
+        }`}
+    >
+      Batch Result
+    </button>
+  </div>
+</div> */}
+
+  <div className="flex items-center justify-center gap-4 mt-4 mb-6">
+    <span className="text-sm font-medium text-gray-700">
+      Single Result
+    </span>
+    <button
+      onClick={() =>
+        setResultMode(resultMode === "single" ? "batch" : "single")
+      }
+      className={`relative inline-flex h-7 w-14 items-center rounded-full transition
+        ${resultMode === "batch" ? "bg-green-500" : "bg-gray-300"}
+      `}
+    >
+    <span
+      className={`inline-block h-6 w-6 transform rounded-full bg-white shadow transition
+      ${resultMode === "batch" ? "translate-x-7" : "translate-x-1"}
+      `}
+    />
+      </button>
+        <span className="text-sm font-medium text-gray-700">
+          Batch Result
+        </span>
+  </div>
+
+{/* <p className="text-xs text-gray-500 text-center -mt-3 mb-4">
+Mode: {resultMode === "single" ? "Single Student Result" : "Batch Result"}
+</p> */}
 
 
 {/* ROW 2 — REGISTRATION INPUT */}
@@ -259,7 +378,11 @@ export default function ResultPage() {
         key={sem.val}
         onClick={() => {
           setSemester(sem.val);
-          fetchResult(undefined, sem.val);
+          if (resultMode === "single") {
+            fetchResult(undefined, sem.val);
+          } else {
+            loadBatch(sem.val);
+          }
         }}
         className={`h-11 rounded-lg text-sm font-semibold transition
           ${semester === sem.val
@@ -455,6 +578,15 @@ export default function ResultPage() {
         </div>
       </>
     )}
+
+
+  {batchResults && (
+    <BatchResultTable
+      students={batchResults}
+      semester={semester}
+    />
+  )}
+
   </div>
 );
 

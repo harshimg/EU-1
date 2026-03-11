@@ -8,6 +8,7 @@ from .database import connect_to_mongo, close_mongo_connection
 # from app.public.routes import router as public_router
 from app.auth.routes import router as auth_router
 from app.public2.routes import router as public_router
+from app.public2.result.routes import router as result_router
 from app.sa.routes import router as super_admin_router
 from app.admin.routes import router as admin_router
 from app.user.routes import router as user_router
@@ -53,6 +54,7 @@ def root():
 
 # All rotes api
 app.include_router(public_router, prefix="/api/public", tags=["Public"])
+app.include_router(result_router, prefix="/api/public/result", tags=["Result"])
 app.include_router(auth_router, prefix="/auth", tags=["Auth"])
 app.include_router(super_admin_router, prefix="/sa", tags=["Super-Admin"])
 app.include_router(admin_router, prefix="/admin", tags=["Admin"])
