@@ -185,6 +185,9 @@ async function loadBatch(semester?: string){
     
 
     const examYear = examHeld.split("/")[1]
+
+    setLoading(true);
+
     const data = await fetchBatchResults(
       regNo,
       semester,
@@ -193,6 +196,7 @@ async function loadBatch(semester?: string){
     )
 
     setBatchResults(data.students)
+    setLoading(false);
 
   } catch (err:any) {
 
