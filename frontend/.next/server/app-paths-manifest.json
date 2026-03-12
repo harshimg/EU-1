@@ -1,3 +1,4 @@
 {
+  "/(user)/result/new/page": "app/(user)/result/new/page.js",
   "/(user)/result/page": "app/(user)/result/page.js"
 }

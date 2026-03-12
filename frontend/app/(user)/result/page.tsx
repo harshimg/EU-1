@@ -1,5 +1,6 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
 
@@ -27,6 +28,9 @@ export default function ResultPage() {
 
   const [resultMode, setResultMode] = useState<"single" | "batch">("single");
 
+  // params
+  const searchParams = useSearchParams();
+
   useEffect(()=>{
 
     if(resultMode === "single"){
@@ -40,6 +44,8 @@ export default function ResultPage() {
     }
     
     },[resultMode]);
+
+
 
   // async function fetchResult() {
   //   if (!regNo || !semester || !examHeld) {
@@ -89,12 +95,13 @@ export default function ResultPage() {
     
   // }
 
-  async function fetchResult(regist?: string, sem?: string) {
+  async function fetchResult(exam_Held?:string, regist?: string, sem?: string) {
     
     const register = regist || regNo;
     const semesterValue = sem || semester;
+    const examinationHeld = exam_Held || examHeld
 
-    if(!examHeld){
+    if(!examinationHeld){
       alert("Please select exam held");
       return;
     }
@@ -103,8 +110,13 @@ export default function ResultPage() {
       alert("Please enter Registration No.");
       return;
     }
+
+    if(!semesterValue){
+      alert("Please select semester");
+      return;
+    }
     
-    if (!register || !semesterValue || !examHeld) {
+    if (!register || !semesterValue || !examinationHeld) {
       setError("Please fill all fields");
       return;
     }
@@ -113,7 +125,7 @@ export default function ResultPage() {
     setError("");
     setResult(null);
   
-    const parts = examHeld.split("/");
+    const parts = examinationHeld.split("/");
     const examYear = parts.length === 2 ? parts[1] : "";
   
     if (!examYear) {
@@ -123,7 +135,7 @@ export default function ResultPage() {
     }
   
     const url = `${API_BASE}?year=${examYear}&redg_no=${register}&semester=${semesterValue}&exam_held=${encodeURIComponent(
-      examHeld
+      examinationHeld
     )}`;
   
     const MAX_RETRIES = 16;
@@ -171,6 +183,36 @@ export default function ResultPage() {
   
     setLoading(false);
   }
+
+
+  // when comes from /result/new set exam_held using params
+  useEffect(() => {
+
+    const examHeldParam = searchParams.get("examHeld");
+    const registrationParam = searchParams.get("regNo");
+    const semesterParam = searchParams.get("semester");
+
+
+  
+    if (examHeldParam) {
+      setExam_held(decodeURIComponent(examHeldParam));
+    }
+  
+    if (registrationParam) {
+      setRegNo(registrationParam);
+    }
+
+    if (semesterParam) {
+      setSemester(semesterParam);
+    }
+
+    if (examHeldParam && registrationParam && semesterParam) {
+  
+      fetchResult(examHeldParam, registrationParam, semesterParam);
+  
+    }
+  
+  }, [searchParams]);
 
 
   // Batch Result
@@ -307,7 +349,7 @@ Mode: {resultMode === "single" ? "Single Student Result" : "Batch Result"}
       if (!isNaN(num) && num > 1) {
         const newReg = String(num - 1);
         setRegNo(newReg);
-        fetchResult(newReg);
+        fetchResult(undefined, newReg, undefined);
       }
     }}
     className="h-14 w-14 rounded-lg
@@ -344,7 +386,7 @@ Mode: {resultMode === "single" ? "Single Student Result" : "Batch Result"}
       if (!isNaN(num)) {
         const newReg = String(num + 1);
         setRegNo(newReg);
-        fetchResult(newReg);
+        fetchResult(undefined, newReg, undefined);
       }
     }}
     className="h-14 w-14 rounded-lg
@@ -383,7 +425,7 @@ Mode: {resultMode === "single" ? "Single Student Result" : "Batch Result"}
         onClick={() => {
           setSemester(sem.val);
           if (resultMode === "single") {
-            fetchResult(undefined, sem.val);
+            fetchResult(undefined, undefined, sem.val);
           } else {
             loadBatch(sem.val);
           }

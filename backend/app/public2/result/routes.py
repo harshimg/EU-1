@@ -16,7 +16,7 @@ async def batch_result(reg: int, semester: str, examHeld: str, year: int):
     async with httpx.AsyncClient(timeout=10) as client:
 
         async def scan_range(start, end, fail_threshold):
-            print(start,end)
+            # print(start,end)
 
             consecutive_fail = 0
             results_students = []
