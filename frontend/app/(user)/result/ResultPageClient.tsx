@@ -33,6 +33,10 @@ export default function ResultPage() {
 
   // params
   const searchParams = useSearchParams();
+  
+  const [showExamModal,setShowExamModal] = useState(false)
+
+  
 
   // localStorage.setItem("lastReg", regNo)
   // const saved = localStorage.getItem("lastReg")
@@ -285,9 +289,27 @@ async function loadBatch(semester?: string){
 
 {/* ROW 1 — EXAM HELD */}
 <div>
-  <label className="text-sm font-medium text-gray-600">
+  {/* <label className="text-sm font-medium text-gray-600">
     Exam Held
-  </label>
+  </label> */}
+
+  <div className="flex items-center justify-between">
+
+<label className="text-sm font-medium text-gray-600">
+Exam Held
+</label>
+
+{/* link for exam held */}
+<a
+href="/result/new"
+target="_blank"
+className="text-xs text-blue-600 hover:underline"
+>
+See Available Exams
+</a>
+
+</div>
+
 
   <select
     className="input mt-1 w-full"
@@ -300,6 +322,15 @@ async function loadBatch(semester?: string){
     ))}
   </select>
 </div>
+
+{/* pop-up for exam held */}
+<button
+type="button"
+onClick={()=>setShowExamModal(true)}
+className="text-xs text-blue-600 hover:underline mt-1"
+>
+View available exam sessions
+</button>
 
 
 
@@ -654,16 +685,85 @@ Mode: {resultMode === "single" ? "Single Student Result" : "Batch Result"}
     <BatchResultTable
       students={batchResults}
       semester={semester}
+      regNo={regNo}
     />
   )}
 
+
+
+{showExamModal && (
+
+<div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+
+<div className="bg-white rounded-lg shadow-lg w-[420px] max-w-[90%] p-5">
+
+<div className="flex justify-between items-center mb-4">
+
+<h3 className="font-semibold text-lg">
+Available Exam Sessions
+</h3>
+
+<button
+onClick={()=>setShowExamModal(false)}
+className="text-gray-500 hover:text-black"
+>
+✕
+</button>
+
+</div>
+
+<ul className="space-y-2 text-sm">
+
+{exam_held_months.map(eh=>(
+<li
+key={eh}
+className="flex justify-between items-center border-b pb-1"
+>
+
+<span>{eh}</span>
+
+<button
+onClick={()=>{
+setExam_held(eh)
+setShowExamModal(false)
+}}
+className="text-blue-600 text-xs hover:underline"
+>
+Use
+</button>
+
+</li>
+))}
+
+</ul>
+
+<a
+href="/result/new"
+target="_blank"
+className="block text-center text-sm text-blue-600 hover:underline mt-4"
+>
+See full result list →
+</a>
+
+</div>
+
+</div>
+
+)}
+
+
+
+
   </div>
+
 );
-
-
 
 
 
 
   
 }
+
+
+
+

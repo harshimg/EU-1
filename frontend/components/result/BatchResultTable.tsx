@@ -3,10 +3,13 @@
 import { useState, useMemo } from "react";
 import { FixedSizeList } from "react-window";
 
-export default function BatchResultTable({ students, semester }: any) {
+// export default function BatchResultTable({ students, semester }: any) {
+  export default function BatchResultTable({ students, semester, regNo }: any) {
 
   const [sortBy, setSortBy] = useState("cgpa");
   const [search, setSearch] = useState("");
+  
+
 
   function romanToIndex(r: string) {
     const map:any = {
@@ -16,6 +19,7 @@ export default function BatchResultTable({ students, semester }: any) {
   }
 
   const semIndex = romanToIndex(semester);
+  const subjectHeaders = students[0]?.subjects || [];
 
   const filtered = useMemo(()=>{
     return students.filter((s:any)=>
@@ -50,7 +54,7 @@ export default function BatchResultTable({ students, semester }: any) {
   },[filtered,sortBy]);
 
 
-  const subjectHeaders = students[0]?.subjects || [];
+
 
 
 
@@ -58,6 +62,10 @@ export default function BatchResultTable({ students, semester }: any) {
 
     const s = sorted[index];
     const rank = index + 1;
+    const isCurrentUser = s.reg == regNo
+
+
+
 
     return (
 
@@ -96,6 +104,39 @@ ${rank === 3 ? "bg-orange-50" : ""}
     );
   };
 
+  // To find average
+  const sgpaAvg = Array.from({ length: semIndex }).map((_, i) => {
+
+    const vals = students
+      .map(s => Number(s.sgpa[i]))
+      .filter(Boolean)
+  
+    if (!vals.length) return "-"
+  
+    return (
+      vals.reduce((a,b)=>a+b,0) / vals.length
+    ).toFixed(2)
+  
+  })
+
+  const avgCGPA =
+  students.reduce((sum, s) => sum + (s.cgpa || 0), 0) /
+  students.length
+
+
+  const subjectAvg = subjectHeaders.map((_,i)=>{
+
+    const vals = students
+      .map(s=>Number(s.subjects[i]?.marks))
+      .filter(Boolean)
+   
+    if(!vals.length) return "-"
+   
+    return (
+      vals.reduce((a,b)=>a+b,0) / vals.length
+    ).toFixed(1)
+   
+   })
 
   return (
 
@@ -181,23 +222,50 @@ className="px-3 py-2 text-center max-w-[160px] truncate"
 {sorted.map((s:any,index:number)=>{
 
 const rank = index + 1
+const isCurrentUser = String(s.reg) === String(regNo)
 
 return(
 
 <tr
 key={s.reg}
+// className={`border-b hover:bg-blue-50
+// ${rank===1?"bg-yellow-300":""}
+// ${rank===2?"bg-yellow-200":""}
+// ${rank===3?"bg-yellow-100":""}
+// `}
 className={`border-b hover:bg-blue-50
-${rank===1?"bg-yellow-50":""}
-${rank===2?"bg-gray-100":""}
-${rank===3?"bg-orange-50":""}
-`}
+  ${rank===1?"bg-yellow-300":""}
+  ${rank===2?"bg-yellow-200":""}
+  ${rank===3?"bg-yellow-100":""}
+  ${isCurrentUser ? "bg-blue-100 ring-2 ring-blue-400 font-semibold" : ""}
+  ${isCurrentUser ? "bg-blue-100 border-l-4 border-blue-600 font-semibold" : ""}
+  `}
+
+
 >
 
-<td className="px-3 py-2 font-semibold text-center">{rank}</td>
+{/* <td className="px-3 py-2 font-semibold text-center">{rank}</td> */}
+<td className="px-3 py-2 font-semibold text-center">
+
+{isCurrentUser ? "⭐ " : ""}
+{rank}
+
+</td>
 
 <td className="px-3 py-2">{s.reg}</td>
 
-<td className="px-3 py-2 whitespace-nowrap">{s.name}</td>
+{/* <td className="px-3 py-2 whitespace-nowrap">{s.name}</td> */}
+<td className="px-3 py-2 whitespace-nowrap flex items-center gap-2">
+
+{s.name}
+
+{isCurrentUser && (
+<span className="text-xs bg-blue-600 text-white px-2 py-0.5 rounded">
+You
+</span>
+)}
+
+</td>
 
 {Array.from({length:semIndex}).map((_,i)=>(
 <td key={i} className="px-3 py-2 text-center">
@@ -221,7 +289,27 @@ ${rank===3?"bg-orange-50":""}
 
 })}
 
+{/* Average */}
+<tr className="bg-yellow-50 font-semibold border-t">
+
+<td colSpan={3}>Average</td>
+
+{sgpaAvg.map((v:any,i:number)=>(
+<td key={i} className="text-center">{v}</td>
+))}
+
+<td className="text-center">{avgCGPA.toFixed(2)}</td>
+
+{subjectAvg.map((v:any,i:number)=>(
+<td key={i} className="text-center">{v}</td>
+))}
+
+</tr>
+
+
 </tbody>
+
+
 
 </table>
 

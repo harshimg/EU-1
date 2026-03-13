@@ -24,6 +24,12 @@ export default function ResultListPage() {
   const [loading, setLoading] = useState(true);
   const [regInputs, setRegInputs] = useState<any>({});
 
+  const latestExam = courses
+  .flatMap(c => c.exams)
+  .sort(
+    (a,b)=> new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
+  )[0]
+
   useEffect(() => {
     async function load() {
       try {
@@ -73,10 +79,16 @@ export default function ResultListPage() {
   return (
     <div className="max-w-6xl mx-auto p-6">
 
+{latestExam && (
+  <div className="bg-green-100 border border-green-300 p-3 mb-6 rounded text-green-800 text-sm">
+    🎉 Latest Result Released: <b>{latestExam.examName} (Exam Held:- {latestExam.examHeld})</b>
+  </div>
+)}
+
       <h1 className="text-center text-blue-700 font-semibold mb-6 text-lg">
         Examination Results
         <span className="text-gray-600 text-sm ml-1">
-          (enter registration number to access result)
+          (Enter registration number to access result)
         </span>
       </h1>
 
