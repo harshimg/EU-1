@@ -303,9 +303,11 @@ Exam Held
 <a
 href="/result/new"
 target="_blank"
-className="text-xs text-blue-600 hover:underline"
+className="flex items-center gap-1 text-xs px-2 py-1 rounded-md
+bg-blue-50 text-blue-700 border border-blue-200
+hover:bg-blue-100 transition"
 >
-See Available Exams
+📋 By only REGISTRATION no.
 </a>
 
 </div>
@@ -327,9 +329,11 @@ See Available Exams
 <button
 type="button"
 onClick={()=>setShowExamModal(true)}
-className="text-xs text-blue-600 hover:underline mt-1"
+className="flex items-center gap-1 text-xs mt-2 px-3 py-1.5 rounded-md
+bg-gray-100 text-gray-700 border
+hover:bg-gray-200 transition"
 >
-View available exam sessions
+🔎 View exam Month/Year
 </button>
 
 
@@ -691,56 +695,76 @@ Mode: {resultMode === "single" ? "Single Student Result" : "Batch Result"}
 
 
 
+
+
 {showExamModal && (
 
-<div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+<div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
+onClick={()=>setShowExamModal(false)}
+>
 
-<div className="bg-white rounded-lg shadow-lg w-[420px] max-w-[90%] p-5">
+<div className="bg-white rounded-xl shadow-xl w-[460px] max-w-[95%] p-6"
+onClick={(e)=>e.stopPropagation()}
+>
+
+{/* HEADER */}
 
 <div className="flex justify-between items-center mb-4">
 
-<h3 className="font-semibold text-lg">
+<h3 className="text-lg font-semibold text-gray-800">
 Available Exam Sessions
 </h3>
 
 <button
 onClick={()=>setShowExamModal(false)}
-className="text-gray-500 hover:text-black"
+className="text-gray-400 hover:text-gray-700 text-lg"
 >
 ✕
 </button>
 
 </div>
 
-<ul className="space-y-2 text-sm">
+<p className="text-sm text-gray-500 mb-4">
+Select an exam session to automatically fill the field.
+</p>
+
+
+{/* LIST */}
+
+<div className="max-h-64 overflow-y-auto space-y-2">
 
 {exam_held_months.map(eh=>(
-<li
-key={eh}
-className="flex justify-between items-center border-b pb-1"
->
-
-<span>{eh}</span>
-
 <button
+key={eh}
 onClick={()=>{
 setExam_held(eh)
 setShowExamModal(false)
 }}
-className="text-blue-600 text-xs hover:underline"
+className="w-full flex justify-between items-center
+px-3 py-2 rounded-md border text-sm
+hover:bg-blue-50 hover:border-blue-300 transition"
 >
-Use
-</button>
 
-</li>
+<span>{eh}</span>
+
+<span className="text-blue-600 text-xs">
+Use →
+</span>
+
+</button>
 ))}
 
-</ul>
+</div>
+
+
+{/* FOOTER */}
+
+<div className="mt-5 border-t pt-3 text-center">
 
 <a
 href="/result/new"
 target="_blank"
-className="block text-center text-sm text-blue-600 hover:underline mt-4"
+className="text-sm text-blue-600 hover:underline"
 >
 See full result list →
 </a>
@@ -749,8 +773,9 @@ See full result list →
 
 </div>
 
-)}
+</div>
 
+)}
 
 
 
