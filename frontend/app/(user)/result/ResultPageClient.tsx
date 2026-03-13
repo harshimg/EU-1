@@ -36,7 +36,8 @@ export default function ResultPage() {
   
   const [showExamModal,setShowExamModal] = useState(false)
 
-  
+  // Exam detauls from beu
+  const [examSessions,setExamSessions] = useState<any[]>([])
 
   // localStorage.setItem("lastReg", regNo)
   // const saved = localStorage.getItem("lastReg")
@@ -56,7 +57,7 @@ export default function ResultPage() {
     
     },[resultMode]);
 
-
+// To get from last used by user
     useEffect(() => {
       if (typeof window !== "undefined") {
         const saved = localStorage.getItem("lastReg");
@@ -66,6 +67,48 @@ export default function ResultPage() {
         if (saved2) setExam_held(saved2)
       }
     }, []);
+
+
+    //  Exam details from beu
+    useEffect(()=>{
+
+      async function loadSessions(){
+      
+      try{
+      
+      const res = await fetch(
+      "https://beu-bih.ac.in/backend/v1/result/sem-get"
+      )
+      
+      const data = await res.json()
+      
+      const btech = data
+      // .filter((c:any)=>c.courseName==="B.Tech")
+      .filter((c: any)=> c.courseid===3)
+      .flatMap((c:any)=>c.exams)
+      
+      setExamSessions(btech)
+      
+      }catch(err){
+      console.error("Failed to load exam sessions")
+      }
+      
+      }
+      
+      loadSessions()
+      
+      },[])
+
+
+      function toRoman(num:number){
+
+        const map:any={
+        1:"I",2:"II",3:"III",4:"IV",
+        5:"V",6:"VI",7:"VII",8:"VIII"
+        }
+        
+        return map[num] || num
+        }
 
 
   // async function fetchResult() {
@@ -733,11 +776,13 @@ Select an exam session to automatically fill the field.
 
 <div className="max-h-64 overflow-y-auto space-y-2">
 
-{exam_held_months.map(eh=>(
+{/* {exam_held_months.map(eh=>( */}
+  {examSessions.map((exam:any)=>(
 <button
-key={eh}
+key={exam.id}
 onClick={()=>{
-setExam_held(eh)
+setExam_held(exam.examHeld)
+// setSemester(toRoman(exam.semId))
 setShowExamModal(false)
 }}
 className="w-full flex justify-between items-center
@@ -745,7 +790,9 @@ px-3 py-2 rounded-md border text-sm
 hover:bg-blue-50 hover:border-blue-300 transition"
 >
 
-<span>{eh}</span>
+<span>
+B.Tech {exam.semId}th Sem({exam.session}) — {exam.examHeld}
+</span>
 
 <span className="text-blue-600 text-xs">
 Use →
