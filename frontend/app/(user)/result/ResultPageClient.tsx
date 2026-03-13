@@ -34,6 +34,10 @@ export default function ResultPage() {
   // params
   const searchParams = useSearchParams();
 
+  // localStorage.setItem("lastReg", regNo)
+  // const saved = localStorage.getItem("lastReg")
+  // if(saved) setRegNo(saved)
+
   useEffect(()=>{
 
     if(resultMode === "single"){
@@ -48,6 +52,16 @@ export default function ResultPage() {
     
     },[resultMode]);
 
+
+    useEffect(() => {
+      if (typeof window !== "undefined") {
+        const saved = localStorage.getItem("lastReg");
+        if (saved) setRegNo(saved);
+
+        const saved2 = localStorage.getItem("lastExamHeld");
+        if (saved2) setExam_held(saved2)
+      }
+    }, []);
 
 
   // async function fetchResult() {
@@ -165,6 +179,12 @@ export default function ResultPage() {
         if (json?.status === 200 && json?.data) {
           setResult(json.data);
           setLoading(false);
+
+          if (typeof window !== "undefined") {
+            localStorage.setItem("lastReg", register);
+            localStorage.setItem("lastExamHeld", examinationHeld)
+          }
+
           return;
         }
   
@@ -367,6 +387,7 @@ Mode: {resultMode === "single" ? "Single Student Result" : "Batch Result"}
 
   {/* INPUT */}
   <input
+  autoFocus
     type="number"
     className="input h-14 text-center text-lg font-semibold flex-1"
     placeholder="Registration Number"
