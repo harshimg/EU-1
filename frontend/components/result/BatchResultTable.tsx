@@ -3,6 +3,14 @@
 import { useState, useMemo } from "react";
 import { FixedSizeList } from "react-window";
 
+// import html2pdf from "html2pdf.js";
+
+let html2pdf: any;
+
+if (typeof window !== "undefined") {
+  html2pdf = require("html2pdf.js");
+}
+
 // export default function BatchResultTable({ students, semester }: any) {
   export default function BatchResultTable({ students, semester, regNo }: any) {
 
@@ -63,9 +71,6 @@ import { FixedSizeList } from "react-window";
     const s = sorted[index];
     const rank = index + 1;
     const isCurrentUser = s.reg == regNo
-
-
-
 
     return (
 
@@ -138,19 +143,119 @@ ${rank === 3 ? "bg-orange-50" : ""}
    
    })
 
+
+
+
+
+  const generatePDFLayout = () => {
+
+    let html = `
+    <div style="font-family: Arial; padding:20px;">
+    <h2 style="margin-bottom:6px;">Batch Result — Semester ${semester}</h2>
+    <p style="font-size:12px;margin-bottom:16px;">
+    Students Found: ${sorted.length}
+    </p>
+    
+    <table border="1" cellspacing="0" cellpadding="6" style="border-collapse:collapse;width:100%;font-size:12px;">
+    <tr>
+    <th>Rank</th>
+    <th>Reg</th>
+    <th>Name</th>
+    `
+    
+    for(let i=0;i<semIndex;i++){
+    html += `<th>Sem ${i+1}</th>`
+    }
+    
+    html += `<th>CGPA</th>`
+    
+    subjectHeaders.forEach((s:any)=>{
+    html += `<th>${s.name}</th>`
+    })
+    
+    html += `</tr>`
+
+    sorted.forEach((s:any,index:number)=>{
+
+        html += `<tr>
+        <td>${index+1}</td>
+        <td>${s.reg}</td>
+        <td>${s.name}</td>
+        `
+        
+        for(let i=0;i<semIndex;i++){
+        html += `<td>${s.sgpa[i] || "-"}</td>`
+        }
+        
+        html += `<td>${s.cgpa}</td>`
+        
+        s.subjects.forEach((sub:any)=>{
+        html += `<td>${sub.marks}</td>`
+        })
+        
+        html += `</tr>`
+        
+        })
+
+        html += `<tr>
+<td colspan="3"><b>Average</b></td>
+`
+
+sgpaAvg.forEach((v:any)=>{
+html += `<td>${v}</td>`
+})
+
+html += `<td>${avgCGPA.toFixed(2)}</td>`
+
+subjectAvg.forEach((v:any)=>{
+html += `<td>${v}</td>`
+})
+
+html += `</tr>`
+
+html += `
+</table>
+
+<p style="margin-top:20px;font-size:11px;color:#555;">
+Generated from AlphaResult.in
+</p>
+
+</div>
+`
+
+return html
+}
+
+
+
+
+
+
+  const downloadBatchPDF = async () => {
+
+    const html2pdf = (await import("html2pdf.js")).default
+    
+    const container = document.createElement("div")
+    
+    container.innerHTML = generatePDFLayout()
+    
+    const opt = {
+    margin:10,
+    filename:`Batch_Result_Sem_${semester}.pdf`,
+    image:{type:"jpeg" as const,quality:0.98},
+    html2canvas:{scale:2},
+    jsPDF:{unit:"mm",format:"a4",orientation:"landscape"}
+    }
+    
+    html2pdf().set(opt).from(container).save()
+    
+    }
+  
+
   return (
 
 <div className="mt-10">
 
-{/* HEADER */}
-<div className="mb-4">
-  <h2 className="text-xl font-semibold">
-    Batch Result — Semester {semester}
-  </h2>
-  <p className="text-gray-600 text-sm">
-    Students Found: {sorted.length}
-  </p>
-</div>
 
 {/* TOOLBAR */}
 <div className="flex flex-wrap gap-4 mb-6">
@@ -181,15 +286,40 @@ className="input w-72"
 </div>
 
 
-<button
-onClick={()=>window.print()}
-className="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
->
-Print Batch Result
-</button>
+{/* Download & print button */}
+<div className="flex gap-3 mb-4">
+
+  <button
+    onClick={downloadBatchPDF}
+    className="flex items-center gap-2 px-4 py-2 text-sm
+    bg-green-600 text-white rounded-md hover:bg-green-700 transition"
+    >
+    ⬇ Download PDF
+  </button>
+
+  <button
+    onClick={()=>window.print()}
+    className="flex items-center gap-2 px-4 py-2 text-sm
+    bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+    >
+    🖨 Print
+  </button>
+
+</div>
 
 {/* TABLE */}
-<div id="batch-result-print" className="overflow-x-auto border rounded-lg">
+{/* <div id="batch-result-print" className="overflow-x-auto border rounded-lg"> */}
+<div id="batch-result-print" className="bg-white p-4">
+
+  {/* HEADER */}
+<div className="mb-4">
+  <h2 className="text-xl font-semibold">
+    Batch Result — Semester {semester}
+  </h2>
+  <p className="text-gray-600 text-sm">
+    Students Found: {sorted.length}
+  </p>
+</div>
 
 <table className="min-w-max text-sm">
 
