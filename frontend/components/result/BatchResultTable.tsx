@@ -242,12 +242,16 @@ return html
     container.innerHTML = generatePDFLayout()
     
     const opt = {
-    margin:10,
-    filename:`Batch_Result_Sem_${semester}.pdf`,
-    image:{type:"jpeg" as const,quality:0.98},
-    html2canvas:{scale:2},
-    jsPDF:{unit:"mm",format:"a4",orientation:"landscape"}
-    }
+      margin: 10,
+      filename: `Batch_Result_Sem_${semester}.pdf`,
+      image: { type: "jpeg" as const, quality: 0.98 },
+      html2canvas: { scale: 2, letterRendering: true },
+      jsPDF: {
+        unit: "mm",
+        format: "a4",
+        orientation: "landscape" as const
+      }
+    };
     
     html2pdf().set(opt).from(container).save()
     
