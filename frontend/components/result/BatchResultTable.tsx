@@ -233,6 +233,8 @@ return html
 
   const downloadBatchPDF = async () => {
 
+    if (typeof window === "undefined") return;
+
     const html2pdf = (await import("html2pdf.js")).default
     
     const container = document.createElement("div")
