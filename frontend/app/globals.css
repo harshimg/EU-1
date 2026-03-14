@@ -191,3 +191,24 @@ body {
 .animate-marquee-left {
   animation: marquee-left 15s linear infinite;
 }
+
+
+@media print {
+
+  body * {
+    visibility: hidden;
+  }
+  
+  #batch-result-print,
+  #batch-result-print * {
+    visibility: visible;
+  }
+  
+  #batch-result-print {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+  
+  }

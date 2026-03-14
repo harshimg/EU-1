@@ -181,8 +181,15 @@ className="input w-72"
 </div>
 
 
+<button
+onClick={()=>window.print()}
+className="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
+>
+Print Batch Result
+</button>
+
 {/* TABLE */}
-<div className="overflow-x-auto border rounded-lg">
+<div id="batch-result-print" className="overflow-x-auto border rounded-lg">
 
 <table className="min-w-max text-sm">
 
