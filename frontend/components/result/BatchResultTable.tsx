@@ -164,13 +164,13 @@ ${rank === 3 ? "bg-orange-50" : ""}
     `
     
     for(let i=0;i<semIndex;i++){
-    html += `<th>Sem ${i+1}</th>`
+    html += `<th>Sem ${i+1}&nbsp;&nbsp; </th>`
     }
     
-    html += `<th>CGPA</th>`
+    html += `<th>CGPA &nbsp;&nbsp; </th>`
     
     subjectHeaders.forEach((s:any)=>{
-    html += `<th>${s.name}</th>`
+    html += `<th>${s.name} </th>`
     })
     
     html += `</tr>`
@@ -179,15 +179,15 @@ ${rank === 3 ? "bg-orange-50" : ""}
 
         html += `<tr>
         <td>${index+1}</td>
-        <td>${s.reg}</td>
+        <td>${s.reg}&nbsp;&nbsp; </td>
         <td>${s.name}</td>
         `
         
         for(let i=0;i<semIndex;i++){
-        html += `<td>${s.sgpa[i] || "-"}</td>`
+        html += `<td>${s.sgpa[i] || "-"},&nbsp; </td>`
         }
         
-        html += `<td>${s.cgpa}</td>`
+        html += `<td>${s.cgpa} &nbsp;&nbsp;</td>`
         
         s.subjects.forEach((sub:any)=>{
         html += `<td>${sub.marks}</td>`
