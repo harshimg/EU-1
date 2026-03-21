@@ -17,6 +17,9 @@ export default function PyqDownloadPage() {
   const [semesters, setSemesters] = useState<any[]>([]);
   const [branches, setBranches] = useState<any[]>([]);
 
+  const [openSyllabus, setOpenSyllabus] = useState<string | null>(null);
+  const [syllabusMap, setSyllabusMap] = useState<any>({});
+
   /* ---------------- AUTO FILL ---------------- */
   useEffect(() => {
     if (user?.semester && user?.branch) {
@@ -54,6 +57,80 @@ export default function PyqDownloadPage() {
       .catch(() => setSubjects([]))
       .finally(() => setLoadingSubjects(false));
   }, [semester, branch]);
+
+
+// ----------------------FETCH SYYALBUS-----------------
+  async function loadSyllabus(subjectCode: string) {
+    if (syllabusMap[subjectCode]) {
+      setOpenSyllabus(subjectCode);
+      return;
+    }
+  
+    try {
+      const res = await apiGet(`/api/public/subject/${subjectCode}`);
+      setSyllabusMap((prev: any) => ({
+        ...prev,
+        [subjectCode]: res.data?.syllabus || [],
+      }));
+  
+      setOpenSyllabus(subjectCode);
+    } catch {
+      setSyllabusMap((prev: any) => ({
+        ...prev,
+        [subjectCode]: [],
+      }));
+    }
+  }
+
+
+
+  function SyllabusAccordion({ syllabus }: any) {
+    const [openIndex, setOpenIndex] = useState<number | null>(0);
+  
+    return (
+      <div className="space-y-2">
+  
+        {syllabus?.map((unit: any, i: number) => (
+          <div key={i} className="border rounded-lg overflow-hidden">
+  
+            {/* HEADER */}
+            <button
+              onClick={() =>
+                setOpenIndex(openIndex === i ? null : i)
+              }
+              className="w-full flex justify-between items-center
+                         px-4 py-3 text-left
+                         bg-indigo-100 hover:bg-indigo-200"
+            >
+              <span className="font-semibold text-indigo-800">
+                {unit.unit}
+              </span>
+  
+              <span>{openIndex === i ? "−" : "+"}</span>
+            </button>
+  
+            {/* BODY */}
+            {openIndex === i && (
+              <div className="px-5 py-3 bg-white">
+  
+                <ul className="space-y-2 text-sm text-slate-700">
+                  {unit.topics.map((t: string, j: number) => (
+                    <li key={j} className="flex gap-2">
+                      <span className="text-indigo-400">•</span>
+                      <span>{t}</span>
+                    </li>
+                  ))}
+                </ul>
+  
+              </div>
+            )}
+  
+          </div>
+        ))}
+  
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-10 space-y-8">
@@ -137,12 +214,16 @@ export default function PyqDownloadPage() {
           {subjects.map((s: any) => (
             <div
               key={s.code}
-              className="bg-white rounded-xl shadow-sm p-5
-                         hover:shadow-md transition
-                         flex flex-col md:flex-row
-                         md:items-center md:justify-between
-                         gap-4"
+              className="space-y-2"
             >
+
+            <div
+                  className="bg-white rounded-xl shadow-sm p-5
+                            hover:shadow-md transition
+                            flex flex-col md:flex-row
+                            md:items-center md:justify-between
+                            gap-4"
+                >
 
               {/* LEFT INFO */}
               <div>
@@ -186,10 +267,88 @@ export default function PyqDownloadPage() {
                   View Solution
                 </Link>
 
+                <button
+                  onClick={() =>
+                    openSyllabus === s.code
+                      ? setOpenSyllabus(null)
+                      : loadSyllabus(s.code)
+                  }
+                  className="px-4 py-2 rounded-lg text-sm font-medium
+                            bg-indigo-100 text-indigo-700
+                            hover:bg-indigo-200 transition"
+                >
+                  {openSyllabus === s.code ? "Hide Syllabus" : "View Syllabus"}
+                </button>
+
               </div>
 
+
+            
+
+
+
+                {/* SYLLABUS */}
+
+
+                {openSyllabus === s.code && (
+                <div className="bg-indigo-50 border border-indigo-100 rounded-lg p-4 mt-3">
+
+                  {syllabusMap[s.code]?.length ? (
+
+                    syllabusMap[s.code].map((unit: any, i: number) => (
+                      <div key={i} className="mb-4">
+
+                        {/* MODULE */}
+                        <h4 className="font-semibold text-indigo-800">
+                          {unit.unit}
+                        </h4>
+
+                        {/* TOPICS */}
+                        <ul className="list-disc ml-6 mt-1 text-sm text-slate-700 space-y-1">
+                          {unit.topics.map((t: string, j: number) => (
+                            <li key={j}>{t}</li>
+                          ))}
+                        </ul>
+
+                      </div>
+                    ))
+
+                  ) : (
+                    <p className="text-sm text-slate-500">
+                      Syllabus not available.
+                    </p>
+                  )}
+
+                </div>
+              )}
+
+
+
+
+
+                {/* ✅ SYLLABUS (OUTSIDE CARD, FULL WIDTH) */}
+    {/* {openSyllabus === s.code && (
+      <div className="bg-indigo-50 border border-indigo-100 rounded-lg p-4">
+
+        <SyllabusAccordion syllabus={syllabusMap[s.code]} />
+
+      </div>
+    )} */}
+
+
+
+  
+
+
+</div>
+
             </div>
+
+            
           ))}
+
+
+
 
         </div>
       )}

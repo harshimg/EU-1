@@ -40,7 +40,11 @@ async def list_subjects(semester=None, branch=None):
 
     subjects = await (
         db_instance.db.subjects
-        .find(query)
+        .find(query,
+        {
+            "syllabus": 0   # ❌ exclude syllabus
+        }
+        )
         .sort("code", 1)
         .to_list(length=200)
     )

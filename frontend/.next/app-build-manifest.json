@@ -55,6 +55,16 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/admin/papers/[paper_id]/page.js"
+    ],
+    "/(user)/pyq/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(user)/pyq/page.js"
+    ],
+    "/_not-found/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/_not-found/page.js"
     ]
   }
 }

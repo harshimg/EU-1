@@ -8,9 +8,8 @@ import Link from "next/link";
 export default function PyqDownloadPage() {
   const { user } = useAuth();
 
-  /* ---------------- STATE ---------------- */
-  const [semester, setSemester] = useState<string>("");
-  const [branch, setBranch] = useState<string>("");
+  const [semester, setSemester] = useState("");
+  const [branch, setBranch] = useState("");
 
   const [subjects, setSubjects] = useState<any[]>([]);
   const [loadingSubjects, setLoadingSubjects] = useState(false);
@@ -18,7 +17,10 @@ export default function PyqDownloadPage() {
   const [semesters, setSemesters] = useState<any[]>([]);
   const [branches, setBranches] = useState<any[]>([]);
 
-  /* ---------------- AUTO-FILL FROM USER ---------------- */
+  const [openSyllabus, setOpenSyllabus] = useState<string | null>(null);
+  const [syllabusMap, setSyllabusMap] = useState<any>({});
+
+  /* ---------------- AUTO FILL ---------------- */
   useEffect(() => {
     if (user?.semester && user?.branch) {
       setSemester(user.semester);
@@ -56,135 +58,241 @@ export default function PyqDownloadPage() {
       .finally(() => setLoadingSubjects(false));
   }, [semester, branch]);
 
-  /* ---------------- UI ---------------- */
+
+// ----------------------FETCH SYYALBUS-----------------
+  async function loadSyllabus(subjectCode: string) {
+    if (syllabusMap[subjectCode]) {
+      setOpenSyllabus(subjectCode);
+      return;
+    }
+  
+    try {
+      const res = await apiGet(`/api/public/subject/${subjectCode}`);
+      setSyllabusMap((prev: any) => ({
+        ...prev,
+        [subjectCode]: res.data?.syllabus || [],
+      }));
+  
+      setOpenSyllabus(subjectCode);
+    } catch {
+      setSyllabusMap((prev: any) => ({
+        ...prev,
+        [subjectCode]: [],
+      }));
+    }
+  }
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-10 space-y-8">
 
-      {/* PAGE TITLE */}
+      {/* HEADER */}
       <div>
         <h1 className="text-2xl font-bold text-slate-800">
           Download Previous Year Question Papers
         </h1>
         <p className="text-sm text-slate-500 mt-1">
-          Select semester & branch to download subject-wise PDFs.
+          Access subject-wise question papers instantly.
         </p>
       </div>
 
-      {/* ---------------- FILTER SECTION ---------------- */}
+      {/* FILTER CARD */}
       <div className="bg-white rounded-2xl shadow-md p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
 
-        <div>
-          <label className="block text-sm text-slate-600 mb-1">
-            Semester
-          </label>
-          <select
-            className="input w-full"
-            value={semester}
-            onChange={e => setSemester(e.target.value)}
-          >
-            <option value="">Select Semester</option>
-            {semesters.map((s: any) => (
-              <option key={s.code} value={s.code}>
-                {s.name}
-              </option>
-            ))}
-          </select>
-        </div>
+        <select
+          className="input w-full"
+          value={semester}
+          onChange={e => setSemester(e.target.value)}
+        >
+          <option value="">Select Semester</option>
+          {semesters.map((s: any) => (
+            <option key={s.code} value={s.code}>
+              {s.name}
+            </option>
+          ))}
+        </select>
 
-        <div>
-          {/* <label className="block text-sm text-slate-600 mb-1"> */}
-          <label className="block text-sm text-slate-600 mb-1">
-            Branch
-          </label>
-          <select
-            className="input w-full"
-            value={branch}
-            onChange={e => setBranch(e.target.value)}
-          >
-            <option value="">Select Branch</option>
-            {branches.map((b: any) => (
-              <option key={b.code} value={b.code}>
-                {b.short_name}({b.code})
-              </option>
-            ))}
-          </select>
-        </div>
-
+        <select
+          className="input w-full"
+          value={branch}
+          onChange={e => setBranch(e.target.value)}
+        >
+          <option value="">Select Branch</option>
+          {branches.map((b: any) => (
+            <option key={b.code} value={b.code}>
+              {b.short_name}({b.code})
+            </option>
+          ))}
+        </select>
       </div>
 
-      {/* ---------------- SUBJECT TABLE ---------------- */}
-      {loadingSubjects && (
-        <div className="text-slate-500">Loading subjects...</div>
+      {/* SEMESTER BADGE */}
+      {semester && branch && (
+        <div className="flex items-center gap-3">
+          <span className="px-4 py-1.5 rounded-full text-sm font-medium
+                           bg-indigo-100 text-indigo-700">
+            Semester {semester}
+          </span>
+          <span className="px-4 py-1.5 rounded-full text-sm font-medium
+                           bg-slate-200 text-slate-700">
+            Branch {branch}
+          </span>
+        </div>
       )}
 
-      {!loadingSubjects && semester && branch && subjects.length > 0 && (
-        <div className="bg-white rounded-2xl shadow overflow-x-auto">
+      {/* LOADING SKELETON */}
+      {loadingSubjects && (
+        <div className="space-y-4">
+          {[...Array(5)].map((_, i) => (
+            <div
+              key={i}
+              className="animate-pulse bg-white p-5 rounded-xl shadow-sm flex justify-between"
+            >
+              <div className="space-y-2 w-1/2">
+                <div className="h-4 bg-slate-200 rounded w-2/3"></div>
+                <div className="h-3 bg-slate-200 rounded w-1/3"></div>
+              </div>
+              <div className="h-8 w-24 bg-slate-200 rounded"></div>
+            </div>
+          ))}
+        </div>
+      )}
 
-          <table className="w-full text-sm">
-            <thead className="bg-slate-100 text-slate-700">
-              <tr>
-                <th className="p-3 text-left">Subject Code</th>
-                <th className="p-3 text-left">Subject Name</th>
-                <th className="p-3 text-center">Download</th>
-                <th className="p-3 text-center">Solutions</th>
-              </tr>
-            </thead>
+      {/* SUBJECT LIST (CARD STYLE TABLE) */}
+      {!loadingSubjects && subjects.length > 0 && (
+        <div className="space-y-4">
 
-            <tbody>
-              {subjects.map((s: any) => (
-                <tr key={s.code} className="border-t hover:bg-slate-50 transition">
+          {subjects.map((s: any) => (
+            <div
+              key={s.code}
+              className="bg-white rounded-xl shadow-sm p-5
+                         hover:shadow-md transition
+                         flex flex-col md:flex-row
+                         md:items-center md:justify-between
+                         gap-4"
+            >
 
-                  <td className="p-3 font-medium text-slate-700">
-                    {s.code}
-                  </td>
+              {/* LEFT INFO */}
+              <div>
+                <h3 className="font-semibold text-slate-800">
+                  {s.full_name}
+                </h3>
+                <p className="text-xs text-slate-500 mt-1">
+                  Subject Code: {s.code}
+                </p>
+              </div>
 
-                  <td className="p-3 text-slate-600">
-                    {s.short_name}
-                  </td>
+              {/* ACTIONS */}
+              <div className="flex gap-3 flex-wrap">
 
-                  <td className="p-3 text-center">
-                    {s.all_paper_pdf ? (
-                      <a
-                        href={s.all_paper_pdf}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-3 py-1.5 rounded-md text-xs font-medium
-                                   bg-indigo-600 text-white
-                                   hover:bg-indigo-700 transition"
-                      >
-                        Download PDF
-                      </a>
-                    ) : (
-                      <span className="text-slate-400 text-xs">
-                        Not Available
-                      </span>
-                    )}
-                  </td>
+                {s.all_paper_pdf ? (
+                  <a
+                    href={s.all_paper_pdf}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2 rounded-lg text-sm font-medium
+                               bg-indigo-600 text-white
+                               hover:bg-indigo-700 transition"
+                  >
+                    Download Question
+                  </a>
+                ) : (
+                  <span className="px-4 py-2 rounded-lg text-sm
+                                   bg-slate-100 text-slate-400">
 
-                  <td className="p-3 text-center">
-                    <Link
-                      href={`/pyq?subject=${s.code}`}
-                      className="px-3 py-1.5 rounded-md text-xs font-medium
-                                 bg-slate-200 text-slate-700
-                                 hover:bg-slate-300 transition"
-                    >
-                      View Solution
-                    </Link>
-                  </td>
+                    Available Soon
+                    {/* Not Available */}
+                  </span>
+                )}
 
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                <Link
+                  href={`/pyq?subject=${s.code}`}
+                  className="px-4 py-2 rounded-lg text-sm font-medium
+                             bg-slate-200 text-slate-700
+                             hover:bg-slate-300 transition"
+                >
+                  View Solution
+                </Link>
+
+                <button
+                  onClick={() =>
+                    openSyllabus === s.code
+                      ? setOpenSyllabus(null)
+                      : loadSyllabus(s.code)
+                  }
+                  className="px-4 py-2 rounded-lg text-sm font-medium
+                            bg-indigo-100 text-indigo-700
+                            hover:bg-indigo-200 transition"
+                >
+                  {openSyllabus === s.code ? "Hide Syllabus" : "View Syllabus"}
+                </button>
+
+              </div>
+
+
+
+
+
+
+                {/* SYLLABUS */}
+
+
+
+
+
+
+
+
+                
+              {openSyllabus === s.code && (
+                <div className="bg-indigo-50 border border-indigo-100 rounded-lg p-4 mt-3">
+
+                  {syllabusMap[s.code]?.length ? (
+
+                    syllabusMap[s.code].map((unit: any, i: number) => (
+                      <div key={i} className="mb-4">
+
+                        {/* MODULE */}
+                        <h4 className="font-semibold text-indigo-800">
+                          {unit.unit}
+                        </h4>
+
+                        {/* TOPICS */}
+                        <ul className="list-disc ml-6 mt-1 text-sm text-slate-700 space-y-1">
+                          {unit.topics.map((t: string, j: number) => (
+                            <li key={j}>{t}</li>
+                          ))}
+                        </ul>
+
+                      </div>
+                    ))
+
+                  ) : (
+                    <p className="text-sm text-slate-500">
+                      Syllabus not available.
+                    </p>
+                  )}
+
+                </div>
+              )}
+
+
+
+
+
+
+            </div>
+          ))}
 
         </div>
       )}
 
       {!loadingSubjects && semester && branch && subjects.length === 0 && (
         <div className="text-slate-500">
-          No theory subjects found for selected semester & branch.
+            Available Soon
+          {/* No theory subjects found. */}
         </div>
       )}
+
     </div>
   );
 }
