@@ -74,6 +74,11 @@ async def remove_subject(code: str):
 async def countsubject():
     return await count_subject()
 
+    #------------SYLLABUS-----------------------
+@router.put("/ssb/subject/{code}/syllabus")
+async def syllabus(code: str, body: dict):
+    return await update_syllabus(code, body)
+
 
 #----------------PAPERS-------------------------------
 

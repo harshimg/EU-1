@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { API_URL } from "@/lib/api";
+import ReactSelect from "react-select";
+
+
 
 /* =====================================================
    TYPES
@@ -22,6 +25,12 @@ interface Branch {
   full_name: string;
 }
 
+
+interface SyllabusUnit {
+  unit: string;
+  topics: string[];
+}
+
 interface Subject {
   code: string;
   short_name: string;
@@ -30,7 +39,10 @@ interface Subject {
   branch_code: string;
   subject_type: string;
   subject_credit: number;
-  max_marks: number
+  max_marks: number;
+  all_paper_pdf: string;
+
+  syllabus?: SyllabusUnit[]; // ✅ NEW
 }
 
 /* =====================================================
@@ -44,13 +56,13 @@ export default function AdminStructurePage() {
 
   // 🔐 Guard
   useEffect(() => {
-    if (!loading && (!user || user.role !== "admin")) {
+    if (!loading && (!user || (user.role !== "admin" && user.role !== "superalpha"))) {
       router.replace("/");
     }
   }, [user, loading, router]);
 
   if (loading) return <Loader />;
-  if (!user || user.role !== "admin") return null;
+  if (!user || (user.role !== "admin" && user.role !== "superalpha")) return null;
 
   return (
     <div className="min-h-screen bg-[#0B0F1A] text-slate-200">
@@ -231,6 +243,10 @@ function SubjectSection() {
   const [open, setOpen] = useState(false);
   const [edit, setEdit] = useState<Subject | null>(null);
 
+  // Syllabus
+  const [openSyllabus, setOpenSyllabus] = useState(false);
+  const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
+
   useEffect(() => {
     loadBase();
   }, []);
@@ -287,20 +303,47 @@ function SubjectSection() {
         <Select value={filterBranch} onChange={setFilterBranch} options={branches} />
       </div>
 
-      <Table headers={["Code", "Short", "Full Name", "Semester", "Branch", "Type", "Credit", "max_marks", "Actions"]}>
+      <Table headers={["Code", "Short", "Full Name", "Semester", "Branch", "Type", "Credit", "max_marks", "view", "Actions"]}>
         {subjects.map(s => (
           <tr key={s.code}>
             <Td>{s.code}</Td>
             <Td>{s.short_name}</Td>
             <Td>{s.full_name}</Td>
             <Td>{s.semester_code}</Td>
-            <Td>{s.branch_code}</Td>
+            {/* <Td>{s.branch_code}</Td> */}
+            <Td>
+  <div className="flex flex-wrap gap-1">
+    {Array.isArray(s.branch_code)
+      ? s.branch_code.map((b: string) => (
+          <span
+            key={b}
+            className="px-2 py-0.5 text-xs rounded bg-slate-200 text-slate-700"
+          >
+            {b}
+          </span>
+        ))
+      : (
+        <span className="px-2 py-0.5 text-xs rounded bg-slate-200 text-slate-700">
+          {s.branch_code}
+        </span>
+      )}
+  </div>
+</Td>
             <Td>{s.subject_type}</Td>
             <Td>{s.subject_credit}</Td>
             <Td>{s.max_marks}</Td>
+            <Td>{s.all_paper_pdf || "Na"}</Td>
             <Td>
               <ActionBtn onClick={() => { setEdit(s); setOpen(true); }}>Edit</ActionBtn>
               <ActionBtn danger onClick={() => remove(s.code)}>Delete</ActionBtn>
+              <ActionBtn
+                onClick={() => {
+                  setSelectedSubject(s);
+                  setOpenSyllabus(true);
+                }}
+              >
+                Syllabus
+              </ActionBtn>
             </Td>
           </tr>
         ))}
@@ -315,6 +358,15 @@ function SubjectSection() {
           onSaved={fetchSubjects}
         />
       )}
+
+      {openSyllabus && selectedSubject && (
+        <SyllabusModal
+          subject={selectedSubject}
+          onClose={() => setOpenSyllabus(false)}
+          onSaved={fetchSubjects}
+        />
+      )}
+
     </SectionLayout>
   );
 }
@@ -560,22 +612,44 @@ function BranchModal({ data, onClose, onSaved }: any) {
 
 
 
-//🟣 SubjectModal
+// //🟣 SubjectModal
+
 function SubjectModal({ data, semesters, branches, onClose, onSaved }: any) {
   const [code, setCode] = useState(data?.code || "");
   const [shortName, setShortName] = useState(data?.short_name || "");
   const [fullName, setFullName] = useState(data?.full_name || "");
   const [semester, setSemester] = useState(data?.semester_code || "");
-  const [branch, setBranch] = useState(data?.branch_code || "");
+
+  const [branchCodes, setBranchCodes] = useState<string[]>(
+    Array.isArray(data?.branch_code) ? data.branch_code : data?.branch_code ? [data.branch_code] : []
+  );
+
   const [subject_type, setsubject_type] = useState(data?.subject_type || "");
   const [subject_credit, setsubject_credit] = useState(data?.subject_credit || "");
   const [max_marks, setmax_marks] = useState(data?.max_marks || "");
+  const [all_paper_pdf, setall_paper_pdf] = useState(data?.all_paper_pdf || "")
+
+
+  const branchOptions = branches.map((b: any) => ({
+    value: b.code,
+    label: `${b.code} – ${b.short_name}`,
+  }));
+  
 
   async function submit() {
-    if (!code || !shortName || !fullName || !semester || !branch || !subject_type || !max_marks) {
+    if (
+      !code ||
+      !shortName ||
+      !fullName ||
+      !semester ||
+      branchCodes.length === 0 ||
+      !subject_type ||
+      !max_marks
+    ) {
       alert("All fields are required");
       return;
     }
+
     const method = data ? "PUT" : "POST";
     const url = data
       ? `${API_URL}/admin/ssb/subject/${data.code}`
@@ -592,10 +666,11 @@ function SubjectModal({ data, semesters, branches, onClose, onSaved }: any) {
         short_name: shortName,
         full_name: fullName,
         semester_code: semester,
-        branch_code: branch,
-        subject_type: subject_type,
-        subject_credit: subject_credit,
-        max_marks: max_marks
+        branch_code: branchCodes, 
+        subject_type,
+        subject_credit,
+        max_marks,
+        all_paper_pdf,
       }),
     });
 
@@ -605,89 +680,229 @@ function SubjectModal({ data, semesters, branches, onClose, onSaved }: any) {
 
   return (
     <Modal onClose={onClose}>
+      <div className="max-h-[85vh] overflow-y-auto pr-1">
       <h3 className="text-lg font-semibold mb-4 text-white">
         {data ? "Edit Subject" : "Add Subject"}
       </h3>
 
-      <input
-        className="input mb-3"
-        placeholder="Code"
-        value={code}
-        disabled={!!data}
+      <input className="input mb-3" placeholder="Code"
+        value={code} disabled={!!data}
         onChange={e => setCode(e.target.value)}
       />
 
-      <input
-        className="input mb-3"
-        placeholder="Short Name"
+      <input className="input mb-3" placeholder="Short Name"
         value={shortName}
         onChange={e => setShortName(e.target.value)}
       />
 
-      <input
-        className="input"
-        placeholder="Full Name"
+      <input className="input mb-3" placeholder="Full Name"
         value={fullName}
         onChange={e => setFullName(e.target.value)}
       />
 
-  <div className="grid grid-cols-2 gap-3">
-      <select
-        // className="input mb-3"
-        className="input"
-        value={semester}
-        onChange={e => setSemester(e.target.value)}
-      >
-        <option value="">Select Semester</option>
-        {semesters.map((s: any) => (
-          <option key={s.code} value={s.code}>{s.code}</option>
-        ))}
-      </select>
+      
+       {/* 🔥 MULTI BRANCH SELECT */}
+       <div className="mb-3">
+          <label className="block text-sm text-gray-300 mb-1">
+            Branch(es)
+          </label>
 
-      <select
-        className="input"
-        value={branch}
-        onChange={e => setBranch(e.target.value)}
-      >
-        <option value="">Select Branch</option>
-        {branches.map((b: any) => (
-          <option key={b.code} value={b.code}>{b.code}</option>
-        ))}
-      </select>
-  </div>
+          <ReactSelect
+            isMulti
+            options={branchOptions}
+            value={branchOptions.filter(opt =>
+              branchCodes.includes(opt.value)
+            )}
+            onChange={(selected: any) =>
+              setBranchCodes(selected.map((s: any) => s.value))
+            }
+            placeholder="Select or search one or more branches"
+            className="text-black"
+            classNamePrefix="react-select"
+          />
+        </div>
 
-  <div className="grid grid-cols-2 gap-3">
-      <select className="input" value={subject_type}
+      <div className="grid grid-cols-2 gap-3">
+        <select className="input" value={semester}
+          onChange={e => setSemester(e.target.value)}>
+          <option value="">Select Semester</option>
+          {semesters.map((s: any) => (
+            <option key={s.code} value={s.code}>{s.code}</option>
+          ))}
+        </select>
+
+        <select className="input" value={subject_type}
           onChange={e => setsubject_type(e.target.value)}>
           <option value="">Subject type</option>
           <option>Theory</option>
           <option>Practical</option>
         </select>
+      </div>
 
+
+
+      <div className="grid grid-cols-2 gap-3">
         <select className="input" value={max_marks}
-            onChange={e => setmax_marks(e.target.value)}>
-            <option value="">Max Marks</option>
-            <option>100</option>
-            <option>50</option>
-          </select>
-  </div>
+          onChange={e => setmax_marks(e.target.value)}>
+          <option value="">Max Marks</option>
+          <option>100</option>
+          <option>50</option>
+        </select>
 
-      <input
-        className="input"
-        placeholder="Subject Credit"
+        <input className="input" placeholder="Subject Credit"
+        type="number"
         value={subject_credit}
-        // only int or float
-        type = "Number"       
         onChange={e => setsubject_credit(e.target.value)}
-      />
+        />
+      </div>
 
-      <button  disabled={!code || !shortName || !fullName || !semester || !branch}
-            onClick={submit} className="btn-primary w-full mt-4 disabled:opacity-40">
+      <div>
+        <input className="input" placeholder="All paper pdf link"
+        type="string" value={all_paper_pdf}
+        onChange={e => setall_paper_pdf(e.target.value)} />
+      </div>
+
+      <button
+        onClick={submit}
+        className="btn-primary w-full mt-4"
+      >
         Save
       </button>
-    </Modal>
+    </div>
+  </Modal>
   );
 }
 
 
+function SyllabusModal({ subject, onClose, onSaved }: any) {
+
+  const [units, setUnits] = useState<SyllabusUnit[]>(
+    subject?.syllabus || [{ unit: "", topics: [""] }]
+  );
+
+  function addUnit() {
+    setUnits([...units, { unit: "", topics: [""] }]);
+  }
+
+  function removeUnit(index: number) {
+    setUnits(units.filter((_, i) => i !== index));
+  }
+
+  function updateUnit(index: number, key: string, value: any) {
+    const updated = [...units];
+    updated[index][key] = value;
+    setUnits(updated);
+  }
+
+  function updateTopic(uIndex: number, tIndex: number, value: string) {
+    const updated = [...units];
+    updated[uIndex].topics[tIndex] = value;
+    setUnits(updated);
+  }
+
+  function addTopic(uIndex: number) {
+    const updated = [...units];
+    updated[uIndex].topics.push("");
+    setUnits(updated);
+  }
+
+  function removeTopic(uIndex: number, tIndex: number) {
+    const updated = [...units];
+    updated[uIndex].topics =
+      updated[uIndex].topics.filter((_, i) => i !== tIndex);
+    setUnits(updated);
+  }
+
+  async function submit() {
+    await fetch(`${API_URL}/admin/ssb/subject/${subject.code}/syllabus`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify({ syllabus: units }),
+    });
+
+    onSaved();
+    onClose();
+  }
+
+  return (
+    <Modal onClose={onClose}>
+      <div className="max-h-[80vh] overflow-y-auto space-y-4">
+
+        <h3 className="text-lg font-semibold text-white">
+          Manage Syllabus ({subject?.short_name})
+        </h3>
+
+        {units.map((u, ui) => (
+          <div key={ui} className="border border-white/10 p-3 rounded">
+
+            <div className="flex justify-between items-center mb-2">
+              <input
+                className="input w-full mr-2"
+                placeholder="Unit Name"
+                value={u.unit}
+                onChange={(e) =>
+                  updateUnit(ui, "unit", e.target.value)
+                }
+              />
+
+              <button
+                onClick={() => removeUnit(ui)}
+                className="text-red-400 text-xs"
+              >
+                Remove
+              </button>
+            </div>
+
+            {/* Topics */}
+            {u.topics.map((t, ti) => (
+              <div key={ti} className="flex gap-2 mb-2">
+                <input
+                  className="input flex-1"
+                  placeholder="Topic"
+                  value={t}
+                  onChange={(e) =>
+                    updateTopic(ui, ti, e.target.value)
+                  }
+                />
+
+                <button
+                  onClick={() => removeTopic(ui, ti)}
+                  className="text-red-400 text-xs"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+
+            <button
+              onClick={() => addTopic(ui)}
+              className="text-indigo-400 text-xs"
+            >
+              + Add Topic
+            </button>
+
+          </div>
+        ))}
+
+        <button
+          onClick={addUnit}
+          className="text-indigo-400 text-sm"
+        >
+          + Add Unit
+        </button>
+
+        <button
+          onClick={submit}
+          className="btn-primary w-full mt-4"
+        >
+          Save Syllabus
+        </button>
+
+      </div>
+    </Modal>
+  );
+}
 

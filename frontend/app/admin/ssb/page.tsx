@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Fragment } from "react";
+
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { API_URL } from "@/lib/api";
@@ -25,6 +27,12 @@ interface Branch {
   full_name: string;
 }
 
+
+interface SyllabusUnit {
+  unit: string;
+  topics: string[];
+}
+
 interface Subject {
   code: string;
   short_name: string;
@@ -35,6 +43,8 @@ interface Subject {
   subject_credit: number;
   max_marks: number;
   all_paper_pdf: string;
+
+  syllabus?: SyllabusUnit[]; // ✅ NEW
 }
 
 /* =====================================================
@@ -115,6 +125,8 @@ function SemesterSection() {
   // }
   async function remove(code?: string) {
     if (!code) return; // 🚫 prevent blank delete
+
+    if (!confirm("Delete this semester?")) return;
   
     const backup = list;
     setList(list.filter(s => s.code !== code));
@@ -178,6 +190,8 @@ function BranchSection() {
 
   async function remove(code: string) {
     if (!code) return; // 🚫 prevent blank delete
+    if (!confirm("Delete this branch?")) return;
+
     const backup = list;
     setList(list.filter(b => b.code !== code));
 
@@ -235,6 +249,9 @@ function SubjectSection() {
   const [open, setOpen] = useState(false);
   const [edit, setEdit] = useState<Subject | null>(null);
 
+  // Syllabus
+  const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
+
   useEffect(() => {
     loadBase();
   }, []);
@@ -268,6 +285,8 @@ function SubjectSection() {
   }, [filterSem, filterBranch]);
 
   async function remove(code: string) {
+
+    if (!confirm("Delete this subject?")) return;
     
     const backup = subjects;
     setSubjects(subjects.filter(s => s.code !== code));
@@ -291,9 +310,10 @@ function SubjectSection() {
         <Select value={filterBranch} onChange={setFilterBranch} options={branches} />
       </div>
 
-      <Table headers={["Code", "Short", "Full Name", "Semester", "Branch", "Type", "Credit", "max_marks", "view", "Actions"]}>
+      <Table headers={["Code", "Short", "Full Name", "Semester", "Branch", "Type", "Credit", "max_marks", "Papers ", "Actions"]}>
         {subjects.map(s => (
-          <tr key={s.code}>
+          <Fragment  key={s.code}>
+            <tr>
             <Td>{s.code}</Td>
             <Td>{s.short_name}</Td>
             <Td>{s.full_name}</Td>
@@ -320,12 +340,51 @@ function SubjectSection() {
             <Td>{s.subject_type}</Td>
             <Td>{s.subject_credit}</Td>
             <Td>{s.max_marks}</Td>
-            <Td>{s.all_paper_pdf || "Na"}</Td>
+            {/* <Td>{s.all_paper_pdf || "Na"}</Td> */}
+            <Td>
+              {s.all_paper_pdf ? (
+                <a
+                  href={s.all_paper_pdf}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-indigo-400 hover:underline"
+                >
+                  View
+                </a>
+              ) : (
+                <span className="text-gray-400 text-xs">NA</span>
+              )}
+          </Td>
             <Td>
               <ActionBtn onClick={() => { setEdit(s); setOpen(true); }}>Edit</ActionBtn>
               <ActionBtn danger onClick={() => remove(s.code)}>Delete</ActionBtn>
-            </Td>
+              <ActionBtn
+                            onClick={() => {
+                              setSelectedSubject(prev =>
+                                prev?.code === s.code ? null : s
+                              );
+                            }}
+                          >
+                            {selectedSubject?.code === s.code ? "Close" : "Syllabus"}
+                          </ActionBtn>
+          </Td>
           </tr>
+            {selectedSubject?.code === s.code && (
+          <tr>
+            
+            <td colSpan={10}>
+              <InlineSyllabusEditor
+                subject={s}
+                onSaved={() => {
+                  fetchSubjects();
+                  setSelectedSubject(null); // CLOSE AFTER SAVE
+                }}
+              />
+            </td>
+
+          </tr>
+        )}
+          </Fragment >
         ))}
       </Table>
 
@@ -338,6 +397,9 @@ function SubjectSection() {
           onSaved={fetchSubjects}
         />
       )}
+
+        
+
     </SectionLayout>
   );
 }
@@ -744,3 +806,162 @@ function SubjectModal({ data, semesters, branches, onClose, onSaved }: any) {
   );
 }
 
+
+
+
+function InlineSyllabusEditor({ subject, onSaved }: any) {
+
+  const [units, setUnits] = useState<SyllabusUnit[]>(
+    subject?.syllabus?.length
+      ? subject.syllabus
+      : [{ unit: "", topics: [""] }]
+  );
+
+  function addUnit() {
+    setUnits([...units, { unit: "", topics: [""] }]);
+  }
+
+  function removeUnit(index: number) {
+    setUnits(units.filter((_, i) => i !== index));
+  }
+
+  function updateUnit(index: number, value: string) {
+    const updated = [...units];
+    updated[index].unit = value;
+    setUnits(updated);
+  }
+
+  function updateTopic(uIndex: number, tIndex: number, value: string) {
+    const updated = [...units];
+    updated[uIndex].topics[tIndex] = value;
+    setUnits(updated);
+  }
+
+  function addTopic(uIndex: number) {
+    const updated = [...units];
+    updated[uIndex].topics.push("");
+    setUnits(updated);
+  }
+
+  function removeTopic(uIndex: number, tIndex: number) {
+    const updated = [...units];
+    updated[uIndex].topics =
+      updated[uIndex].topics.filter((_, i) => i !== tIndex);
+    setUnits(updated);
+  }
+
+  async function submit() {
+    await fetch(`${API_URL}/admin/ssb/subject/${subject.code}/syllabus`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify({ syllabus: units }),
+    });
+
+    onSaved();
+    alert("Syllabus saved");
+  }
+
+  return (
+    <div className="bg-[#0F1629] border border-indigo-500/20 rounded-lg p-4 space-y-4">
+
+      <h4 className="text-indigo-300 font-semibold">
+        Syllabus — {subject.short_name}
+      </h4>
+
+      {units.map((u, ui) => (
+  <div
+    key={ui}
+    className="border border-white/10 p-4 rounded-lg bg-[#0B1225]"
+  >
+
+    {/* MODULE HEADER */}
+    <div className="flex items-center gap-2 mb-3">
+
+      <span className="text-xs text-indigo-400 font-semibold">
+        MODULE {ui + 1}
+      </span>
+
+      <input
+        className="flex-1 bg-transparent border-b border-indigo-500/40 
+                   text-lg font-semibold text-white px-2 py-1 
+                   focus:outline-none focus:border-indigo-400"
+        placeholder="Module Name"
+        value={u.unit}
+        onChange={(e) => updateUnit(ui, e.target.value)}
+      />
+
+      <button
+        onClick={() => removeUnit(ui)}
+        className="text-red-400 text-sm hover:text-red-300"
+      >
+        ✕
+      </button>
+
+    </div>
+
+    {/* TOPICS */}
+    <div className="pl-6 space-y-2">
+
+      {u.topics.map((t, ti) => (
+        <div key={ti} className="flex gap-2 items-start">
+
+          {/* bullet */}
+          <span className="mt-2 text-gray-400">•</span>
+
+          <textarea
+            className="flex-1 bg-[#11172C] border border-white/10 rounded 
+                       px-3 py-2 text-sm text-white 
+                       focus:outline-none focus:border-indigo-400
+                       resize-none"
+            rows={2}
+            placeholder="Topic"
+            value={t}
+            onChange={(e) =>
+              updateTopic(ui, ti, e.target.value)
+            }
+          />
+
+          <button
+            onClick={() => removeTopic(ui, ti)}
+            className="text-red-400 text-xs mt-2"
+          >
+            ✕
+          </button>
+
+        </div>
+      ))}
+
+      <button
+        onClick={() => addTopic(ui)}
+        className="text-indigo-400 text-xs hover:text-indigo-300"
+      >
+        + Add Topic
+      </button>
+
+    </div>
+
+  </div>
+))}
+
+      <div className="flex justify-between">
+        <button
+          onClick={addUnit}
+          className="text-indigo-400 text-sm"
+        >
+          + Add Unit
+        </button>
+
+        <button
+          onClick={submit}
+          className="btn-primary"
+        >
+          Save
+        </button>
+      </div>
+
+    </div>
+  );
+}

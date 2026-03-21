@@ -259,6 +259,21 @@ async def count_subject():
     }
 
 
+    #------------SYLLABUS-----------------------
+async def update_syllabus(code: str, body: dict):
+
+    syllabus = body.get("syllabus", [])
+
+    await db_instance.db.subjects.update_one(
+        {"code": code},
+        {"$set": {"syllabus": syllabus}}
+    )
+
+    return {
+        "success": True,
+        "message": "Updated syllabus"}
+
+
 #=============================================
 #----------PAPERS-----------------------------
 #=============================================
