@@ -951,7 +951,7 @@ function InlineSyllabusEditor({ subject, onSaved }: any) {
           onClick={addUnit}
           className="text-indigo-400 text-sm"
         >
-          + Add Unit
+          + Add Module
         </button>
 
         <button

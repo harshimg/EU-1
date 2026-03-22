@@ -4,6 +4,15 @@ import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { API_URL, apiGet, apiPost } from "@/lib/api";
 import { useAuthModal } from "@/components/auth/AuthModal";
+import {
+  MobileTabs,
+  SubjectSelector,
+  PaperSelector,
+  QuestionSelector,
+} from "@/components/pyq/mobile";
+import { useSwipeable } from "react-swipeable";
+
+
 
 
 
@@ -15,6 +24,11 @@ export default function PYQPage() {
   const [subjects, setSubjects] = useState<any[]>([]);
   const [papers, setPapers] = useState<any[]>([]);
   const [paper, setPaper] = useState<any | null>(null);
+  const QUESTION_LABEL = paper?.type === "NPTEL" ? "Week" : "Q";
+
+
+  const [viewMode, setViewMode] = useState<"solution" | "all">("solution");
+
 
   const [activeSubject, setActiveSubject] = useState<any | null>(null);
   const [activePaper, setActivePaper] = useState<any | null>(null);
@@ -25,6 +39,24 @@ export default function PYQPage() {
   const [rightW, setRightW] = useState(100);
 
   /* Mobile drawers */
+  const [activeTab, setActiveTab] = useState<
+  "subjects" | "papers" | "questions"
+>("questions");
+
+const handlers = useSwipeable({
+  onSwipedLeft: () => {
+    if (activeTab === "subjects") setActiveTab("papers");
+    else if (activeTab === "papers") setActiveTab("questions");
+  },
+  onSwipedRight: () => {
+    if (activeTab === "questions") setActiveTab("papers");
+    else if (activeTab === "papers") setActiveTab("subjects");
+  },
+  trackMouse: true,
+});
+
+
+
   const [showLeftMobile, setShowLeftMobile] = useState(false);
   const [showRightMobile, setShowRightMobile] = useState(false);
 
@@ -224,12 +256,27 @@ useEffect(() => {
 
   const current = activeQ?.sq ?? activeQ?.q;
 
+  // const isUnavailable =
+  // !current?.question_md &&
+  // !current?.solution_md &&
+  // (!current?.options || current.options.length === 0);
+
+  // const isUnavailable = !current;
+
+  const isUnavailable =
+  !current ||
+  !current.question_md ||
+  current.question_md.trim().length === 0;
+
+
+
+
   return (
     <div className="h-screen overflow-hidden bg-slate-100 flex flex-col md:flex-row">
       {!user && !loading && (
   <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/30 backdrop-blur-sm">
     <div className="bg-white rounded-xl p-6 shadow-xl text-center">
-      <p className="text-slate-700 mb-3">Please sign in to view PYQs</p>
+      <p className="text-slate-700 mb-3">Please sign in to view PYQs & Solution</p>
       <button
         onClick={showLogin}
         className="btn-primary"
@@ -240,9 +287,49 @@ useEffect(() => {
   </div>
 )}
 
+      {/* MOBILE  Navigation for Subjects, papers, Quetions */}
+      <div >
+
+          <MobileTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+
+          {activeTab === "subjects" && (
+            <SubjectSelector
+              subjects={subjects}
+              activeSubject={activeSubject}
+              onSelect={(s) => {
+                setActiveSubject(s);
+                setActiveTab("papers"); // auto switch
+              }}
+            />
+          )}
+
+          {activeTab === "papers" && (
+            <PaperSelector
+              papers={papers}
+              activePaper={activePaper}
+              onSelect={(p) => {
+                setActivePaper(p);
+                setActiveTab("questions"); // auto switch
+              }}
+            />
+          )}
+
+          {activeTab === "questions" && (
+            <QuestionSelector
+              paper={paper}
+              activeQ={activeQ}
+              onSelect={setActiveQ}
+            />
+          )}
+
+</div>
+
+
+
+
 
       {/* MOBILE TOP BAR */}
-      <div className="md:hidden sticky top-0 z-30 flex justify-between items-center gap-3 px-3 py-3 
+      {/* <div className="md:hidden sticky top-0 z-30 flex justify-between items-center gap-3 px-3 py-3 
                       bg-gradient-to-r from-indigo-600 to-blue-600 border-b border-black/10 shadow-md">
         <button
           onClick={() => setShowLeftMobile(true)}
@@ -259,7 +346,7 @@ useEffect(() => {
         >
           Questions
         </button>
-      </div>
+      </div> */}
 
       {/* LEFT PANEL (DESKTOP) */}
       <aside
@@ -295,120 +382,306 @@ useEffect(() => {
         )}
 
 
-{/* Next & and Previous button */}
-<div className="flex justify-between items-center pt-6 mt-6">
-  <button
-    onClick={goPrev}
-    disabled={currentIndex <= 0}
-    className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
-               bg-white text-slate-700 border border-slate-300
-               hover:bg-slate-100
-               disabled:opacity-40 disabled:cursor-not-allowed"
-  >
-    ← Previous
-  </button>
+  
+{/* VIEW TOGGLE
+<div className="flex justify-center mb-4">
+  <div className="flex bg-slate-100 rounded-lg p-1">
+    <button
+      onClick={() => setViewMode("solution")}
+      className={`px-4 py-1.5 rounded-md text-sm font-medium transition
+        ${viewMode === "solution"
+          ? "bg-white shadow text-indigo-600"
+          : "text-slate-600 hover:text-slate-800"}`}
+    >
+      Solution
+    </button>
 
-  <button
-    onClick={goNext}
-    disabled={currentIndex >= flatQuestions.length - 1}
-    className="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium
-               bg-indigo-600 text-white shadow-sm
-               hover:bg-indigo-700
-               disabled:opacity-40 disabled:cursor-not-allowed"
+    <button
+      onClick={() => setViewMode("all")}
+      className={`px-4 py-1.5 rounded-md text-sm font-medium transition
+        ${viewMode === "all"
+          ? "bg-white shadow text-indigo-600"
+          : "text-slate-600 hover:text-slate-800"}`}
+    >
+      All Questions
+    </button>
+
+    {paper?.paper_pdf && (
+  <a
+    href={paper.paper_pdf}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="inline-block mt-3 px-4 py-2 rounded-lg text-sm font-medium
+               bg-blue-600 text-white hover:bg-green-700"
   >
-    Next →
-  </button>
+    Download PDF
+  </a>
+)}
+
+  </div>
+</div> */}
+
+
+{/* VIEW TOGGLE + DOWNLOAD */}
+<div className="flex items-center justify-between mb-4">
+
+  {/* LEFT SPACER (keeps toggle centered) */}
+  <div className="w-24" />
+
+  {/* CENTER TOGGLE */}
+  <div className="flex bg-slate-100 rounded-lg p-1">
+    <button
+      onClick={() => setViewMode("solution")}
+      className={`px-4 py-1.5 rounded-md text-sm font-medium transition
+        ${viewMode === "solution"
+          ? "bg-white shadow text-indigo-600"
+          : "text-slate-600 hover:text-slate-800"}`}
+    >
+      Solution
+    </button>
+
+    <button
+      onClick={() => setViewMode("all")}
+      className={`px-4 py-1.5 rounded-md text-sm font-medium transition
+        ${viewMode === "all"
+          ? "bg-white shadow text-indigo-600"
+          : "text-slate-600 hover:text-slate-800"}`}
+    >
+      All Questions
+    </button>
+  </div>
+
+  {/* RIGHT DOWNLOAD BUTTON */}
+  {paper?.paper_pdf ? (
+    <a
+      href={paper.paper_pdf} // recommended backend route
+      target="_blank"
+      rel="noopener noreferrer"
+      className="px-4 py-1.5 rounded-lg text-sm font-medium
+                 bg-gradient-to-r from-indigo-600 to-blue-600
+                 text-white shadow hover:opacity-90 transition"
+    >
+      Download PDF
+    </a>
+  ) : (
+    <div className="w-24" />
+  )}
+
 </div>
 
 
 
-        {current && (
-          <div className="bg-white rounded-xl shadow-md p-4 md:p-6 space-y-6">
-            <h3 className="text-xl font-semibold">
-              Q{activeQ?.q.q_no}
-              {activeQ?.sq && ` (${activeQ.sq.sq_no})`}
 
-              {/* MAIN QUESTION HEADING (for multi) */}
-            {activeQ?.q?.heading && (
-            <div className="text-slate-700 font-medium bg-slate-50 border-l-4 border-slate-300 px-4 py-2 rounded">
-                {activeQ.q.heading}
-            </div>
-            )}
+{viewMode === "solution" &&  (
+  <div className="bg-white rounded-xl shadow-md p-4 md:p-6 space-y-6">
 
-            </h3>
+    {/* Top Navigation */}
+    <div className="flex justify-between items-center pt-6 mt-6">
+      <button
+        onClick={goPrev}
+        disabled={currentIndex <= 0}
+        className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
+                   bg-white text-slate-700 border border-slate-300
+                   hover:bg-slate-100
+                   disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        ← Previous
+      </button>
 
-            <p className="whitespace-pre-wrap">{current.question_md}</p>
+      <button
+        onClick={goNext}
+        disabled={currentIndex >= flatQuestions.length - 1}
+        className="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium
+                   bg-indigo-600 text-white shadow-sm
+                   hover:bg-indigo-700
+                   disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        Next →
+      </button>
+    </div>
 
-            {/* ✅ OBJECTIVE OPTIONS */}
-            {Array.isArray(current.options) && (
-              <div className="space-y-2">
-                {current.options.map((op: string, i: number) => {
-                  const isCorrect = current.correct_index === i;
-                  return (
-                    <div
-                      key={i}
-                      className={`p-3 rounded border ${
-                        isCorrect
-                          ? "bg-green-50 border-green-400 text-green-800"
-                          : "bg-slate-50 border-slate-200"
-                      }`}
-                    >
-                      <strong>{String.fromCharCode(65 + i)}.</strong> {op}
-                      {isCorrect && (
-                        <span className="ml-2 text-xs font-semibold">
-                          ✓ Correct
-                        </span>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+    {/* 🚨 AVAILABLE SOON BLOCK */}
+    {isUnavailable ? (
+      <div className="flex flex-col items-center justify-center py-20 text-center">
 
-            {/* SOLUTION */}
-            {current.solution_md && (
-              <div className="bg-indigo-50 border-l-4 border-indigo-400 p-4 rounded">
-                <strong className="block mb-1">Solution</strong>
-                {/* <div className="whitespace-pre-wrap"> */}
-                <div className="mt-2 text-sm-400 whitespace-pre-wrap">
-                {/* <div className="mt-3 rounded-lg bg-emerald-50 border border-emerald-200 
-                px-4 py-3 text-emerald-900 text-sm leading-relaxed 
-                whitespace-pre-wrap"> */}
-                  {current.solution_md}
-                </div>
-              </div>
-            )}
+        <div className="text-5xl font-bold text-indigo-600 tracking-wide">
+          AVAILABLE SOON
+        </div>
 
-{/* Next & and Previous button */}
-<div className="flex justify-between items-center pt-6 mt-6">
-  <button
-    onClick={goPrev}
-    disabled={currentIndex <= 0}
-    className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
-               bg-white text-slate-700 border border-slate-300
-               hover:bg-slate-100
-               disabled:opacity-40 disabled:cursor-not-allowed"
-  >
-    ← Previous
-  </button>
+        {/* <p className="mt-4 text-slate-500 text-sm max-w-md">
+          This question and its solution are currently being prepared.
+          Please check back later.
+        </p> */}
 
-  <button
-    onClick={goNext}
-    disabled={currentIndex >= flatQuestions.length - 1}
-    className="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium
-               bg-indigo-600 text-white shadow-sm
-               hover:bg-indigo-700
-               disabled:opacity-40 disabled:cursor-not-allowed"
-  >
-    Next →
-  </button>
-</div>
+      </div>
+    ) : (
+      <>
+        {/* QUESTION TITLE */}
+        <h3 className="text-xl font-semibold">
+          {QUESTION_LABEL}-{activeQ?.q.q_no}
+          {activeQ?.sq && ` (${activeQ.sq.sq_no})`}
+        </h3>
 
-
-
-            
+        {/* HEADING (if multi) */}
+        {activeQ?.q?.heading && (
+          <div className="text-slate-700 font-medium bg-slate-50 border-l-4 border-slate-300 px-4 py-2 rounded">
+            {activeQ.q.heading}
           </div>
         )}
+
+        {/* QUESTION TEXT */}
+        {current.question_md && (
+          <p className="whitespace-pre-wrap">
+            {current.question_md}
+          </p>
+        )}
+
+        {/* OBJECTIVE OPTIONS */}
+        {Array.isArray(current.options) && (
+          <div className="space-y-2">
+            {current.options.map((op: string, i: number) => {
+              const isCorrect = current.correct_index === i;
+              return (
+                <div
+                  key={i}
+                  className={`p-3 rounded border ${
+                    isCorrect
+                      ? "bg-green-50 border-green-400 text-green-800"
+                      : "bg-slate-50 border-slate-200"
+                  }`}
+                >
+                  <strong>{String.fromCharCode(65 + i)}.</strong> {op}
+                  {isCorrect && (
+                    <span className="ml-2 text-xs font-semibold">
+                      ✓ Correct
+                    </span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* SOLUTION */}
+        {current.solution_md && (
+          <div className="bg-indigo-50 border-l-4 border-indigo-400 p-4 rounded">
+            <strong className="block mb-1">Solution</strong>
+            <div className="mt-2 whitespace-pre-wrap">
+              {current.solution_md}
+            </div>
+          </div>
+        )}
+      </>
+    )}
+
+    {/* Bottom Navigation */}
+    <div className="flex justify-between items-center pt-6 mt-6">
+      <button
+        onClick={goPrev}
+        disabled={currentIndex <= 0}
+        className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
+                   bg-white text-slate-700 border border-slate-300
+                   hover:bg-slate-100
+                   disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        ← Previous
+      </button>
+
+      <button
+        onClick={goNext}
+        disabled={currentIndex >= flatQuestions.length - 1}
+        className="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium
+                   bg-indigo-600 text-white shadow-sm
+                   hover:bg-indigo-700
+                   disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        Next →
+      </button>
+    </div>
+
+  </div>
+)}
+
+
+
+
+
+
+
+{viewMode === "all" && paper && (
+  <div className="bg-white rounded-xl shadow-md p-4 md:p-6
+                  max-h-[70vh] overflow-y-auto space-y-4">
+
+    <h3 className="text-lg font-semibold text-slate-700">
+      All Questions
+    </h3>
+
+    {paper.questions.map((q: any) => (
+      <div
+        key={q.q_no}
+        className="pb-4 bg-slate-50/50 rounded-lg px-3 space-y-2"
+      >
+        {/* MAIN QUESTION */}
+        <button
+          onClick={() => {
+            if (q.sub_questions?.length) {
+              setActiveQ({ q, sq: q.sub_questions[0] });
+            } else {
+              setActiveQ({ q });
+            }
+            setViewMode("solution");
+          }}
+          className="block w-full text-left font-medium text-slate-800
+                     hover:text-indigo-600"
+        >
+          {QUESTION_LABEL}-{q.q_no}. {q.question_md}
+        </button>
+
+        {/* MAIN QUESTION OPTIONS (OBJECTIVE) */}
+        {Array.isArray(q.options) && (
+          <div className="ml-4 space-y-1 text-sm text-slate-600">
+            {q.options.map((op: string, i: number) => (
+              <div key={i}>
+                {String.fromCharCode(65 + i)}. {op}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* SUB QUESTIONS */}
+        {q.sub_questions?.map((sq: any) => (
+          <div key={sq.sq_no} className="ml-4 space-y-1">
+            <button
+              onClick={() => {
+                setActiveQ({ q, sq });
+                setViewMode("solution");
+              }}
+              className="block w-full text-left mt-2
+                         text-sm text-slate-700 hover:text-blue-600"
+            >
+              ({sq.sq_no}) {sq.question_md}
+            </button>
+
+            {/* SUB QUESTION OPTIONS (OBJECTIVE) */}
+            {Array.isArray(sq.options) && (
+              <div className="ml-4 space-y-1 text-xs text-slate-500">
+                {sq.options.map((op: string, i: number) => (
+                  <div key={i}>
+                    {String.fromCharCode(65 + i)}. {op}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    ))}
+  </div>
+)}
+
+
+
+
       </main>
 
       {/* RIGHT RESIZER */}
@@ -461,7 +734,10 @@ useEffect(() => {
         </MobileDrawer>
       )}
     </div>
-  );
+
+
+
+  );   //return
 }
 
 /* ---------------- MOBILE DRAWER ---------------- */
@@ -483,38 +759,48 @@ function PanelLeft({ subjects, papers, activeSubject, activePaper, onSubject, on
   return (
     <div className="p-4 space-y-4 text-sm">
       <h3 className="font-semibold">Subjects</h3>
-      {/* {subjects.map((s: any) => (
-        <button
-          key={s._id}
-          onClick={() => onSubject(s)}
-          className={`block w-full text-left px-3 py-2 rounded ${
-            activeSubject?.code === s.code
-              ? "bg-indigo-100 text-indigo-700"
+
+      {subjects
+  .filter((s: any) => s.subject_type === "Theory")
+  .map((s: any) => {
+    const isActive = activeSubject?.code === s.code;
+
+    return (
+      <div
+        key={s._id}
+        onClick={() => onSubject(s)}   // ✅ CLICK ANYWHERE
+        className={`flex items-center justify-between px-3 py-2 rounded cursor-pointer transition
+          ${
+            isActive
+              ? "bg-indigo-100"
               : "hover:bg-slate-100"
           }`}
+      >
+        {/* SUBJECT NAME */}
+        <span
+          className={`font-medium
+            ${isActive ? "text-indigo-700" : "text-slate-700"}`}
         >
           {s.short_name}
-        </button>
-      ))} */}
+        </span>
 
-    {subjects
-      .filter((s: any) => s.subject_type === "Theory")
-      .map((s: any) => (
-        <button
-          key={s._id}
-          onClick={() => onSubject(s)}
-          className={`block w-full text-left px-3 py-2 rounded ${
-            activeSubject?.code === s.code
-              ? "bg-indigo-100 text-indigo-700"
-              : "hover:bg-slate-100"
-          }`}
-        >
-          {s.short_name}
-        </button>
-      ))}
-
-
-
+        {/* DOWNLOAD PDF BUTTON */}
+        {isActive && s?.all_paper_pdf && (
+          <a
+            href={s.all_paper_pdf}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}  // ✅ Prevent subject activation
+            className="text-xs px-3 py-1 rounded-md
+                       bg-indigo-600 text-white
+                       hover:bg-indigo-700 transition"
+          >
+            Download PDF
+          </a>
+        )}
+      </div>
+    );
+  })}
 
       <h3 className="font-semibold mt-4">Papers</h3>
       {papers.map((p: any) => (
@@ -582,7 +868,9 @@ function duplicatePanelRight({ paper, activeQ, onSelect }: any) {
 function PanelRight({ paper, activeQ, onSelect }: any) {
   return (
     <div className="p-4 text-sm">
-      <h3 className="font-semibold mb-3">Questions</h3>
+      <h3 className="font-semibold mb-3">
+        {paper?.type === "NPTEL" ? "Week" : "Questions"}
+      </h3>
 
       {paper.questions.map((q: any) => {
         const isMainActive = activeQ?.q.q_no === q.q_no;

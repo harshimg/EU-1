@@ -27,7 +27,7 @@ export default function PYQPage() {
   const QUESTION_LABEL = paper?.type === "NPTEL" ? "Week" : "Q";
 
 
-  const [viewMode, setViewMode] = useState<"solution" | "all">("solution");
+  const [viewMode, setViewMode] = useState<"solution" | "all" | "syllabus">("solution");
 
 
   const [activeSubject, setActiveSubject] = useState<any | null>(null);
@@ -37,6 +37,15 @@ export default function PYQPage() {
   /* Desktop panel sizes (CHANGE DEFAULTS HERE) */
   const [leftW, setLeftW] = useState(150);
   const [rightW, setRightW] = useState(100);
+
+  // SYLLABUS
+  const [syllabus, setSyllabus] = useState<any[]>([]);
+  const [loadingSyllabus, setLoadingSyllabus] = useState(false);
+
+  const [loadingSubjects, setLoadingSubjects] = useState(true);
+  const [loadingPapers, setLoadingPapers] = useState(false);
+  const [loadingPaper, setLoadingPaper] = useState(false);
+
 
   /* Mobile drawers */
   const [activeTab, setActiveTab] = useState<
@@ -127,8 +136,7 @@ const handlers = useSwipeable({
 
 
   /* ---------------- FETCH SUBJECTS ---------------- */
-  useEffect(() => {
-    if (!user) return;
+ 
 
   //   fetch(
   //     `${API_URL}/user/subjects?semester_code=${user.semester}&branch_code=${user.branch}`,
@@ -146,17 +154,27 @@ const handlers = useSwipeable({
   // }, [user]);
 
 
+  useEffect(() => {
+    if (!user) return;
+
+  setLoadingSubjects(true);
 
   apiGet(
     `/user/subjects?semester_code=${user.semester}&branch_code=${user.branch}`
   )
     .then(json => {
-      setSubjects(json.data || []);
-      if (json.data?.length) setActiveSubject(json.data[0]);
+      const theoryOnly = (json.data || []).filter(
+        (s: any) => s.subject_type === "Theory"
+      );
+      setSubjects(theoryOnly || []);
+      if (theoryOnly?.length) setActiveSubject(theoryOnly[0]);
     })
     .catch(err => {
       console.error(err.message);
-    });
+    })
+    .finally(() => setLoadingSubjects(false));
+    
+
 }, [user]);
 
 
@@ -179,12 +197,31 @@ const handlers = useSwipeable({
 useEffect(() => {
   if (!activeSubject) return;
 
+  setLoadingPapers(true);
+
+  setPapers([])
+  setActivePaper(null);
+  setPaper(null);
+  setActiveQ(null);
+
   apiGet(`/user/papers?subject_code=${activeSubject.code}`)
-    .then(json => {
-      setPapers(json.data || []);
-      if (json.data?.length) setActivePaper(json.data[0]);
-    })
-    .catch(err => console.error(err.message));
+  .then(json => {
+    const sorted = (json.data || []).sort(
+      (a: any, b: any) => b.year - a.year
+    );
+
+    setPapers(sorted);
+    if (sorted.length) setActivePaper(sorted[0]); // latest auto select
+  })
+  .catch(err => console.error(err.message))
+    .finally(() => setLoadingPapers(false));
+
+  // apiGet(`/user/papers?subject_code=${activeSubject.code}`)
+  //   .then(json => {
+  //     setPapers(json.data || []);
+  //     if (json.data?.length) setActivePaper(json.data[0]);
+  //   })
+  //   .catch(err => console.error(err.message));
 }, [activeSubject]);
 
 
@@ -213,6 +250,11 @@ useEffect(() => {
 useEffect(() => {
   if (!activePaper) return;
 
+  setLoadingPaper(true);
+
+  setPaper(null);
+  setActiveQ(null);
+
   apiGet(`/user/paper/${activePaper._id}`)
     .then(json => {
       setPaper(json.data);
@@ -226,8 +268,39 @@ useEffect(() => {
         );
       }
     })
-    .catch(err => console.error(err.message));
+    .catch(err => console.error(err.message))
+    .finally(() => setLoadingPaper(false));
+
 }, [activePaper]);
+
+
+//--------------------------- FETCH SYLLABUS---------------------------
+
+
+useEffect(() => {
+  if (loadingPapers) return;
+
+  if (papers.length === 0) {
+    setViewMode("syllabus");
+  } else {
+    setViewMode("solution"); // ✅ auto switch back
+  }
+}, [papers, loadingPapers]);
+
+
+useEffect(() => {
+  if (!activeSubject) return;
+
+  setLoadingSyllabus(true);
+
+  apiGet(`/api/public/subject/${activeSubject.code}`)
+    .then(res => {
+      setSyllabus(res.data?.syllabus || []);
+    })
+    .catch(() => setSyllabus([]))
+    .finally(() => setLoadingSyllabus(false));
+
+}, [activeSubject]);
 
 
   /* ---------------- DESKTOP RESIZE ---------------- */
@@ -286,6 +359,10 @@ useEffect(() => {
     </div>
   </div>
 )}
+
+
+
+
 
       {/* MOBILE  Navigation for Subjects, papers, Quetions */}
       <div >
@@ -360,6 +437,7 @@ useEffect(() => {
           activePaper={activePaper}
           onSubject={setActiveSubject}
           onPaper={setActivePaper}
+          onOpenSyllabus={() => setViewMode("syllabus")}    // ✅ ADD
         />
       </aside>
 
@@ -369,8 +447,31 @@ useEffect(() => {
         onMouseDown={() => (resizing.current = "left")}
       />
 
+
+
+
       {/* MAIN CONTENT */}
       <main className="flex-1 min-h-0 h-full overflow-y-auto p-4 md:p-6">
+
+      {/* {loadingSubjects && (
+  <div className="flex items-center justify-center py-20">
+    <div className="animate-pulse text-slate-400">
+      Loading subjects...
+    </div>
+  </div>
+)} */}
+
+{/* {!loadingSubjects && loadingPapers && (
+  <div className="space-y-4">
+    {[...Array(5)].map((_, i) => (
+      <div key={i} className="h-16 bg-white rounded-xl animate-pulse" />
+    ))}
+  </div>
+)} */}
+
+
+
+
         {paper && (
           <div className="bg-white rounded-xl p-4 mb-6 shadow-sm">
             <h2 className="text-lg font-semibold">{paper.name}</h2>
@@ -380,6 +481,10 @@ useEffect(() => {
             <p className="text-slate-600 mt-1 text-sm">{paper.description}</p>
           </div>
         )}
+
+
+
+        
 
 
   
@@ -449,6 +554,17 @@ useEffect(() => {
     >
       All Questions
     </button>
+
+    {/* ✅ NEW */}
+  <button
+    onClick={() => setViewMode("syllabus")}
+    className={`px-4 py-1.5 rounded-md text-sm font-medium transition
+      ${viewMode === "syllabus"
+        ? "bg-white shadow text-indigo-600"
+        : "text-slate-600"}`}
+  >
+    Syllabus
+  </button>
   </div>
 
   {/* RIGHT DOWNLOAD BUTTON */}
@@ -474,6 +590,14 @@ useEffect(() => {
 
 {viewMode === "solution" &&  (
   <div className="bg-white rounded-xl shadow-md p-4 md:p-6 space-y-6">
+
+{loadingPaper && (
+  <div className="flex items-center justify-center py-20">
+    <div className="animate-pulse text-slate-400">
+      Loading paper...
+    </div>
+  </div>
+)}
 
     {/* Top Navigation */}
     <div className="flex justify-between items-center pt-6 mt-6">
@@ -501,10 +625,51 @@ useEffect(() => {
     </div>
 
     {/* 🚨 AVAILABLE SOON BLOCK */}
-    {isUnavailable ? (
-      <div className="flex flex-col items-center justify-center py-20 text-center">
+    {/* {!loadingSubjects  && !loadingPapers && !loadingPaper && isUnavailable ? ( */}
+    {isUnavailable ? ( 
+      loadingSubjects || loadingPapers || loadingPaper ? (
 
-        <div className="text-5xl font-bold text-indigo-600 tracking-wide">
+        <div className="space-y-6 animate-pulse">
+
+    {/* title */}
+    <div className="h-6 w-1/3 bg-slate-200 rounded"></div>
+
+    {/* paragraph */}
+    <div className="space-y-2">
+      <div className="h-4 bg-slate-200 rounded"></div>
+      <div className="h-4 bg-slate-200 rounded w-5/6"></div>
+      <div className="h-4 bg-slate-200 rounded w-2/3"></div>
+    </div>
+
+    {/* options */}
+    <div className="space-y-2">
+      {[...Array(4)].map((_, i) => (
+        <div key={i} className="h-10 bg-slate-200 rounded"></div>
+      ))}
+    </div>
+
+  </div>
+        
+
+        // <div className="flex flex-col items-center justify-center py-20 text-center">
+          
+        //   <div className="text-5xl font-bold text-indigo-600 tracking-wide">
+        //     LOADING
+        //     <div className="space-y-4">
+        //       {[...Array(5)].map((_, i) => (
+        //         <div key={i} className="h-16 bg-white rounded-xl animate-pulse" />
+        //       ))}
+        //     </div>
+
+        //   </div>
+        // </div>
+
+      ):(
+
+
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          
+        <div  className="text-3xl font-semibold text-slate-400 animate-pulse">
           AVAILABLE SOON
         </div>
 
@@ -514,6 +679,8 @@ useEffect(() => {
         </p> */}
 
       </div>
+        )
+        
     ) : (
       <>
         {/* QUESTION TITLE */}
@@ -612,6 +779,10 @@ useEffect(() => {
   <div className="bg-white rounded-xl shadow-md p-4 md:p-6
                   max-h-[70vh] overflow-y-auto space-y-4">
 
+
+  
+    
+
     <h3 className="text-lg font-semibold text-slate-700">
       All Questions
     </h3>
@@ -678,6 +849,52 @@ useEffect(() => {
     ))}
   </div>
 )}
+
+
+
+
+
+
+{/* ------MODE-> SYLLABIS----------------------------------- */}
+{viewMode === "syllabus" && (
+  <div className="bg-white rounded-xl shadow-md p-6 space-y-6">
+
+    <h3 className="text-lg font-semibold text-indigo-700">
+      Syllabus — {activeSubject?.short_name}
+    </h3>
+
+    {loadingSyllabus ? (
+      <p className="text-sm text-slate-500">Loading syllabus...</p>
+    ) : syllabus.length === 0 ? (
+      <p className="text-sm text-slate-500">
+        Syllabus available soon
+      </p>
+    ) : (
+      syllabus.map((u: any, i: number) => (
+        <div
+          key={i}
+          className="border border-slate-200 rounded-lg p-4"
+        >
+
+          {/* MODULE */}
+          <h4 className="text-md font-semibold text-slate-800 mb-2">
+            {u.unit}
+          </h4>
+
+          {/* TOPICS */}
+          <ul className="list-disc ml-6 space-y-1 text-slate-600">
+            {u.topics.map((t: string, j: number) => (
+              <li key={j}>{t}</li>
+            ))}
+          </ul>
+
+        </div>
+      ))
+    )}
+
+  </div>
+)}
+
 
 
 
@@ -755,7 +972,7 @@ function MobileDrawer({ children, onClose }: any) {
 }
 
 /* ---------------- LEFT PANEL ---------------- */
-function PanelLeft({ subjects, papers, activeSubject, activePaper, onSubject, onPaper }: any) {
+function PanelLeft({ subjects, papers, activeSubject, activePaper, onSubject, onPaper, onOpenSyllabus }: any) {
   return (
     <div className="p-4 space-y-4 text-sm">
       <h3 className="font-semibold">Subjects</h3>
@@ -803,7 +1020,49 @@ function PanelLeft({ subjects, papers, activeSubject, activePaper, onSubject, on
   })}
 
       <h3 className="font-semibold mt-4">Papers</h3>
-      {papers.map((p: any) => (
+{/* PAPERS LIST */}
+{papers.length > 0 ? (
+  <>
+    {papers.map((p: any) => (
+      <button
+        key={p._id}
+        onClick={() => onPaper(p)}
+        className={`block w-full text-left px-3 py-2 rounded ${
+          activePaper?._id === p._id
+            ? "bg-blue-100 text-blue-700"
+            : "hover:bg-slate-100"
+        }`}
+      >
+        {p.year} {p.name}
+      </button>
+    ))}
+
+    {/* 👉 SYLLABUS AT END */}
+    <button
+  onClick={() => {
+    onPaper(null);        // clear paper
+    onOpenSyllabus();     // trigger syllabus mode
+  }}
+  className="block w-full text-left px-3 py-2 rounded
+             bg-indigo-50 text-indigo-700 hover:bg-indigo-100 mt-2"
+>
+  Syllabus
+</button>
+  </>
+) : (
+  /* 👉 NO PAPERS → ONLY SYLLABUS */
+  <button
+  onClick={() => {
+    onPaper(null);        // clear paper
+    onOpenSyllabus();     // trigger syllabus mode
+  }}
+  className="block w-full text-left px-3 py-2 rounded
+             bg-indigo-50 text-indigo-700 hover:bg-indigo-100 mt-2"
+>
+  Syllabus
+</button>
+)}
+      {/* {papers.map((p: any) => (
         <button
           key={p._id}
           onClick={() => onPaper(p)}
@@ -815,7 +1074,70 @@ function PanelLeft({ subjects, papers, activeSubject, activePaper, onSubject, on
         >
           {p.year} {p.name}
         </button>
-      ))}
+      ))} */}
+    </div>
+  );
+}
+
+
+
+
+function SyllabusBlock({ syllabus, loading }: any) {
+  const [open, setOpen] = useState(true);
+
+  if (loading) {
+    return (
+      <div className="mt-4 text-xs text-slate-400">
+        Loading syllabus...
+      </div>
+    );
+  }
+
+  if (!syllabus?.length) {
+    return (
+      <div className="mt-4 text-xs text-slate-400">
+        Syllabus not available
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-4 border-t pt-3">
+
+      {/* HEADER */}
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full text-left text-xs font-semibold
+                   text-indigo-600 flex justify-between"
+      >
+        Syllabus
+        <span>{open ? "−" : "+"}</span>
+      </button>
+
+      {/* BODY */}
+      {open && (
+        <div className="mt-2 space-y-2">
+
+          {syllabus.map((u: any, i: number) => (
+            <div key={i} className="text-xs">
+
+              {/* MODULE */}
+              <div className="font-semibold text-slate-700">
+                {u.unit}
+              </div>
+
+              {/* TOPICS */}
+              <ul className="ml-3 list-disc text-slate-500">
+                {u.topics.map((t: string, j: number) => (
+                  <li key={j}>{t}</li>
+                ))}
+              </ul>
+
+            </div>
+          ))}
+
+        </div>
+      )}
     </div>
   );
 }
@@ -862,6 +1184,9 @@ function duplicatePanelRight({ paper, activeQ, onSelect }: any) {
     </div>
   );
 }
+
+
+
 
 
 /* ---------------- RIGHT PANEL ---------------- */
