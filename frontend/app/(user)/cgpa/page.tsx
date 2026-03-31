@@ -4,6 +4,12 @@ import { useEffect, useState } from "react";
 import { apiGet, apiPost } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 
+import { SEMESTERS } from "@/lib/constants/academic";
+import { BRANCHES } from "@/lib/constants/academic";
+
+const semesters = SEMESTERS;
+const branches = BRANCHES;
+
 export default function SgpaPage() {
   const { user, loading, refreshUser } = useAuth();
 
@@ -17,9 +23,6 @@ export default function SgpaPage() {
   const practicalSubjects = subjects.filter(s => s.subject_type === "Practical");
 
 
-  /* Dropdown data (guest users only) */
-  const [semesters, setSemesters] = useState<any[]>([]);
-  const [branches, setBranches] = useState<any[]>([]);
 
   // Marks
 // const [marks, setMarks] = useState<Record<string, number | "">>({});
@@ -67,19 +70,7 @@ const canCalculate =
 
   }, [user]);
 
-  /* ---------------- FETCH DROPDOWNS (GUEST ONLY) ---------------- */
-  useEffect(() => {
-    // if (isLoggedIn) return;
-    if (semester  && branch) return;
 
-    apiGet("/api/public/semester")
-      .then(res => setSemesters(res.data || []))
-      .catch(() => {});
-
-    apiGet("/api/public/branch")
-      .then(res => setBranches(res.data || []))
-      .catch(() => {});
-  }, [isLoggedIn]);
 
   /* ---------------- FETCH SUBJECTS ---------------- */
   useEffect(() => {

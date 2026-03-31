@@ -5,6 +5,14 @@ import { apiPost } from "@/lib/api";
 import { API_URL } from "@/lib/api";
 import GoogleLoginButton from "./GoogleLoginButton";
 
+
+import { SEMESTERS } from "@/lib/constants/academic";
+import { BRANCHES } from "@/lib/constants/academic";
+
+const semesters = SEMESTERS;
+const branches = BRANCHES;
+
+
 export default function SignupForm({ showLogin, showOtp }: any) {
   const [data, setData] = useState({
     name: "",
@@ -16,20 +24,20 @@ export default function SignupForm({ showLogin, showOtp }: any) {
     reg_no: "",
   });
 
-  const [semesters, setSemesters] = useState<any[]>([]);
-  const [branches, setBranches] = useState<any[]>([]);
+  // const [semesters, setSemesters] = useState<any[]>([]);
+  // const [branches, setBranches] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
   /* ---------------- LOAD SEM & BRANCH (PUBLIC) ---------------- */
-  useEffect(() => {
-    fetch(`${API_URL}/api/public/semester`)
-      .then(res => res.json())
-      .then(json => setSemesters(json.data || []));
+  // useEffect(() => {
+  //   fetch(`${API_URL}/api/public/semester`)
+  //     .then(res => res.json())
+  //     .then(json => setSemesters(json.data || []));
 
-    fetch(`${API_URL}/api/public/branch`)
-      .then(res => res.json())
-      .then(json => setBranches(json.data || []));
-  }, []);
+  //   fetch(`${API_URL}/api/public/branch`)
+  //     .then(res => res.json())
+  //     .then(json => setBranches(json.data || []));
+  // }, []);
 
   async function handleSignup() {
     try {

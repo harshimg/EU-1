@@ -1,8 +1,7 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/(user)/result/page": "app/(user)/result/page.js",
-  "/(user)/pyq/page": "app/(user)/pyq/page.js",
-  "/(user)/account/page": "app/(user)/account/page.js",
   "/(user)/page": "app/(user)/page.js",
-  "/admin/page": "app/admin/page.js"
+  "/(user)/cgpa/page": "app/(user)/cgpa/page.js",
+  "/admin/page": "app/admin/page.js",
+  "/(user)/pyq/download/page": "app/(user)/pyq/download/page.js",
+  "/(user)/account/page": "app/(user)/account/page.js"
 }

@@ -5,6 +5,12 @@ import { apiGet } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import Link from "next/link";
 
+import { SEMESTERS } from "@/lib/constants/academic";
+import { BRANCHES } from "@/lib/constants/academic";
+
+const semesters = SEMESTERS;
+const branches = BRANCHES;
+
 export default function PyqDownloadPage() {
   const { user } = useAuth();
 
@@ -13,9 +19,6 @@ export default function PyqDownloadPage() {
 
   const [subjects, setSubjects] = useState<any[]>([]);
   const [loadingSubjects, setLoadingSubjects] = useState(false);
-
-  const [semesters, setSemesters] = useState<any[]>([]);
-  const [branches, setBranches] = useState<any[]>([]);
 
   const [openSyllabus, setOpenSyllabus] = useState<string | null>(null);
   const [syllabusMap, setSyllabusMap] = useState<any>({});
@@ -27,17 +30,6 @@ export default function PyqDownloadPage() {
       setBranch(user.branch);
     }
   }, [user]);
-
-  /* ---------------- FETCH DROPDOWNS ---------------- */
-  useEffect(() => {
-    apiGet("/api/public/semester")
-      .then(res => setSemesters(res.data || []))
-      .catch(() => {});
-
-    apiGet("/api/public/branch")
-      .then(res => setBranches(res.data || []))
-      .catch(() => {});
-  }, []);
 
   /* ---------------- FETCH SUBJECTS ---------------- */
   useEffect(() => {

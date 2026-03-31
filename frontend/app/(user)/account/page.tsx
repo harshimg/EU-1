@@ -5,6 +5,12 @@ import { useAuth } from "@/lib/auth";
 import { apiGet, apiPut } from "@/lib/api";
 import { useRouter } from "next/navigation";
 
+import { SEMESTERS } from "@/lib/constants/academic";
+import { BRANCHES } from "@/lib/constants/academic";
+
+const semesters = SEMESTERS;
+const branches = BRANCHES;
+
 
 export default function AccountPage() {
   const { user, loading, refreshUser } = useAuth();
@@ -14,8 +20,6 @@ export default function AccountPage() {
 
   // To get
   const [profile, setProfile] = useState<any>(null);
-  const [semesters, setSemesters] = useState<any[]>([]);
-  const [branches, setbranches] = useState<any[]>([]);
 
   // To update
   const [semester, setSemester] = useState("");
@@ -43,18 +47,6 @@ export default function AccountPage() {
     .catch(err => console.error(err.message));
     
   }
-  /* ---------------- FETCH SEMESTERS ---------------- */
-  useEffect(() => {
-    if (!showModal) return;
-
-    apiGet("/user/semester")
-      .then(json => setSemesters(json.data || []),)
-      .catch(err => console.error(err.message));
-
-      apiGet("/user/branch")
-      .then(json => setbranches(json.data || []),)
-      .catch(err => console.error(err.message));
-  }, [showModal]);
 
   async function updateProfile() {
     if (!semester) return;
