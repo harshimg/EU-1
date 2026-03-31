@@ -29,16 +29,19 @@ async def get_brach():
     return await list_branches()
 
 
-@router.get("/subjects", dependencies=[Depends(user_required)])
+# @router.get("/subjects", dependencies=[Depends(user_required)])
+@router.get("/subjects")
 async def get_subjects(semester_code: int, branch_code: str):
     return await list_subjects(str(semester_code), branch_code)
 
 
-@router.get("/papers", dependencies=[Depends(user_required)])
+# @router.get("/papers", dependencies=[Depends(user_required)])
+@router.get("/papers")
 async def get_papers(subject_code: str):
     return await list_papers(subject_code)
 
 
-@router.get("/paper/{paper_id}", dependencies=[Depends(user_required)])
+# @router.get("/paper/{paper_id}", dependencies=[Depends(user_required)])
+@router.get("/paper/{paper_id}")
 async def get_paper(paper_id: str):
     return await get_full_paper(paper_id)
