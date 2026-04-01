@@ -13,6 +13,22 @@ export default function PyqSelectorPage() {
   const [selectedSem, setSelectedSem] = useState<string | null>(null);
   const [selectedBranch, setSelectedBranch] = useState<string | null>(null);
 
+
+    // Load from localStorage (first time)
+    useEffect(() => {
+      const of_logged_in_savedSem = user?.semester;
+      const of_logged_in_savedBranch = user?.branch;
+  
+      const savedSem = localStorage.getItem("semester") || of_logged_in_savedSem;
+      const savedBranch = localStorage.getItem("branch") || of_logged_in_savedBranch;
+      
+      if (!searchParams.get("sem") && !searchParams.get("branch")) {
+        if (savedSem && savedBranch) {
+          router.replace(`/pyq/${savedBranch}/sem-${savedSem}`);
+        }
+      }
+    }, []);
+
   // Read from URL
   useEffect(() => {
     const sem = searchParams.get("sem");
@@ -32,26 +48,14 @@ export default function PyqSelectorPage() {
     }
   }, [selectedSem, selectedBranch]);
 
-  // Load from localStorage (first time)
-  useEffect(() => {
-    const of_logged_in_savedSem = user?.semester;
-    const of_logged_in_savedBranch = user?.branch;
 
-    const savedSem = localStorage.getItem("user.semester") || of_logged_in_savedSem;
-    const savedBranch = localStorage.getItem("user.branch") || of_logged_in_savedBranch;
-    
-    if (!searchParams.get("sem") && !searchParams.get("branch")) {
-      if (savedSem && savedBranch) {
-        router.replace(`/pyq/${savedBranch}/sem-${savedSem}`);
-      }
-    }
-  }, []);
 
   // -------- HANDLERS --------
 
   const selectSemester = (sem: string) => {
+    localStorage.setItem("semester", sem);
+
     if (selectedBranch) {
-      localStorage.setItem("semester", sem);
       router.push(`/pyq/${selectedBranch}/sem-${sem}`);
     } else {
       router.push(`/pyq?sem=${sem}`);
@@ -59,8 +63,9 @@ export default function PyqSelectorPage() {
   };
 
   const selectBranch = (branch: string) => {
+    localStorage.setItem("branch", branch);
+
     if (selectedSem) {
-      localStorage.setItem("branch", branch);
       router.push(`/pyq/${branch}/sem-${selectedSem}`);
     } else {
       router.push(`/pyq?branch=${branch}`);
