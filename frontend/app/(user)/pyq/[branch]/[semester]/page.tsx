@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { API_URL, apiGet, apiPost } from "@/lib/api";
 import { useAuthModal } from "@/components/auth/AuthModal";
+import {handleShare} from "@/components/handleShare/handleShare";
 import {
   MobileTabs,
   SubjectSelector,
@@ -12,7 +13,7 @@ import {
 } from "@/components/pyq/mobile";
 import { useSwipeable } from "react-swipeable";
 import { useParams, useRouter } from 'next/navigation';
-
+import { Share2, Share, RefreshCw } from "lucide-react";
 
 
 
@@ -189,6 +190,10 @@ const handlers = useSwipeable({
       if (!selected) selected = theoryOnly[0];
 
       setActiveSubject(selected);
+      // setActiveSubject(prev => {
+      //   if (prev?.code === selected.code) return prev;
+      //   return selected;
+      // });
     })
     .catch(err => {
       console.error(err.message);
@@ -225,6 +230,10 @@ useEffect(() => {
       if (!selected) selected = sorted[0];
 
       setActivePaper(selected);
+      // setActivePaper(prev => {
+      //   if (prev?._id === selected._id) return prev;
+      //   return selected;
+      // });
   })
   .catch(err => console.error(err.message))
     .finally(() => setLoadingPapers(false));
@@ -464,7 +473,8 @@ useEffect(() => {
 
 
 
-        {paper && (
+
+        {/* {paper && (
           <div className="bg-white rounded-xl p-4 mb-6 shadow-sm">
             <h2 className="text-lg font-semibold">{paper.name}</h2>
             <p className="text-slate-500 text-sm">
@@ -472,7 +482,77 @@ useEffect(() => {
             </p>
             <p className="text-slate-600 mt-1 text-sm">{paper.description}</p>
           </div>
-        )}
+        )} */}
+
+
+
+
+{paper && (
+  <div className="bg-white rounded-xl px-4 py-3 mb-4 shadow-sm border border-slate-100">
+
+    {/* 🔝 TOP BAR */}
+    <div className="flex items-center justify-between">
+
+      {/* LEFT: Branch + Semester */}
+      <div className="flex items-center gap-2 text-xs font-medium">
+        <span className="px-2 py-0.5 rounded bg-indigo-50 text-indigo-700">
+          {branch.toUpperCase()}
+        </span>
+        <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700">
+          {semester.toUpperCase()}
+        </span>
+      </div>
+
+      {/* RIGHT: Actions */}
+      <div className="flex items-center gap-2">
+
+        {/* SHARE */}
+        <button
+          onClick={handleShare}
+          className="flex items-center gap-1 px-2 py-1 rounded 
+                     text-indigo-600 hover:bg-indigo-50 transition text-xs"
+        >
+          <Share size={14} />
+          <span className="hidden sm:inline">Share</span>
+        </button>
+
+        {/* CHANGE (FIXED MOBILE) */}
+        <button
+          onClick={() => {
+            localStorage.removeItem("branch");
+            localStorage.removeItem("semester");
+            router.push("/pyq");
+          }}
+          className="flex items-center gap-1 px-2 py-1 rounded 
+                     text-slate-600 hover:bg-slate-100 transition text-xs"
+        >
+          {/* 👇 ALWAYS visible (short text for mobile) */}
+          <RefreshCw size={14} />
+          <span>Change Branch / Semester</span>
+        </button>
+
+      </div>
+    </div>
+
+    {/* 📄 PAPER DETAILS (compact) */}
+    <div className="mt-2">
+      <h2 className="text-base font-semibold text-slate-800 leading-tight">
+        {paper.name}
+      </h2>
+
+      <p className="text-slate-500 text-xs mt-0.5">
+        {paper.subject_code} • {paper.type} • {paper.year}
+      </p>
+
+      {paper.description && (
+        <p className="text-slate-600 text-sm leading-relaxed">
+          {paper.description}
+        </p>
+      )}
+    </div>
+
+  </div>
+)}
 
 
 
