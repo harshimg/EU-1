@@ -185,6 +185,15 @@ return (
       </div>
 
 
+      {/* INFO INTRO */}
+      <div className="text-sm text-slate-600 text-center max-w-2xl mx-auto">
+        <p>
+          This SGPA calculator helps you estimate your semester performance based on your internal and external marks. 
+          Simply enter your marks for each subject and get your SGPA instantly.
+        </p>
+      </div>
+
+
 <div className="flex justify-end mb-2">
 <button
   onClick={() =>
@@ -195,7 +204,7 @@ return (
   }
       className="flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-700"
 >
-<Share size={14} />
+<Share size={28} />
   Share
 </button>
 </div>
@@ -255,6 +264,18 @@ return (
           Loading subjects…
         </p>
       )}
+
+
+      {/* HOW IT WORKS */}
+<div className="bg-white rounded-xl shadow-sm p-4 text-sm text-slate-600">
+  <h3 className="font-semibold text-slate-800 mb-2">
+    How SGPA is Calculated
+  </h3>
+  <p>
+    SGPA (Semester Grade Point Average) is calculated based on your marks in each subject and their respective credits. 
+    Higher marks result in better grade points, which contribute to your overall SGPA.
+  </p>
+</div>
 
       {/* THEORY SUBJECTS */}
       {!loadingSubjects && theorySubjects.length > 0 && (
@@ -420,12 +441,29 @@ return (
         </div>
       )}
 
+
+
       {/* NO SUBJECTS */}
       {!loadingSubjects && semester && branch && subjects.length === 0 && (
         <p className="text-center text-sm text-red-500">
           No subjects found for selected semester & branch.
+
+          <p className="text-center text-sm text-slate-600">
+            Subjects for this semester are currently not available. 
+            We are continuously updating data, please check back soon.
+          </p>
         </p>
+
       )}
+
+
+            {/* ADDITIONAL INFO */}
+<div className="text-xs text-slate-500 text-center max-w-2xl mx-auto pt-4">
+  <p>
+    Note: This calculator provides an estimated SGPA based on entered marks. 
+    Actual SGPA may vary depending on your university’s grading system and credit structure.
+  </p>
+</div>
 
     </div>
   </div>

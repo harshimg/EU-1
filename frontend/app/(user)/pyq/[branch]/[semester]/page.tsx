@@ -517,12 +517,13 @@ useEffect(() => {
           className="flex items-center gap-1 px-2 py-1 rounded 
                      text-indigo-600 hover:bg-indigo-50 transition text-xs"
         >
-          <Share size={14} />
+          <Share size={28} />
           <span className="hidden sm:inline">Share</span>
         </button>
 
         {/* CHANGE (FIXED MOBILE) */}
-        <button
+        {  !user &&
+        <button  
           onClick={() => {
             localStorage.removeItem("branch");
             localStorage.removeItem("semester");
@@ -535,6 +536,8 @@ useEffect(() => {
           <RefreshCw size={14} />
           <span>Change Branch / Semester</span>
         </button>
+
+        }
 
       </div>
     </div>
@@ -558,6 +561,15 @@ useEffect(() => {
 
   </div>
 )}
+
+
+
+<div className="text-sm text-slate-600 text-center max-w-2xl mx-auto">
+  <p>
+    This section provides previous year questions along with detailed solutions for your selected subject. 
+    Practicing these questions helps you understand exam patterns and improve your preparation.
+  </p>
+</div>
 
 
 
@@ -748,6 +760,16 @@ useEffect(() => {
           
         <div  className="text-3xl font-semibold text-slate-400 animate-pulse">
           AVAILABLE SOON
+        </div>
+
+        <div className="text-center py-10 space-y-2">
+          <h3 className="text-lg font-semibold text-slate-700">
+            Content Not Available Yet
+          </h3>
+          <p className="text-sm text-slate-500 max-w-md mx-auto">
+            We are currently adding solutions and study materials for this subject. 
+            Please check back later or explore other subjects.
+          </p>
         </div>
 
         {/* <p className="mt-4 text-slate-500 text-sm max-w-md">
@@ -941,10 +963,11 @@ useEffect(() => {
     </h3>
 
     {loadingSyllabus ? (
-      <p className="text-sm text-slate-500">Loading syllabus...</p>
+      <p className="text-sm text-slate-500"> Loading syllabus content, please wait...</p>
     ) : syllabus.length === 0 ? (
       <p className="text-sm text-slate-500">
-        Syllabus available soon
+          The syllabus for this subject is not available yet. 
+          We are working to add detailed topics and modules soon.
       </p>
     ) : (
       syllabus.map((u: any, i: number) => (

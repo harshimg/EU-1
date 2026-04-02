@@ -157,16 +157,28 @@ export default function PyqDownloadPage() {
     );
   }
 
+
+  /*--------------------UI-------------------------*/
   return (
     <div className="max-w-6xl mx-auto px-4 py-10 space-y-8">
 
       {/* HEADER */}
-      <div>
+      <div className="text-center">
         <h1 className="text-2xl font-bold text-slate-800">
           Download Previous Year Question Papers
         </h1>
         <p className="text-sm text-slate-500 mt-1">
           Access subject-wise question papers instantly.
+        </p>
+      </div>
+
+
+
+      {/* INTRO */}
+      <div className="text-sm text-slate-600 text-center max-w-2xl mx-auto">
+        <p>
+          Access previous year question papers for your selected branch and semester. 
+          These papers help you understand exam patterns, important topics, and frequently asked questions.
         </p>
       </div>
 
@@ -181,12 +193,12 @@ export default function PyqDownloadPage() {
   }
       className="flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-700"
 >
-<Share size={14} />
+<Share size={28} />
   Share
 </button>
 </div>
 
-      {/* FILTER CARD */}
+      {/* FILTER CARD  SELECT SEMETER AND BRANCH */  }
       <div className="bg-white rounded-2xl shadow-md p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
 
         <select
@@ -247,6 +259,19 @@ export default function PyqDownloadPage() {
           </span>
         </div>
       )}
+
+
+{/* HOW TO USE */}
+<div className="bg-white rounded-xl shadow-sm p-4 text-sm text-slate-600">
+  <h3 className="font-semibold text-slate-800 mb-2">
+    How to Use These Papers
+  </h3>
+  <p>
+    Select your branch and semester to view available subjects. 
+    You can download question papers, view detailed solutions, or explore the syllabus for each subject to prepare effectively.
+  </p>
+</div>
+
 
       {/* LOADING SKELETON */}
       {loadingSubjects && (
@@ -313,7 +338,6 @@ export default function PyqDownloadPage() {
                                    bg-slate-100 text-slate-400">
 
                     Available Soon
-                    {/* Not Available */}
                   </span>
                 )}
 
@@ -373,9 +397,11 @@ export default function PyqDownloadPage() {
                     ))
 
                   ) : (
-                    <p className="text-sm text-slate-500">
-                      Syllabus not available.
+                    <p className="text-sm text-slate-600">
+                      Syllabus for this subject is currently not available. 
+                      It will be added soon for better understanding of topics.
                     </p>
+                    
                   )}
 
                 </div>
@@ -413,11 +439,27 @@ export default function PyqDownloadPage() {
       )}
 
       {!loadingSubjects && semester && branch && subjects.length === 0 && (
-        <div className="text-slate-500">
-            Available Soon
-          {/* No theory subjects found. */}
+        // <div className="text-slate-500">
+        //     Available Soon
+        //   {/* No theory subjects found. */}
+        // </div>
+
+        <div className="text-sm text-slate-600 text-center">
+          Question papers for this selection are not available yet. 
+          We are continuously updating our database, please check back soon.
         </div>
+        
       )}
+
+
+{/* NOTE */}
+<div className="text-xs text-slate-500 text-center max-w-3xl mx-auto pt-6">
+  <p>
+    Note: These question papers are collected for educational purposes to help students prepare better. 
+    Content may vary depending on university updates.
+  </p>
+</div>
+
 
     </div>
   );
