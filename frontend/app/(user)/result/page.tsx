@@ -1,14 +1,11 @@
-"use client";
+import ClientResult from "./ResultClient";
 
-export const dynamic = "force-dynamic";
-
-import { Suspense } from "react";
-import ResultPageClient from "./ResultPageClient";
+export const metadata = {
+  title: "BEU Result - AlphaResult",
+  description:
+    "Check your Bihar Engineering University (BEU) semester results quickly using your registration number.",
+};
 
 export default function ResultPage() {
-  return (
-    <Suspense fallback={<div className="p-6 text-center">Loading result...</div>}>
-      <ResultPageClient />
-    </Suspense>
-  );
+  return <ClientResult/>
 }

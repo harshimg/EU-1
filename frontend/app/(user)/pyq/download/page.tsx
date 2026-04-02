@@ -1,15 +1,13 @@
-"use client";
+// "use client";
 
-import AcademicSelector from "@/components/academic/AcademicSelector";
-import { useAcademicSelection } from "@/lib/hooks/useAcademicSelection";
+import ClientPyqdownload from "./PyqdownloadClient";
+
+export const metadata = {
+  title: "BEU Download PYQs - AlphaResult",
+  description:
+    "Download previous year question papers for BEU engineering students by subject and semester.",
+};
 
 export default function PYQDOWNLOADRoot() {
-  const state = useAcademicSelection("/pyq/download");
-
-  return (
-    <AcademicSelector
-      {...state}
-      title="Download PYQs"
-    />
-  );
+  return <ClientPyqdownload />;
 }

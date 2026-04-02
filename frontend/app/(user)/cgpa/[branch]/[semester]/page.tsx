@@ -14,6 +14,7 @@ import { BRANCHES } from "@/lib/constants/academic";
 const semesters = SEMESTERS;
 const branches = BRANCHES;
 
+
 export default function SgpaPage() {
   const { user, loading, refreshUser } = useAuth();
 

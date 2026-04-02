@@ -9,8 +9,8 @@ import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 
 export const metadata = {
-  title: "Alpha Result — PYQ & Solutions",
-  description: "Study tools & past year questions",
+  title: "Alpha Result - PYQs, Solutions, Results & SGPA Calculator",
+  description: "AlphaResult helps BEU students access PYQs, Solutions, check results, and calculate SGPA easily.",
   icons: {
     // icon: "/favicon.ico",
     apple: "/apple-icon.png",
