@@ -1,6 +1,4 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/(user)/cgpa/[branch]/[semester]/page": "app/(user)/cgpa/[branch]/[semester]/page.js",
   "/(user)/pyq/page": "app/(user)/pyq/page.js",
   "/(user)/pyq/[branch]/[semester]/page": "app/(user)/pyq/[branch]/[semester]/page.js",
   "/(user)/page": "app/(user)/page.js",

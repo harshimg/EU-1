@@ -1,10 +1,26 @@
-import { Suspense } from "react";
-import PyqClient from "./PyqClient";
+// import { Suspense } from "react";
+// import PyqClient from "./PyqClient";
 
-export default function Page() {
+// export default function Page() {
+//   return (
+//     <Suspense fallback={<div className="p-6">Loading...</div>}>
+//       <PyqClient />
+//     </Suspense>
+//   );
+// }
+
+"use client";
+
+import AcademicSelector from "@/components/academic/AcademicSelector";
+import { useAcademicSelection } from "@/lib/hooks/useAcademicSelection";
+console.log(useAcademicSelection);
+export default function PYQRoot() {
+  const state = useAcademicSelection("/pyq");
+
   return (
-    <Suspense fallback={<div className="p-6">Loading...</div>}>
-      <PyqClient />
-    </Suspense>
+    <AcademicSelector
+      {...state}
+      title="Select Branch & Semester for PYQs"
+    />
   );
 }
