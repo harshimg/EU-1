@@ -1,7 +1,0 @@
-{
-  "/(user)/pyq/page": "app/(user)/pyq/page.js",
-  "/(user)/pyq/[branch]/[semester]/page": "app/(user)/pyq/[branch]/[semester]/page.js",
-  "/(user)/page": "app/(user)/page.js",
-  "/(user)/pyq/download/page": "app/(user)/pyq/download/page.js",
-  "/(user)/pyq/download/[branch]/[semester]/page": "app/(user)/pyq/download/[branch]/[semester]/page.js"
-}
