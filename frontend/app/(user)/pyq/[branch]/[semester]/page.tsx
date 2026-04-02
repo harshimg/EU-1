@@ -508,7 +508,12 @@ useEffect(() => {
 
         {/* SHARE */}
         <button
-          onClick={handleShare}
+          onClick={() =>
+            handleShare({
+              title: "Previous Year Questions - AlphaResult",
+              text: "Check PYQs with solutions on AlphaResult 📘",
+            })
+          }
           className="flex items-center gap-1 px-2 py-1 rounded 
                      text-indigo-600 hover:bg-indigo-50 transition text-xs"
         >

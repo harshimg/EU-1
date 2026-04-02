@@ -1,1 +1,1 @@
-self.__REACT_LOADABLE_MANIFEST="{\"components\\\\result\\\\BatchResultTable.tsx -> html2pdf.js\":{\"id\":\"components\\\\result\\\\BatchResultTable.tsx -> html2pdf.js\",\"files\":[]}}"
+self.__REACT_LOADABLE_MANIFEST="{}"
