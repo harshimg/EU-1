@@ -10,6 +10,8 @@ export default function HomePage() {
   const { showLogin } = useAuthModal();
   
 
+
+  
   useEffect(() => {
     async function checkBackend(){
       try {
