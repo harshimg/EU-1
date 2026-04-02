@@ -403,10 +403,3 @@ const params = useParams();
 
  
 
-
-  useEffect(() => {
-    if (!branchFromUrl || !semesterFromUrl) return;
-  
-    setBranch(branchFromUrl);
-    setSemester(semesterFromUrl);
-  }, [branchFromUrl, semesterFromUrl]);
