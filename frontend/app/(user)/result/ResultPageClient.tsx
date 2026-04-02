@@ -248,7 +248,9 @@ export default function ResultPage() {
     }
   
     setError(
-      "Check Examination (Month/Year) and valid Registration No. or Result server is busy right now. Please try again after some time."
+      // "Check Examination (Month/Year) and valid Registration No. or Result server is busy right now. Please try again after some time."
+      "Unable to fetch result. Please check your registration number and exam session or Result server is busy right now, then try again."
+      
     );
   
     setLoading(false);
@@ -323,9 +325,17 @@ async function loadBatch(semester?: string){
   <div className="max-w-6xl mx-auto px-4 py-6">
 
     {/* PAGE TITLE (HIDDEN ON PRINT) */}
-    <h1 className="text-xl font-semibold mb-4 print:hidden">
+    <h1 className="text-xl font-semibold text-center mb-2 print:hidden">
       BEU Examination Result
     </h1>
+
+    {/* INTRO */}
+    <div className="text-sm text-slate-600 text-center max-w-2xl mx-auto">
+      <p>
+        Check your Bihar Engineering University (BEU) semester results by entering your registration number 
+        and selecting the appropriate exam session. This tool helps you quickly access your marks, grades, SGPA, and CGPA.
+      </p>
+    </div>
 
    {/* INPUT FORM */}
 <div className="bg-white p-5 rounded-xl shadow space-y-5 print:hidden">
@@ -735,6 +745,30 @@ Mode: {resultMode === "single" ? "Single Student Result" : "Batch Result"}
       regNo={regNo}
     />
   )}
+
+
+
+
+  {/* HOW TO USE */}
+<div className="bg-white p-4 rounded-xl shadow-sm text-sm text-slate-600">
+  <h3 className="font-semibold text-slate-800 mb-2">
+    How to Check Your Result
+  </h3>
+  <ul className="list-disc list-inside space-y-1">
+    <li>Select the exam session (month/year).</li>
+    <li>Enter your registration number.</li>
+    <li>Choose your semester.</li>
+    <li>Your result will be displayed instantly.</li>
+  </ul>
+</div>
+
+{/* NOTE */}
+<div className="text-xs text-slate-500 text-center mt-6 max-w-3xl mx-auto">
+  <p>
+    Note: Results displayed here are for informational purposes only. 
+    Please verify with official university records for final confirmation.
+  </p>
+</div>
 
 
 

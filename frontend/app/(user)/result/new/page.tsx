@@ -92,6 +92,26 @@ export default function ResultListPage() {
         </span>
       </h1>
 
+      {/* INTRO */}
+<div className="text-sm text-slate-600 max-w-3xl mx-auto mb-5 text-center">
+  <p>
+    View the latest Bihar Engineering University (BEU) examination results by entering your registration number. This page provides quick access to published results across semesters.
+  </p>
+</div>
+
+{/* HOW TO USE */}
+<div className="bg-white border rounded-lg shadow-sm p-4 mb-4 text-sm text-slate-600">
+  <h3 className="font-semibold text-slate-800 mb-2">
+    How to Check Your Result
+  </h3>
+  <ul className="list-disc list-inside space-y-1">
+    <li>Find your exam from the list below.</li>
+    <li>Enter your registration number in the input field.</li>
+    <li>Click on “View Result” or press Enter.</li>
+    <li>Your detailed result will open instantly.</li>
+  </ul>
+</div>
+
       <div className="overflow-x-auto border rounded-lg shadow-sm">
 
         <table className="min-w-full text-sm">
@@ -185,6 +205,16 @@ export default function ResultListPage() {
           </tbody>
         </table>
       </div>
+
+{/* NOTE */}
+<div className="text-xs text-slate-500 text-center mt-6 max-w-3xl mx-auto">
+  <p>
+    Note: Results displayed here are for quick reference. 
+    Please verify with official university records for final confirmation.
+  </p>
+</div>
+
+
     </div>
   );
 }
