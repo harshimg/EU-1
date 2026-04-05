@@ -36,3 +36,31 @@ async def get_subject(code: str):
 @router.post("/sgpa/calculate")
 async def calculate_sgpa(body : dict, current_user: Optional[dict] = Depends(get_current_user_optional)):
     return await sgpa(body, current_user)
+
+
+# To get quest. papers pdf link of one subject
+@router.get("/papers/{subject_code}")
+async def get_papers_by_subject(subject_code: str):
+    """
+    Returns all paper PDF links for a subject
+    """
+
+    # 🔹 Replace with your DB logic
+    papers = await db_instance.db.papers.find({"subject_code": subject_code}).to_list(length=200)
+
+    result = []
+
+    for p in papers:
+        if p.get("paper_pdf"):
+            result.append({
+                "id": str(p["_id"]),
+                "year": p.get("year"),
+                "name": p.get("name"),
+                "pdf": p.get("paper_pdf"),
+            })
+
+    return {
+        "success": True,
+        "count": len(result),
+        "data": result
+    }

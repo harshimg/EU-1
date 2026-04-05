@@ -39,6 +39,42 @@ export default function PyqDownloadPage() {
       ? semesterParam.replace("sem-", "")
       : "";
 
+
+    // All papers pdf link of one subject
+
+    const [activeSubjectCode, setActiveSubjectCode] = useState<string | null>(null);
+    const [papers, setPapers] = useState<any[]>([]);
+    const [loadingPapers, setLoadingPapers] = useState(false);
+
+    const handleViewPapers = async (subject: any) => {
+      // 🔁 TOGGLE CLOSE
+      if (activeSubjectCode === subject.code) {
+        setActiveSubjectCode(null);
+        setPapers([]);
+        return;
+      }
+    
+      setActiveSubjectCode(subject.code);
+      setLoadingPapers(true);
+    
+      try {
+        const res = await apiGet(`/api/public/papers/${subject.code}`);
+        setPapers(res.data || []);
+      } catch {
+        setPapers([]);
+      } finally {
+        setLoadingPapers(false);
+      }
+
+       // ✅ SCROLL AFTER OPEN
+  setTimeout(() => {
+    document
+      .getElementById(`subject-${subject.code}`)
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, 100);
+    };
+
+
   /* ---------------- AUTO FILL ---------------- */
     /* ---------------- INIT FROM USER (ONCE) ---------------- */
     useEffect(() => {
@@ -319,7 +355,11 @@ export default function PyqDownloadPage() {
                 </p>
               </div>
 
-              {/* ACTIONS */}
+
+
+
+
+              {/* ----------------------ACTIONS----------------------- */}
               <div className="flex gap-3 flex-wrap">
 
                 {s.all_paper_pdf ? (
@@ -340,6 +380,22 @@ export default function PyqDownloadPage() {
                     Available Soon
                   </span>
                 )}
+
+
+                {/* SUBJECT LIST */}
+                <button
+                  onClick={() => handleViewPapers(s)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition
+                    ${
+                      activeSubjectCode === s.code
+                        ? "bg-red-100 text-red-600"
+                        : "bg-indigo-600 text-white hover:bg-indigo-700"
+                    }`}
+                >
+                  {activeSubjectCode === s.code ? "Hide Papers" : "View Papers"}
+                </button>
+
+
 
                 <Link
                   href={`/pyq?subject=${s.code}`}
@@ -371,8 +427,6 @@ export default function PyqDownloadPage() {
 
 
                 {/* SYLLABUS */}
-
-
                 {openSyllabus === s.code && (
                 <div className="bg-indigo-50 border border-indigo-100 rounded-lg p-4 mt-3">
 
@@ -408,9 +462,6 @@ export default function PyqDownloadPage() {
               )}
 
 
-
-
-
                 {/* ✅ SYLLABUS (OUTSIDE CARD, FULL WIDTH) */}
     {/* {openSyllabus === s.code && (
       <div className="bg-indigo-50 border border-indigo-100 rounded-lg p-4">
@@ -421,16 +472,65 @@ export default function PyqDownloadPage() {
     )} */}
 
 
-
-  
-
-
-</div>
-
             </div>
 
-            
-          ))}
+       {/* View ALL PDF Quetions */}
+        {/* 🔥 VIEW PAPERS (FULL WIDTH BELOW SUBJECT) */}
+            {activeSubjectCode === s.code && (
+              <div id={`subject-${s.code}`}   className="mt-4 bg-white border rounded-xl shadow-sm p-4 space-y-4">
+
+                <h3 className="font-semibold text-slate-800">
+                  Question Papers
+                </h3>
+
+                {loadingPapers ? (
+                  <p className="text-sm text-slate-500">Loading papers...</p>
+                ) : papers.length === 0 ? (
+                  <p className="text-sm text-slate-500">
+                    No papers available for this subject yet.
+                  </p>
+                ) : (
+                  papers.map((p, i) => {
+                    const previewLink = p.pdf.replace("/view", "/preview");
+
+                    return (
+                      <div
+                        key={p.id}
+                        className="border rounded-lg overflow-hidden"
+                      >
+                        {/* HEADER */}
+                        <div className="px-3 py-2 bg-slate-50 flex justify-between text-sm">
+                          <span>{p.year} – {p.name}</span>
+
+                          <a
+                            href={p.pdf}
+                            target="_blank"
+                            className="text-indigo-600 text-xs"
+                          >
+                            Open
+                          </a>
+                        </div>
+
+                        {/* PDF */}
+                        <iframe
+                          src={previewLink}
+                          className="w-full h-[600px]"
+                          loading="lazy"
+                        />
+                      </div>
+                    );
+                  })
+                )}
+
+       </div>
+)}
+
+
+
+    </div>
+
+          
+    ))}
 
 
 
@@ -450,6 +550,7 @@ export default function PyqDownloadPage() {
         </div>
         
       )}
+      
 
 
 {/* NOTE */}
