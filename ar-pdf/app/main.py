@@ -13,6 +13,8 @@ app = FastAPI(
 
 
 
+
+
 # Root Route
 @app.get("/")
 def root():
