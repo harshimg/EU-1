@@ -46,7 +46,7 @@ async def get_papers_by_subject(subject_code: str):
     """
 
     # 🔹 Replace with your DB logic
-    papers = await db_instance.db.papers.find({"subject_code": subject_code}).to_list(length=200)
+    papers = await db_instance.db.papers.find({"subject_code": subject_code}).sort("year", -1).to_list(length=200)
 
     result = []
 
