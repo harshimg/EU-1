@@ -46,6 +46,7 @@ export default function PyqDownloadPage() {
     const [activeSubjectCode, setActiveSubjectCode] = useState<string | null>(null);
     const [papers, setPapers] = useState<any[]>([]);
     const [loadingPapers, setLoadingPapers] = useState(false);
+    const [activePaperIndex, setActivePaperIndex] = useState(0);
 
     const handleViewPapers = async (subject: any) => {
       // 🔁 TOGGLE CLOSE
@@ -57,6 +58,7 @@ export default function PyqDownloadPage() {
     
       setActiveSubjectCode(subject.code);
       setLoadingPapers(true);
+      setActivePaperIndex(0); // ✅ RESET
     
       try {
         const res = await apiGet(`/api/public/papers/${subject.code}`);
@@ -87,6 +89,14 @@ export default function PyqDownloadPage() {
       }
     };
 
+
+  // Download paper
+  const getDownloadLink = (url: string) => {
+    const match = url.match(/\/d\/(.*?)\//);
+    return match
+      ? `https://drive.google.com/uc?export=download&id=${match[1]}`
+      : url;
+  };
 
   /* ---------------- AUTO FILL ---------------- */
     /* ---------------- INIT FROM USER (ONCE) ---------------- */
@@ -375,7 +385,7 @@ export default function PyqDownloadPage() {
               {/* ----------------------ACTIONS----------------------- */}
               <div className="flex gap-3 flex-wrap">
 
-                {s.all_paper_pdf ? (
+                {/* {s.all_paper_pdf ? (
                   <a
                     href={s.all_paper_pdf}
                     target="_blank"
@@ -392,7 +402,7 @@ export default function PyqDownloadPage() {
 
                     Available Soon
                   </span>
-                )}
+                )} */}
 
 
                 {/* SUBJECT LIST */}
@@ -405,13 +415,40 @@ export default function PyqDownloadPage() {
                         : "bg-indigo-600 text-white hover:bg-indigo-700"
                     }`}
                 >
-                  {activeSubjectCode === s.code ? "Hide Papers" : "View Papers"}
+                  {activeSubjectCode === s.code ? "Hide Papers" : "View Questions Papers"}
                 </button>
+
+
+                {/* <button
+  onClick={() => {
+    window.open(
+      getDownloadLink(papers[activePaperIndex]?.pdf),
+      "_blank"
+    );
+  }}
+  className="text-sm text-indigo-600"
+>
+  Download
+</button> */}
+
+{/* {papers.map((p, i) => (
+  <button
+    key={i}
+    onClick={() => setActivePaperIndex(i)} // 👈 HERE
+    className="text-sm text-indigo-600"
+  >
+    {p.year}
+  </button>
+))} */}
 
 
 
                 <Link
-                  href={`/pyq?subject=${s.code}`}
+                  // href={`/pyq?subject=${s.code}`}
+                  // branch && semester
+                  //   ? `/pyq/${branch}/sem-${semester}/${s.code}`
+                  //   : "/pyq"
+                  href={`/pyq/${branch}/sem-${semester}/${s.code}`}
                   className="px-4 py-2 rounded-lg text-sm font-medium
                              bg-slate-200 text-slate-700
                              hover:bg-slate-300 transition"
@@ -498,10 +535,18 @@ export default function PyqDownloadPage() {
 
                 {loadingPapers ? (
                   <p className="text-sm text-slate-500">Loading papers...</p>
-                ) : papers.length === 0 ? (
-                  <p className="text-sm text-slate-500">
-                    No papers available for this subject yet.
-                  </p>
+                ) : !papers || papers.length === 0 ? (
+
+                  <div className="text-center py-6">
+                    <p className="text-sm text-slate-500">
+                      No question papers available for this subject yet.
+                    </p>
+
+                    <p className="text-xs text-slate-400 mt-1">
+                      Papers will be updated soon.
+                    </p>
+                  </div>
+                  
                 ) : (
                   papers.map((p, i) => {
                     const previewLink = p.pdf.replace("/view", "/preview");
@@ -519,6 +564,18 @@ export default function PyqDownloadPage() {
                   <div className="px-3 py-2 bg-slate-50 flex justify-between text-sm items-center">
 
                         <span>{p.year} – {p.name}</span>
+                        {/* Dowload button for one paper */}
+                        <button
+                          onClick={() => {
+                            window.open(
+                              getDownloadLink(p?.pdf),
+                              "_blank"
+                            );
+                          }}
+                          className="text-sm text-indigo-600"
+                        >
+                          Download
+                        </button>
 
                     <div className="flex items-center gap-2">
 
