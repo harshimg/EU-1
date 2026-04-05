@@ -5,9 +5,10 @@ import { useRouter, useParams } from "next/navigation";
 import { apiGet } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import Link from "next/link";
+import { useRef } from "react";
 
 import { handleShare } from "@/components/handleShare/handleShare";
-import { Share2, Share  } from "lucide-react";
+import { Share2, Share, Maximize2  } from "lucide-react";
 
 import { SEMESTERS } from "@/lib/constants/academic";
 import { BRANCHES } from "@/lib/constants/academic";
@@ -72,6 +73,18 @@ export default function PyqDownloadPage() {
       .getElementById(`subject-${subject.code}`)
       ?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, 100);
+    };
+
+
+    const viewerRefs = useRef<Record<string, HTMLDivElement | null>>({});
+    const toggleFullscreen = (id: string) => {
+      const el = viewerRefs.current[id];
+    
+      if (!document.fullscreenElement) {
+        el?.requestFullscreen();
+      } else {
+        document.exitFullscreen();
+      }
     };
 
 
@@ -494,36 +507,47 @@ export default function PyqDownloadPage() {
                     const previewLink = p.pdf.replace("/view", "/preview");
 
                     return (
-                      <div
-                        key={p.id}
-                        className="border rounded-lg overflow-hidden"
+                  <div
+                          key={p.id}
+                          ref={(el) => {
+                            if (el) viewerRefs.current[p.id] = el;
+                          }}
+                          className="border rounded-lg overflow-hidden relative"
+                        >
+
+                  {/* HEADER */}
+                  <div className="px-3 py-2 bg-slate-50 flex justify-between text-sm items-center">
+
+                        <span>{p.year} – {p.name}</span>
+
+                    <div className="flex items-center gap-2">
+
+                      {/* FULLSCREEN BUTTON */}
+                      <button
+                        onClick={() => toggleFullscreen(p.id)}
+                        className="text-xs bg-white border px-2 py-1 rounded hover:bg-slate-100"
                       >
-                        {/* HEADER */}
-                        <div className="px-3 py-2 bg-slate-50 flex justify-between text-sm">
-                          <span>{p.year} – {p.name}</span>
+                          <Maximize2 size={14} />
+                          {/* ⛶ */}
+                      </button>
 
-                          <a
-                            href={p.pdf}
-                            target="_blank"
-                            className="text-indigo-600 text-xs"
-                          >
-                            Open
-                          </a>
-                        </div>
+                    </div>
+                  </div>
 
-                        {/* PDF */}
-                        <iframe
-                          src={previewLink}
-                          className="w-full h-[600px]"
-                          loading="lazy"
-                        />
-                      </div>
+                  {/* PDF */}
+                  <iframe
+                    src={previewLink}
+                    className="w-full h-[800px]"
+                    loading="lazy"
+                  />
+
+                </div>
                     );
                   })
                 )}
 
-       </div>
-)}
+              </div>
+            )}
 
 
 
