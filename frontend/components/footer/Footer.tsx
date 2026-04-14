@@ -46,6 +46,7 @@ export default function Footer() {
             <li><Link href="/terms-and-conditions" className="hover:text-white cursor-pointer">Terms & Conditions</Link></li>
             <li><Link href="/disclaimer" className="hover:text-white cursor-pointer">Disclaimer</Link></li>
             <li><Link href="/contact-us" className="hover:text-white">Contact Us</Link></li>
+            <li><Link href="/help" className="hover:text-white">Help</Link></li>
           </ul>
         </div>
 

@@ -23,6 +23,7 @@ const USER_NAV: NavLink[] = [
   { href: "/result", label: "Result"},
   { href: "/cgpa", label: "CGPA" },
   { href: "/about", label: "About" },
+  { href: "/help", label: "Help" },
   { href: "/contact-us", label: "Contact-Us" },
 ];
 
