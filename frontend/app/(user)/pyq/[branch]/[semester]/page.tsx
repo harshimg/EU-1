@@ -865,7 +865,11 @@ useEffect(() => {
       </button>
     </div>
 
+
+    
+
   </div>
+
 )}
 
 
@@ -946,6 +950,8 @@ useEffect(() => {
         ))}
       </div>
     ))}
+
+    
   </div>
 )}
 
@@ -996,6 +1002,33 @@ useEffect(() => {
 )}
 
 
+
+
+<div className="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-6">
+  <h2 className="text-sm font-semibold text-blue-800 mb-2">
+    Prepare smarter with PYQs
+  </h2>
+
+  <p className="text-sm text-blue-700">
+    Want to know how to use previous year papers effectively?{" "}
+    <a
+      href="/help/how-to-use-pyq"
+      className="text-blue-900 underline font-medium"
+    >
+      Read the full guide
+    </a>
+  </p>
+
+  <p className="text-sm text-blue-700 mt-2">
+    Learn why PYQs are important for scoring better →{" "}
+    <a
+      href="/help/importance-of-pyq"
+      className="text-blue-900 underline font-medium"
+    >
+      Importance of PYQs
+    </a>
+  </p>
+</div>
 
 
 
@@ -1051,6 +1084,8 @@ useEffect(() => {
         </MobileDrawer>
       )}
     </div>
+
+    
 
 
 

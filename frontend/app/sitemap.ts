@@ -93,6 +93,7 @@
 
 import { MetadataRoute } from "next";
 import { SEMESTERS, BRANCHES } from "@/lib/constants/academic";
+import { articles } from "@/lib/articles"; // 🔥 ADD THIS
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://www.alpharesult.in";
@@ -103,6 +104,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/pyq",
     "/pyq/download",
     "/result",
+    "/help", // 🔥 ADD THIS
     "/about",
     "/contact-us",
     "/privacy-policy",
@@ -111,6 +113,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${baseUrl}${route}`,
     lastModified: new Date(),
   }));
+
+
+    /* ---------------- HELP (DYNAMIC SLUG) ---------------- */
+    const helpRoutes = articles.map((a) => ({
+      url: `${baseUrl}/help/${a.slug}`,
+      lastModified: new Date(),
+    }));
 
   /* ---------------- DYNAMIC (FRONTEND) ---------------- */
   const dynamicRoutes: MetadataRoute.Sitemap = [];
@@ -134,5 +143,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }
   }
 
-  return [...staticRoutes, ...dynamicRoutes];
+  return [...staticRoutes,  ...helpRoutes, ...dynamicRoutes];
 }

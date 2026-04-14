@@ -632,6 +632,20 @@ export default function PyqDownloadPage() {
         </div>
         
       )}
+
+
+
+<div className="bg-indigo-50 border border-indigo-100 rounded-xl p-4 mb-6">
+  <p className="text-sm text-indigo-700">
+    Not sure how to use these papers?{" "}
+    <a
+      href="/help/using-pyq-effectively"
+      className="underline font-medium text-indigo-900"
+    >
+      Learn how to use PYQs effectively
+    </a>
+  </p>
+</div>
       
 
 

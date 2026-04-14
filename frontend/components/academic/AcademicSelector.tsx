@@ -101,6 +101,21 @@ export default function AcademicSelector({
             Selecting the correct branch and semester ensures accurate and relevant content.
           </p>
         </div>
+
+
+    
+        <div className="mt-6 text-sm text-slate-600 leading-relaxed max-w-2xl mx-auto">
+  <p>
+    Previous year question papers (PYQs) are one of the most effective ways to prepare for exams. 
+    By selecting your branch and semester, you can access subject-wise papers that help you understand 
+    exam patterns, important topics, and frequently asked questions.
+  </p>
+
+  <p className="mt-3">
+    Practicing these papers regularly improves confidence, time management, and overall performance in exams. 
+    You can also explore solutions and syllabus to strengthen your preparation.
+  </p>
+</div>
   
       </div>
     </div>

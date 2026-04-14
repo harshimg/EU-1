@@ -458,6 +458,29 @@ return (
       )}
 
 
+<div className="bg-green-50 border border-green-100 rounded-xl p-4 mb-6 space-y-2">
+  <p className="text-sm text-green-700">
+    Understand how SGPA works and how to plan your score →{" "}
+    <a
+      href="/help/sgpa-calculation-guide"
+      className="underline font-medium text-green-900"
+    >
+      SGPA Calculation Guide
+    </a>
+  </p>
+
+  <p className="text-sm text-green-700">
+    Plan your study better using structured approach →{" "}
+    <a
+      href="/help/study-plan-using-alpharesult"
+      className="underline font-medium text-green-900"
+    >
+      Study Plan Guide
+    </a>
+  </p>
+</div>
+
+
             {/* ADDITIONAL INFO */}
 <div className="text-xs text-slate-500 text-center max-w-2xl mx-auto pt-4">
   <p>

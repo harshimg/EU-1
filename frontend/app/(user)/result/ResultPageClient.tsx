@@ -762,6 +762,21 @@ Mode: {resultMode === "single" ? "Single Student Result" : "Batch Result"}
   </ul>
 </div>
 
+
+
+<div className="bg-yellow-50 border border-yellow-100 rounded-xl p-4 mb-6">
+  <p className="text-sm text-yellow-700">
+    Having trouble checking your result?{" "}
+    <a
+      href="/help/how-to-check-result"
+      className="underline font-medium text-yellow-900"
+    >
+      Read this guide
+    </a>
+  </p>
+</div>
+
+
 {/* NOTE */}
 <div className="text-xs text-slate-500 text-center mt-6 max-w-3xl mx-auto">
   <p>
