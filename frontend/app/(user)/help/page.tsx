@@ -16,7 +16,7 @@ export default function ArticlesPage() {
         {articles.map((a) => (
           <Link
             key={a.slug}
-            href={`/articles/${a.slug}`}
+            href={`/help/${a.slug}`}
             className="block border p-4 rounded hover:bg-slate-50"
           >
             <h2 className="font-medium text-slate-800">{a.title}</h2>
