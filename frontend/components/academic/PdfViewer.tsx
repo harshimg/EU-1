@@ -292,8 +292,13 @@ export default function PdfViewer({ url }: { url: string }) {
       const container = containerRef.current;
       container.innerHTML = "";
 
-      const containerWidth =
-        container.clientWidth || window.innerWidth;
+    //   const containerWidth =container.clientWidth || window.innerWidth;
+    
+        const containerWidth =
+            Math.min(
+                containerRef.current?.clientWidth || window.innerWidth,
+                800 // 🔥 max width for desktop
+            );
 
       // ⚡ render only first few pages initially (faster load)
       const pagesToRender = Math.min(pdf.numPages, 3);
@@ -344,43 +349,56 @@ useEffect(() => {
     const el = wrapperRef.current;
     if (!el) return;
   
-    let lastDistance = 0;
+    let pointers: any[] = [];
+    let prevDistance = 0;
   
-    const getDistance = (touches: TouchList) => {
-      const dx = touches[0].clientX - touches[1].clientX;
-      const dy = touches[0].clientY - touches[1].clientY;
+    const getDistance = (p1: any, p2: any) => {
+      const dx = p1.clientX - p2.clientX;
+      const dy = p1.clientY - p2.clientY;
       return Math.sqrt(dx * dx + dy * dy);
     };
   
-    const handleTouchStart = (e: TouchEvent) => {
-      if (e.touches.length === 2) {
-        lastDistance = getDistance(e.touches);
+    const onPointerDown = (e: PointerEvent) => {
+      pointers.push(e);
+    };
+  
+    const onPointerMove = (e: PointerEvent) => {
+      pointers = pointers.map(p => (p.pointerId === e.pointerId ? e : p));
+  
+      if (pointers.length === 2) {
+        const distance = getDistance(pointers[0], pointers[1]);
+        e.preventDefault(); // 🔥 only prevent during pinch
+  
+        if (prevDistance) {
+          const delta = distance - prevDistance;
+  
+          setZoom(z => {
+            const next = z + delta * 0.005;
+            return Math.min(Math.max(next, 1), 3);
+          });
+        }
+  
+        prevDistance = distance;
       }
     };
   
-    const handleTouchMove = (e: TouchEvent) => {
-      if (e.touches.length === 2) {
-        e.preventDefault(); // 🔥 IMPORTANT
-  
-        const distance = getDistance(e.touches);
-  
-        const delta = distance - lastDistance;
-  
-        setZoom((z) => {
-          const next = z + delta * 0.005;
-          return Math.min(Math.max(next, 1), 3);
-        });
-  
-        lastDistance = distance;
-      }
+    const onPointerUp = (e: PointerEvent) => {
+      pointers = pointers.filter(p => p.pointerId !== e.pointerId);
+      prevDistance = 0;
     };
   
-    el.addEventListener("touchstart", handleTouchStart, { passive: false });
-    el.addEventListener("touchmove", handleTouchMove, { passive: false });
+    el.addEventListener("pointerdown", onPointerDown);
+    el.addEventListener("pointermove", onPointerMove);
+    el.addEventListener("pointerup", onPointerUp);
+    el.addEventListener("pointercancel", onPointerUp);
+    el.addEventListener("pointerleave", onPointerUp);
   
     return () => {
-      el.removeEventListener("touchstart", handleTouchStart);
-      el.removeEventListener("touchmove", handleTouchMove);
+      el.removeEventListener("pointerdown", onPointerDown);
+      el.removeEventListener("pointermove", onPointerMove);
+      el.removeEventListener("pointerup", onPointerUp);
+      el.removeEventListener("pointercancel", onPointerUp);
+      el.removeEventListener("pointerleave", onPointerUp);
     };
   }, []);
 
@@ -399,31 +417,53 @@ useEffect(() => {
 
 
     <div ref={wrapperRef}
-    style={{ touchAction: "none" }} className="w-full h-[80vh] overflow-y-auto bg-black rounded">
+    // style={{ touchAction: "none" }}
+    style={{ touchAction: "pan-y" }} // ✅ allows vertical scroll
+    className="w-full h-[80vh] overflow-y-auto bg-black rounded">
 
   {/* 🔥 Sticky Toolbar */}
-  <div className="sticky top-0 z-10 bg-[#0B0F1A] border-b px-3 py-2 flex justify-between items-center">
+  {/* <div className="sticky top-0 z-10 bg-[#0B0F1A] border-b px-3 py-2 flex justify-between items-center"> */}
     
-    <span className="text-xs text-slate-400">
+    {/* <span className="text-xs text-slate-400">
       Pinch or use buttons to zoom
-    </span>
+    </span> */}
 
-    <div className="flex gap-2">
-      <button
-        onClick={() => setZoom(z => Math.max(z - 0.2, 1))}
-        className="px-2 py-1 bg-gray-700 rounded text-sm"
-      >
-        −
-      </button>
+{/* <div className="flex items-center gap-3 justify-center"> */}
 
-      <button
-        onClick={() => setZoom(z => Math.min(z + 0.2, 3))}
-        className="px-2 py-1 bg-gray-700 rounded text-sm"
-      >
-        +
-      </button>
-    </div>
-  </div>
+  {/* Zoom Out */}
+  {/* <button
+    onClick={() => setZoom(z => Math.max(z - 0.2, 1))}
+    className="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-sm"
+  >
+    −
+  </button> */}
+
+  {/* Zoom % Indicator */}
+  {/* <span className="text-xs text-slate-300 min-w-[50px] text-center">
+    {Math.round(zoom * 100)}%
+  </span> */}
+
+  {/* Zoom In */}
+  {/* <button
+    onClick={() => setZoom(z => Math.min(z + 0.2, 3))}
+    className="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-sm"
+  >
+    +
+  </button> */}
+
+  {/* Reset Zoom */}
+  {/* <button
+    onClick={() => setZoom(1)}
+    className="px-2 py-1 text-xs text-indigo-400"
+  >
+    Reset
+  </button> */}
+
+{/* </div> */}
+
+
+    
+  {/* </div> */}
 
   {/* 🔥 ZOOM WRAPPER */}
   <div

@@ -18,9 +18,6 @@
   --radius: 14px;
 }
 
-.pdf-wrapper {
-  touch-action: none;
-}
 
 /* Body */
 body {

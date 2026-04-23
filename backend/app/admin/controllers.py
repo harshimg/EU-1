@@ -568,9 +568,9 @@ async def upload_pdf_to_cloudinary(file, branch, sem, subject, year, exam_type, 
 
     # 🔥 public_id
     if exam_type:
-        public_id = f"pyq/{branch}/sem-{sem}/{subject}/{year}_{exam_type}"
+        public_id = f"BEU/pyq/{branch}/sem-{sem}/{subject}/{year}_{exam_type}"
     else:
-        public_id = f"pyq/{branch}/sem-{sem}/{subject}/{year}"
+        public_id = f"BEU/pyq/{branch}/sem-{sem}/{subject}/{year}"
 
     result = cloudinary.uploader.upload(
         file.file,
