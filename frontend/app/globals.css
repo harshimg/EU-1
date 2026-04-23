@@ -18,6 +18,10 @@
   --radius: 14px;
 }
 
+.pdf-wrapper {
+  touch-action: none;
+}
+
 /* Body */
 body {
   background: var(--bg);
@@ -208,7 +212,7 @@ body {
     position: absolute;
     left: 0;
     top: 0;
-    width: 100%;
+    width: 100%
   }
   
   }
