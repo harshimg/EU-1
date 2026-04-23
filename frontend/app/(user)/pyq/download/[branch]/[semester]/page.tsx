@@ -13,6 +13,14 @@ import { Share2, Share, Maximize2  } from "lucide-react";
 import { SEMESTERS } from "@/lib/constants/academic";
 import { BRANCHES } from "@/lib/constants/academic";
 
+// import { PdfViewer } from "@/components/academic/PdfViewer"
+import dynamic from "next/dynamic";
+
+const PdfViewer = dynamic(
+  () => import("@/components/academic/PdfViewer"),
+  { ssr: false }
+);
+
 const semesters = SEMESTERS;
 const branches = BRANCHES;
 
@@ -215,6 +223,33 @@ export default function PyqDownloadPage() {
       </div>
     );
   }
+
+
+// To convert a link into drive link
+  function getPreviewLink(url: string) {
+    if (!url) return "";
+  
+    // 🔹 Google Drive link
+    if (url.includes("drive.google.com")) {
+      return url.replace("/view", "/preview");
+    }
+  
+    // 🔹 Cloudinary or any external PDF
+    return `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(url)}`;
+  }
+
+
+// To view g-drive link as preview & cloudnari as direct
+function getPdfSourceType(url: string) {
+  if (!url) return "unknown";
+
+  if (url.includes("drive.google.com")) return "gdrive";
+  if (url.includes("res.cloudinary.com")) return "cloudinary";
+
+  return "other";
+}
+
+
 
 
   /*--------------------UI-------------------------*/
@@ -549,7 +584,10 @@ export default function PyqDownloadPage() {
                   
                 ) : (
                   papers.map((p, i) => {
-                    const previewLink = p.pdf.replace("/view", "/preview");
+                    // const previewLink = p.pdf.replace("/view", "/preview");
+                    const previewLink = getPreviewLink(p.pdf);
+                    const type = getPdfSourceType(p.pdf);
+                    console.log(type)
 
                     return (
                   <div
@@ -593,11 +631,52 @@ export default function PyqDownloadPage() {
                   </div>
 
                   {/* PDF */}
-                  <iframe
+                  {/* <iframe
                     src={previewLink}
                     className="w-full h-[800px]"
                     loading="lazy"
-                  />
+                  /> */}
+
+
+                                  {/* <iframe
+                                  src={previewLink}
+                                  className="w-full h-[800px] rounded"
+                                  loading="lazy"
+                                />
+
+                                <PdfViewer url={p.pdf} /> */}
+
+                
+          
+
+                {type === "gdrive" ? (
+  <iframe
+    src={previewLink}
+    className="w-full h-[800px] max-w-[1500px] rounded"
+    loading="lazy"
+  />
+) : type === "cloudinary" ? (
+  <PdfViewer url={p.pdf} />
+) : (
+  <div className="text-center p-4 border rounded">
+    <p className="text-slate-400 text-sm">
+      Preview not supported
+    </p>
+    <a
+      href={p.paper_pdf}
+      target="_blank"
+      className="text-indigo-400 underline"
+    >
+      Open PDF
+    </a>
+  </div>
+)}
+
+
+                                    
+
+
+
 
                 </div>
                     );

@@ -162,3 +162,74 @@ async def process_pdf(
     # admin=Depends(get_current_admin),
     return await call_pdf_service(file, admin)
 
+
+
+
+#===============ALL Upload rouetes===================
+from fastapi import Form
+# from controllers.upload_controller import upload_pdf_to_cloudinary
+
+@router.post("/upload-pdf")
+async def upload_pdf(
+    file: UploadFile = File(...),
+    paper_id: str = Form(...),
+    branch: str = Form(...),
+    sem: str = Form(...),
+    subject: str = Form(...),
+    year: str = Form(...),
+    exam_type: str = Form(None),  # optional
+    admin=Depends(get_current_admin),
+):
+
+
+    # checking paper_id to save pdf url uploaded in cloudnari to db
+    try:
+        obj_id = ObjectId(paper_id)
+    except:
+        return {"success": False, "error": "Invalid paper_id"}
+
+    paper = await db_instance.db.papers.find_one({"_id": ObjectId(paper_id)})
+    if not paper:
+        return {"success": False, "error": "Paper not found"}
+
+    
+    #Uploading to cloudanary
+    result = await upload_pdf_to_cloudinary(
+        file,
+        branch,
+        sem,
+        subject,
+        year,
+        exam_type,
+        admin
+    )
+
+    if not result.get("secure_url"):
+        return {
+            "success": False,
+            "error": result.get("error", "Upload failed")
+        }
+
+
+    # To save pdf url uploaded in cloudnari to db
+    await db_instance.db.papers.update_one(
+        {"_id": ObjectId(paper_id)},
+        {
+            "$set": {
+                "paper_pdf": result["secure_url"],
+                "updated_at": utcnow(),
+            },
+            "$addToSet": {
+                "admin_userids": admin["admin_userid"]
+            }
+        }
+    )
+
+    return {
+    "success": True,
+    "message": "PDF uploaded successfully",
+    "data": {
+        "url": result["secure_url"],
+        "public_id": result["public_id"]
+        }
+    }

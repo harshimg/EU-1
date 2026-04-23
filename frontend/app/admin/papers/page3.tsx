@@ -51,11 +51,13 @@ export default function AdminPapersPage() {
   const [open, setOpen] = useState(false);
   const [edit, setEdit] = useState<Paper | null>(null);
 
+  const [file, setFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadedUrl, setUploadedUrl] = useState("");
+
   const [fileMap, setFileMap] = useState<{ [key: string]: File | null }>({});
   const [uploadingId, setUploadingId] = useState<string | null>(null);
   const [examTypeMap, setExamTypeMap] = useState<{ [key: string]: string }>({});
-
-  const [previewMap, setPreviewMap] = useState<{ [key: string]: string }>({});
 
 
     // 🔐 HARD GUARD (client-side)
@@ -131,24 +133,19 @@ export default function AdminPapersPage() {
 
   async function uploadFileForPaper(p: Paper) {
     const file = fileMap[p._id];
-  
-    if (!file) {
-      alert("Select file first");
-      return;
-    }
-  
-    const exam_type = `${p.type}/${examTypeMap[p._id] || 'regular'}`;
+    if (!file) return alert("Select file first");
   
     setUploadingId(p._id);
+    const exam_type = examTypeMap[p._id] || p.type;
+
   
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("paper_id", p._id);
     formData.append("branch", branch);
     formData.append("sem", semester);
     formData.append("subject", subject);
-    formData.append("year", String(p.year));
-    formData.append("exam_type", exam_type);
+    formData.append("year", String(p.year));   // ✅ from row
+    formData.append("exam_type", exam_type);      // ✅ from row
   
     try {
       const res = await fetch(`${API_URL}/admin/upload-pdf`, {
@@ -162,27 +159,7 @@ export default function AdminPapersPage() {
       const json = await res.json();
   
       if (json.success) {
-        // await fetch(`${API_URL}/admin/papers/${p._id}`, {
-        //   method: "PUT",
-        //   headers: {
-        //     "Content-Type": "application/json",
-        //     Authorization: `Bearer ${localStorage.getItem("token")}`,
-        //   },
-        //   body: JSON.stringify({
-        //     paper_pdf: json.data.secure_url,
-        //     type: exam_type,
-        //   }),
-        // });
-
-
-        // ✅ clear file + preview
-      setFileMap(prev => ({ ...prev, [p._id]: null }));
-      setPreviewMap(prev => ({ ...prev, [p._id]: "" }));
-
-      // ✅ success message
-      alert("✅ Uploaded successfully");
-  
-        fetchPapers();
+        fetchPapers(); // refresh table
       } else {
         alert("Upload failed");
       }
@@ -230,7 +207,6 @@ export default function AdminPapersPage() {
               <Th>Year</Th>
               <Th>Description</Th>
               <Th>Pdf</Th>
-              <Th>Upload</Th>
               <Th>Actions</Th>
             </tr>
           </thead>
@@ -254,120 +230,57 @@ export default function AdminPapersPage() {
                 <Td>{p.type}</Td>
                 <Td>{p.year}</Td>
                 <Td>{p.description || "-"}</Td>
-                {/* <Td>{p.paper_pdf || "Na"}</Td> */}
-                <Td>
-                {p.paper_pdf? 
-                  <button
-                    onClick={() => window.open(p.paper_pdf, "_blank")}
-                    className="text-indigo-400 cursor-pointer"
-                  >
-                   View
-                  </button>
-                  :
-                "Na"}
-                </Td>
+                <Td>{p.paper_pdf || "Na"}</Td>
+                <div className="mb-4">
+  <label className="text-xs text-slate-400">Upload PDF</label>
 
 
+  <select
+  value={examTypeMap[p._id] || p.type}
+  onChange={(e) =>
+    setExamTypeMap(prev => ({
+      ...prev,
+      [p._id]: e.target.value
+    }))
+  }
+  className="input"
+>
+  <option value="regular">Regular</option>
+  <option value="special">Special</option>
+</select>
 
+  <input
+  type="file"
+  accept="application/pdf"
+  onChange={(e) => {
+    const file = e.target.files?.[0] || null;
+    setFileMap((prev) => ({ ...prev, [p._id]: file }));
+  }}
+  className="input"
+/>
 
+  {/* Upload Button */}
+  <button
+  onClick={() => uploadFileForPaper(p)}
+  disabled={!fileMap[p._id] || uploadingId === p._id}
+  className="btn-primary mt-2 disabled:opacity-40"
+>
+  {uploadingId === p._id ? "Uploading..." : "Upload PDF"}
+</button>
 
-                    <Td>
-                          <div className="bg-[#0F1629] border border-white/10 rounded-lg p-3 space-y-3">
-
-                            {/* 🔹 TOP ROW */}
-                            <div className="flex items-center gap-2">
-
-                              {/* TYPE SELECT */}
-                              <select
-                                onChange={(e) =>
-                                  setExamTypeMap(prev => ({
-                                    ...prev,
-                                    [p._id]: e.target.value
-                                  }))
-                                }
-                                className="bg-[#0B0F1A] border border-white/10 px-2 py-1 rounded text-xs"
-                              >
-                                <option value="regular">Regular</option>
-                                <option value="special">Special</option>
-                              </select>
-
-                              {/* FILE INPUT */}
-                              <label className="text-xs cursor-pointer bg-indigo-600/20 text-indigo-300 px-3 py-1 rounded hover:bg-indigo-600/30 transition">
-                                Choose File
-                                <input
-                                  type="file"
-                                  accept="application/pdf"
-                                  hidden
-                                  onChange={(e) => {
-                                    const file = e.target.files?.[0] || null;
-
-                                    if (file) {
-                                      const previewUrl = URL.createObjectURL(file);
-
-                                      setFileMap(prev => ({
-                                        ...prev,
-                                        [p._id]: file
-                                      }));
-
-                                      setPreviewMap(prev => ({
-                                        ...prev,
-                                        [p._id]: previewUrl
-                                      }));
-                                    }
-                                  }}
-                                />
-                              </label>
-
-                            </div>
-
-                            {/* 🔹 FILE NAME */}
-                            {fileMap[p._id] && (
-                              <p className="text-[11px] text-slate-400 truncate">
-                                📄 {fileMap[p._id]?.name}
-                              </p>
-                            )}
-
-                            {/* 🔹 PREVIEW */}
-                            {previewMap[p._id] && (
-                              <div className="rounded overflow-hidden border border-white/10">
-                                <iframe
-                                  src={previewMap[p._id]}
-                                  className="w-full h-[200px]"
-                                />
-                              </div>
-                            )}
-
-                            {/* 🔹 ACTION ROW */}
-                            <div className="flex justify-between items-center">
-
-                              {/* CLEAR FILE */}
-                              {fileMap[p._id] && (
-                                <button
-                                  onClick={() => {
-                                    setFileMap(prev => ({ ...prev, [p._id]: null }));
-                                    setPreviewMap(prev => ({ ...prev, [p._id]: "" }));
-                                  }}
-                                  className="text-[11px] text-red-400 hover:underline"
-                                >
-                                  Remove
-                                </button>
-                              )}
-
-                              {/* UPLOAD BUTTON */}
-                              <button
-                                onClick={() => uploadFileForPaper(p)}
-                                disabled={uploadingId === p._id}
-                                className="text-xs bg-indigo-600 px-3 py-1 rounded hover:bg-indigo-500 disabled:opacity-40"
-                              >
-                                {uploadingId === p._id ? "Uploading..." : "Upload"}
-                              </button>
-
-                            </div>
-
-                          </div>
-                        </Td>
-
-
+  {/* Preview */}
+  {uploadedUrl && (
+    <div className="mt-3 text-xs">
+      <a
+        href={uploadedUrl}
+        target="_blank"
+        className="text-green-400 underline"
+      >
+        Preview Uploaded PDF
+      </a>
+    </div>
+  )}
+</div>
                 <Td>
                   <ActionBtn onClick={() => { setEdit(p); setOpen(true); }}>Edit</ActionBtn>
                   <ActionBtn danger onClick={() => remove(p._id)}>Delete</ActionBtn>
@@ -377,12 +290,13 @@ export default function AdminPapersPage() {
           </tbody>
         </table>
       </div>
-      
 
       {/* MODAL */}
       {open && (
         <PaperModal
           subject={subject}
+          branch={branch}   // ✅ ADD
+          sem={semester}    // ✅ ADD
           data={edit}
           onClose={() => setOpen(false)}
           onSaved={fetchPapers}
@@ -439,7 +353,7 @@ const ActionBtn = ({ children, danger, ...p }: any) => (
 
 /* ================= MODAL ================= */
 
-function PaperModal({ subject, data, onClose, onSaved }: any) {
+function PaperModal({ subject, branch, sem, data, onClose, onSaved }: any) {
   const [name, setName] = useState(data?.name || "");
   const [type, setType] = useState(data?.type || "END-SEM");
   const [year, setYear] = useState(data?.year || new Date().getFullYear());
@@ -503,6 +417,8 @@ function PaperModal({ subject, data, onClose, onSaved }: any) {
 
         <input type="string" className="input mb-3" placeholder="Pdf link"
           value={paper_pdf} onChange={e => setpaper_pdf(e.target.value)} />
+
+          
 
         <button onClick={submit}
           disabled={!name}

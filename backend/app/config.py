@@ -31,4 +31,9 @@ class Settings:
     PDF_SERVICE_KEY= os.getenv("PDF_SERVICE_KEY")
     PDF_SERVICE_TIMEOUT= os.getenv("PDF_SERVICE_TIMEOUT")
 
+    #Clouanari
+    CLOUDINARY_CLOUD_NAME=os.getenv("CLOUDINARY_CLOUD_NAME")
+    CLOUDINARY_API_KEY=os.getenv("CLOUDINARY_API_KEY")
+    CLOUDINARY_API_SECRET=os.getenv("CLOUDINARY_API_SECRET")
+
 settings = Settings()

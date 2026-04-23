@@ -542,3 +542,45 @@ async def call_pdf_service(file: UploadFile, admin):
         )
 
 
+
+
+
+
+
+#===============ALL Upload CONTROLLERS===================
+
+import cloudinary.uploader
+
+async def upload_pdf_to_cloudinary(file, branch, sem, subject, year, exam_type, admin):
+
+    content_type = file.content_type
+
+    # 🔥 detect type using MIME
+    if content_type == "application/pdf":
+        resource_type = "raw"
+    elif content_type.startswith("image/"):
+        resource_type = "image"
+    else:
+        return {
+            "success": False,
+            "error": "Unsupported file type"
+        }
+
+    # 🔥 public_id
+    if exam_type:
+        public_id = f"pyq/{branch}/sem-{sem}/{subject}/{year}_{exam_type}"
+    else:
+        public_id = f"pyq/{branch}/sem-{sem}/{subject}/{year}"
+
+    result = cloudinary.uploader.upload(
+        file.file,
+        resource_type=resource_type,
+        public_id=public_id,
+        overwrite=True,    #Upload again → replaces old file❗
+    )
+
+    return {
+        "secure_url": result.get("secure_url"),
+        "public_id": result.get("public_id"),
+        "resource_type": resource_type
+    }
