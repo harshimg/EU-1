@@ -624,7 +624,7 @@ function getPdfSourceType(url: string) {
 
                         <span>{p.year} – {p.name}</span>
                         
-                        {/* Dowload button for one paper */}
+                        {/* --------------------Dowload button for one paper ------------------ */}
                         <button
                           onClick={async () => {
                             try {
@@ -646,7 +646,7 @@ function getPdfSourceType(url: string) {
 
                               const link = document.createElement("a");
                               link.href = url;
-                              link.download = `alpha_result_${p.name}_${p.year}`;
+                              link.download = `alpha_result_${p.name}_${p.year}.pdf`;
 
                               document.body.appendChild(link);
                               link.click();
