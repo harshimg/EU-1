@@ -99,11 +99,33 @@ export default function PyqDownloadPage() {
 
 
   // Download paper
-  const getDownloadLink = (url: string) => {
-    const match = url.match(/\/d\/(.*?)\//);
-    return match
-      ? `https://drive.google.com/uc?export=download&id=${match[1]}`
-      : url;
+  // const getDownloadLink = (url: string) => {
+  //   const match = url.match(/\/d\/(.*?)\//);
+  //   return match
+  //     ? `https://drive.google.com/uc?export=download&id=${match[1]}`
+  //     : url;
+  // };
+
+  const getDownloadLink = (url: string, filename: string) => {
+    if (!url) return "";
+  
+    // Google Drive
+    if (url.includes("drive.google.com")) {
+      const match = url.match(/\/d\/(.*?)\//);
+      return match
+        ? `https://drive.google.com/uc?export=download&id=${match[1]}`
+        : url;
+    }
+  
+    // 🔥 Cloudinary RAW fix
+    if (url.includes("res.cloudinary.com")) {
+      const parts = url.split("/upload/");
+      // console.log("aaaaaaaaaaa")
+      // return `${url}?dl=${encodeURIComponent(filename)}.pdf`;
+      return `${url}?dl=1`;
+    }
+  
+    return url;
   };
 
   /* ---------------- AUTO FILL ---------------- */
@@ -587,7 +609,6 @@ function getPdfSourceType(url: string) {
                     // const previewLink = p.pdf.replace("/view", "/preview");
                     const previewLink = getPreviewLink(p.pdf);
                     const type = getPdfSourceType(p.pdf);
-                    console.log(type)
 
                     return (
                   <div
@@ -605,11 +626,37 @@ function getPdfSourceType(url: string) {
                         
                         {/* Dowload button for one paper */}
                         <button
-                          onClick={() => {
-                            window.open(
-                              getDownloadLink(p?.pdf),
-                              "_blank"
-                            );
+                          onClick={async () => {
+                            try {
+
+                              // g-drive download
+                              if (type=='gdrive'){
+                                  window.open(
+                                    getDownloadLink(p?.pdf, `${p.name}_${p.year}`),
+                                    "_blank"
+                                  );
+                                  return;
+                                }
+                            
+                                // cloudnari download
+                              const res = await fetch(getDownloadLink(p?.pdf, `${p.name}_${p.year}`));
+                              const blob = await res.blob();
+
+                              const url = window.URL.createObjectURL(blob);
+
+                              const link = document.createElement("a");
+                              link.href = url;
+                              link.download = `alpha_result_${p.name}_${p.year}`;
+
+                              document.body.appendChild(link);
+                              link.click();
+
+                              link.remove();
+                              window.URL.revokeObjectURL(url);
+                            } catch (err) {
+                              console.error("Download failed", err);
+                              alert("Download failed");
+                            }
                           }}
                           className="text-sm text-indigo-600"
                         >

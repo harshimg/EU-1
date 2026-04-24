@@ -137,7 +137,7 @@ export default function AdminPapersPage() {
       return;
     }
   
-    const exam_type = `${p.type}/${examTypeMap[p._id] || 'regular'}`;
+    const exam_type = `${p.type}_${examTypeMap[p._id] || 'regular'}`;
   
     setUploadingId(p._id);
   
