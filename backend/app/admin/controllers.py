@@ -573,7 +573,7 @@ async def upload_pdf_to_cloudinary(file, branch, sem, subject, year, exam_type, 
         public_id = f"BEU/pyq/{branch}/sem-{sem}/{subject}/{year}"
 
     clean_name = f"{subject}_{year}_{exam_type}".replace(" ", "_")
-    public_id = f"{public_id}/{clean_name}"   #'.pdf'
+    public_id = f"{public_id}/{clean_name}.pdf"   
 
     result = cloudinary.uploader.upload(
         file.file,

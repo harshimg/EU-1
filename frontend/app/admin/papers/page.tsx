@@ -258,7 +258,7 @@ export default function AdminPapersPage() {
                 <Td>
                 {p.paper_pdf? 
                   <button
-                    onClick={() => window.open(p.paper_pdf  + ".pdf", "_blank")}
+                    onClick={() => window.open(p.paper_pdf, "_blank")}
                     className="text-indigo-400 cursor-pointer"
                   >
                    View
