@@ -5,6 +5,8 @@ from app.utils.datetime import utcnow
 from app.config import settings
 from fastapi import HTTPException, status, UploadFile
 from fastapi.responses import StreamingResponse, Response
+import fitz  # PyMuPDF
+from io import BytesIO
 
 import httpx
 
@@ -547,24 +549,26 @@ async def call_pdf_service(file: UploadFile, admin):
 
 
 
-#===============ALL Upload CONTROLLERS===================
+#===============ALL Upload CONTROLLERS===================#
 
 import cloudinary.uploader
 
 async def upload_pdf_to_cloudinary(file, branch, sem, subject, year, exam_type, admin):
 
-    content_type = file.content_type
+    # content_type = file.content_type
+    file.seek(0)
+    resource_type = "raw"
 
     # 🔥 detect type using MIME
-    if content_type == "application/pdf":
-        resource_type = "raw"
-    elif content_type.startswith("image/"):
-        resource_type = "image"
-    else:
-        return {
-            "success": False,
-            "error": "Unsupported file type"
-        }
+    # if content_type == "application/pdf":
+    #     resource_type = "raw"
+    # elif content_type.startswith("image/"):
+    #     resource_type = "image"
+    # else:
+    #     return {
+    #         "success": False,
+    #         "error": "Unsupported file type"
+    #     }
 
     # 🔥 public_id
     if exam_type:
@@ -576,7 +580,7 @@ async def upload_pdf_to_cloudinary(file, branch, sem, subject, year, exam_type, 
     public_id = f"{public_id}/{clean_name}.pdf"   
 
     result = cloudinary.uploader.upload(
-        file.file,
+        file, # file.file,
         resource_type=resource_type,
         public_id=public_id,
         overwrite=True,    #Upload again → replaces old file❗
@@ -587,3 +591,138 @@ async def upload_pdf_to_cloudinary(file, branch, sem, subject, year, exam_type, 
         "public_id": result.get("public_id"),
         "resource_type": resource_type
     }
+
+
+
+
+#===============Branding===================#
+logo_path = "app/assets/ar_only_logo_watermark.png"
+ALPHA_URL = "https://alpharesult.in"
+
+# -------------------------
+# 1. LOGO WATERMARK (CENTER)
+# -------------------------
+def add_logo_watermark(page, logo_path):
+    rect = page.rect
+
+    logo_size = 150  # adjust
+    x0 = (rect.width - logo_size) / 2
+    y0 = (rect.height - logo_size) / 2
+
+    logo_rect = fitz.Rect(
+        x0, y0,
+        x0 + logo_size,
+        y0 + logo_size
+    )
+
+    page.insert_image(
+        logo_rect,
+        filename=logo_path,
+        overlay=True,
+        keep_proportion=True
+    )
+
+
+# -------------------------
+# 2. DIAGONAL TEXT
+# -------------------------
+def add_diagonal_text(page):
+    rect = page.rect
+    text = "ALPHA RESULT"
+
+    # Create a BIG box larger than page
+    box = fitz.Rect(
+        -rect.width,             # start far left
+        rect.height * 0.2,
+        rect.width * 2,          # extend beyond right
+        rect.height * 0.8
+    )
+
+    # Center point for rotation
+    center = fitz.Point(rect.width / 2, rect.height / 2)
+
+    # 45 degree rotation
+    matrix = fitz.Matrix(1, 1).prerotate(45)
+
+    page.insert_textbox(
+        box,
+        text,
+        fontsize=140,                    # 🔥 BIG (key)
+        color=(0.65, 0.65, 0.65),        # grey (visible but light)
+        align=1,                         # center
+        morph=(center, matrix),          # rotate around center
+        overlay=True                     # must be true for scanned PDFs
+    )
+
+
+# def add_diagonal_text(page):
+#     rect = page.rect
+#     text = "ALPHA RESULT"
+
+#     center = fitz.Point(rect.width / 2, rect.height / 2)
+#     matrix = fitz.Matrix(1, 1).prerotate(45)
+
+#     page.insert_text(
+#         center,
+#         text,
+#         fontsize=100,
+#         color=(0.95, 0.95, 0.95),  # 🔥 very light
+#         morph=(center, matrix),
+#         overlay=True  # ✅ MUST
+#     )
+
+
+# -------------------------
+# 3. FOOTER
+# -------------------------
+def add_footer(page):
+    rect = page.rect
+
+    text = "Click here for PYQ & Solutions - alpharesult.in"
+
+    text_width = fitz.get_text_length(text, fontsize=10)
+    x = (rect.width - text_width) / 2
+    y = rect.height - 20
+
+    page.insert_text(
+        (x, y),
+        text,
+        fontsize=14,
+        color=(0.2, 0.4, 0.8),
+    )
+
+
+# -------------------------
+# 4. FULL PAGE CLICKABLE LINK
+# -------------------------
+def add_clickable_link(page):
+    page.insert_link({
+        "kind": fitz.LINK_URI,
+        "from": page.rect,  # FULL PAGE
+        "uri": ALPHA_URL
+    })
+
+
+# -------------------------
+# MAIN PROCESS FUNCTION
+# -------------------------
+async def process_pdf_branding(file_bytes):
+    doc = fitz.open(stream=file_bytes, filetype="pdf")
+
+    for page in doc:
+        # add_logo_watermark(page, logo_path)
+        # print("watermark added")
+        # add_diagonal_text(page)
+        # print("Diagonal text added")
+        add_footer(page)
+        # print("footer added")
+        add_clickable_link(page)
+        # print("link clickable added")
+
+    # Save to memory (NO TEMP FILE)
+    output = BytesIO()
+    doc.save(output)
+    doc.close()
+
+    output.seek(0)
+    return output

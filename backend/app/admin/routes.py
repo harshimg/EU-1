@@ -192,10 +192,14 @@ async def upload_pdf(
     if not paper:
         return {"success": False, "error": "Paper not found"}
 
-    
+    #Branding
+    file_bytes = await file.read()
+    processed_pdf = await process_pdf_branding(file_bytes)
+
+
     #Uploading to cloudanary
     result = await upload_pdf_to_cloudinary(
-        file,
+        processed_pdf,
         branch,
         sem,
         subject,
