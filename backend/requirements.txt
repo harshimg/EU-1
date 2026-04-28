@@ -24,7 +24,7 @@ dnspython==2.6.1
 httpx==0.27.2
 email-validator==2.2.0
 cloudinary==1.40.0
-pymupdf==1.24.0
+pymupdf==1.26.7
 
 
 
