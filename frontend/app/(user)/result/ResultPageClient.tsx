@@ -13,7 +13,7 @@ import { fetchBatchResults } from "@/lib/result/fetchBatchResults";
 const API_BASE =
   "https://beu-bih.ac.in/backend/v1/result/get-result";
 
-const exam_held_months = ["December/2025", "November/2025", "July/2025", "May/2025" ]
+const exam_held_months = ["February/2026", "December/2025", "November/2025", "July/2025", "May/2025" ]
 
 export default function ResultPage() {
   const { user } = useAuth();
