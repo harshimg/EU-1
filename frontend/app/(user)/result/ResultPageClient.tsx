@@ -15,6 +15,7 @@ const API_BASE =
 
 const exam_held_months = ["February/2026", "December/2025", "November/2025", "July/2025", "May/2025" ]
 
+
 export default function ResultPage() {
   const { user } = useAuth();
 
