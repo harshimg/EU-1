@@ -1,6 +1,7 @@
 "use client";
 
 import { SEMESTERS, BRANCHES } from "@/lib/constants/academic";
+import Link from "next/link";
 
 type Props = {
   semester: string | null;
@@ -29,11 +30,16 @@ export default function AcademicSelector({
 
   return (
     <div className="min-h-screen bg-slate-100 py-8 px-3">
-      <div className="max-w-3xl mx-auto space-y-6">
+      <div className="max-w-1xl mx-auto space-y-6">
   
         {/* 🔝 TITLE */}
         <div className="text-center space-y-2">
-          <h1 className="text-2xl font-semibold text-slate-800">
+       
+          {/* <h1 className="text-2xl font-semibold text-slate-800"> */}
+          <h1 className="text-3xl font-bold text-slate-800 tracking-tight">
+          <p className="text-sm text-slate-500">
+            BEU Study Platform • PYQs • Solutions • Tools
+          </p>
             {title}
           </h1>
           <p className="text-sm text-slate-600 max-w-xl mx-auto">
@@ -43,7 +49,8 @@ export default function AcademicSelector({
         </div>
   
         {/* 📦 CARD */}
-        <div className="bg-white rounded-xl shadow-sm p-5 space-y-6">
+        {/* <div className="bg-white rounded-xl shadow-sm p-5 space-y-6"> */}
+        <div className="bg-white/90 backdrop-blur rounded-2xl shadow-md border border-slate-200 p-6">
   
           {/* SEMESTERS */}
           {!semester && (
@@ -57,9 +64,12 @@ export default function AcademicSelector({
                   <button
                     key={s.code}
                     onClick={() => selectSemester(s.code)}
-                    className="px-4 py-2 rounded-lg border text-sm 
-                               bg-white hover:bg-indigo-50 
-                               hover:border-indigo-300 transition"
+                    // className="px-4 py-2 rounded-lg border text-sm 
+                    //            bg-white hover:bg-indigo-50 
+                    //            hover:border-indigo-300 transition"
+                    className="px-4 py-2 rounded-lg border text-sm font-medium
+bg-white hover:bg-indigo-50 hover:border-indigo-400
+transition-all duration-200 hover:scale-[1.03] active:scale-95"
                   >
                     {s.name}
                   </button>
@@ -101,6 +111,101 @@ export default function AcademicSelector({
             Selecting the correct branch and semester ensures accurate and relevant content.
           </p>
         </div>
+
+
+{/* 📊 STRUCTURED SEMESTER GRID (TRANSPOSED) */}
+<div className="mt-12 bg-white rounded-xl shadow-sm p-5">
+  <h2 className="text-lg font-semibold text-slate-800 text-center mb-6">
+    Explore by Semester & Branch
+  </h2>
+
+  <div className="space-y-10">
+
+    {SEMESTERS.map((sem) => (
+      <div key={sem.code} className="space-y-4">
+
+        {/* Semester Title */}
+        <div className="flex justify-center">
+          <h3 className="px-4 py-1.5 rounded-full 
+                        bg-slate-100 text-slate-700 border border-slate-200
+                        bg-slate-800 text-white
+                        text-sm font-semibold tracking-wide
+                        border border-indigo-200
+                        shadow-sm">
+            {sem.name}
+          </h3>
+        </div>
+
+        {/* Table */}
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm border rounded-lg overflow-hidden">
+            
+            {/* Header */}
+            <thead className="bg-slate-50 text-center">
+              <tr>
+                <th className="py-2 px-3 text-left">Branch</th>
+                <th className="py-2 px-3">PYQ</th>
+                <th className="py-2 px-3">Solution</th>
+                <th className="py-2 px-3">Calculate CGPA</th>
+              </tr>
+            </thead>
+
+            {/* Body */}
+            <tbody className="divide-y">
+
+              {BRANCHES.map((b) => (
+                <tr key={b.code} className="text-center">
+
+                  {/* Branch Name */}
+                  <td className="py-2 px-3 text-left font-medium text-slate-700">
+                    {b.full_name}
+                  </td>
+
+                  {/* PYQ */}
+                  <td>
+                    <Link
+                      href={`/pyq/download/${b.code}/sem-${sem.code}`}
+                      className="text-indigo-600 hover:underline"
+                    >
+                      View
+                    </Link>
+                  </td>
+
+                  {/* Solution */}
+                  <td>
+                    <Link
+                      href={`/pyq/${b.code}/sem-${sem.code}`}
+                      className="text-green-600 hover:underline"
+                    >
+                      View
+                    </Link>
+                  </td>
+
+                  {/* CGPA */}
+                  <td>
+                    <Link
+                      href={`/cgpa/${b.code}/sem-${sem.code}`}
+                      className="text-blue-600 hover:underline"
+                    >
+                      Open
+                    </Link>
+                  </td>
+
+                </tr>
+              ))}
+
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    ))}
+
+  </div>
+</div>
+
+
+
 
 
     

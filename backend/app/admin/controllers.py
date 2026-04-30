@@ -311,14 +311,20 @@ async def create_paper(body: dict, admin):
     }
 
 
-async def list_papers(subject_code: str):
-    docs = await db_instance.db.papers.find(
-        {"subject_code": subject_code}
-    ).sort("year", -1).to_list(None)
+# async def list_papers(subject_code: str):
+#     docs = await db_instance.db.papers.find(
+#         {
+#             "subject_code": subject_code,
+#             "questions.0": {"$exists": True}  # ✅ at least 1 question
+#         }
+#     ).sort("year", -1).to_list(None)
 
-    return {"success": True,
-        "data": mongo_to_json(docs)
-    }
+#     return {
+#         "success": True,
+#         "data": mongo_to_json(docs)
+#     }
+
+
 
 
 async def get_paper_with_questions(paper_id: str):
