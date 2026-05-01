@@ -87,16 +87,29 @@ async def list_subjects(semester_code: int, branch_code: str):
 # -------------------------------------------------
 # GET PAPERS (by subject_code)
 # -------------------------------------------------
-async def list_papers(subject_code: str):
-    cursor = db_instance.db.papers.find(
-        {"subject_code": subject_code}
-    ).sort("year", -1)
+# async def list_papers(subject_code: str):
+#     cursor = db_instance.db.papers.find(
+#         {"subject_code": subject_code}
+#     ).sort("year", -1)
 
-    docs = await cursor.to_list(length=None)
+#     docs = await cursor.to_list(length=None)
+
+#     return {
+#         "success": True,
+#         "data": [mongo_to_json(d) for d in docs],
+#     }
+
+async def list_papers(subject_code: str):
+    docs = await db_instance.db.papers.find(
+        {
+            "subject_code": subject_code,
+            "questions.0": {"$exists": True}  # ✅ at least 1 question
+        }
+    ).sort("year", -1).to_list(None)
 
     return {
         "success": True,
-        "data": [mongo_to_json(d) for d in docs],
+        "data": mongo_to_json(docs)
     }
 
 
