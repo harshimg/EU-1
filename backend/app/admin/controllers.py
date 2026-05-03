@@ -747,5 +747,107 @@ async def process_pdf_branding(file_bytes):
     return output
 
 
+# mere function to merge all papers of a subject
 
+import requests
+async def merge_subject_pdfs(subject_code: str, admin):
+    # 1. Fetch papers (only valid PDFs)
+    papers = await db_instance.db.papers.find(
+        {
+            "subject_code": subject_code,
+            "paper_pdf": {"$exists": True, "$ne": ""}
+        }
+    ).sort("year", -1).to_list(None)
+
+    if not papers:
+        return {
+            "success": False,
+            "message": "No valid PDFs found for this subject"
+        }
+
+    merged_doc = fitz.open()
+    merged_info = []
+    success_count = 0
+
+    # 2. Download + merge
+    for p in papers:
+        pdf_url = p.get("paper_pdf")
+
+        try:
+            res = requests.get(pdf_url, timeout=10)
+            res.raise_for_status()
+
+            pdf_bytes = BytesIO(res.content)
+            doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+
+            if doc.page_count == 0:
+                doc.close()
+                continue
+
+            merged_doc.insert_pdf(doc)
+            doc.close()
+
+            success_count += 1
+
+            merged_info.append({
+                "year": p.get("year")
+            })
+
+        except Exception as e:
+            print(f"[MERGE ERROR] {pdf_url}: {e}")
+            continue
+
+    if success_count == 0:
+        return {
+            "success": False,
+            "message": "All PDFs failed to merge"
+        }
+
+    # 3. Save merged PDF to memory
+    output = BytesIO()
+    merged_doc.save(output)
+    merged_doc.close()
+    del merged_doc
+
+    output.seek(0)
+
+    # 4. Upload to Cloudinary
+    subject = await db_instance.db.subjects.find_one({"code": subject_code})
+    branch = subject["branch_code"][0]
+    sem = subject["semester_code"]
+
+    public_id = f"BEU/pyq/{branch}/sem-{sem}/{subject_code}/all_years"
+    clean_name = f"{subject_code}_all_years".replace(" ", "_")
+    public_id = f"{public_id}/{clean_name}.pdf"   
+
+    result = cloudinary.uploader.upload(
+        output,
+        resource_type="raw",
+        public_id=public_id,
+        overwrite=True,
+        invalidate=True
+    )
+
+    merged_url = result["secure_url"]
+
+    # 5. Save URL in subject
+    await db_instance.db.subjects.update_one(
+        {"code": subject_code},
+        {
+            "$set": {
+                "all_paper_pdf": merged_url,
+                "merged_years": merged_info,
+                "updated_at": utcnow(),
+                "admin_userids": admin["admin_userid"]
+            }
+        }
+    )
+
+    return {
+        "success": True,
+        "message": f"Merged {success_count} papers successfully",
+        "url": merged_url,
+        "total_papers": success_count,
+        "papers": merged_info
+    }
     

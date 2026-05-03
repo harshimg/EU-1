@@ -252,6 +252,9 @@ function SubjectSection() {
   // Syllabus
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
 
+  const [loadingSubject, setLoadingSubject] = useState<string | null>(null);
+  const [statusMap, setStatusMap] = useState<Record<string, string>>({});
+
   useEffect(() => {
     loadBase();
   }, []);
@@ -303,6 +306,59 @@ function SubjectSection() {
     }
   }
 
+
+  // To merge all papers of a subject
+  const handleMerge = async (subjectCode: string) => {
+    try {
+      setLoadingSubject(subjectCode);
+      setStatusMap(prev => ({
+        ...prev,
+        [subjectCode]: "Merging..."
+      }));
+  
+      const res = await fetch(`${API_URL}/admin/merge-subject-pdfs`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({ subject_code: subjectCode }),
+      });
+  
+      const data = await res.json();
+  
+      if (!res.ok) {
+        throw new Error(data.detail || "Merge failed");
+      }
+  
+      // ✅ SUCCESS MESSAGE
+      setStatusMap(prev => ({
+        ...prev,
+        [subjectCode]: `✔ ${data.total_papers} papers merged (${data.papers.map(p => p.year).join(", ")} years)`
+      }));
+  
+      // 🔥 UPDATE ONLY THIS SUBJECT (NO RELOAD)
+      setSubjects(prev =>
+        prev.map(s =>
+          s.code === subjectCode
+            ? { ...s, all_paper_pdf: data.url }
+            : s
+        )
+      );
+  
+    } catch (err: any) {
+      setStatusMap(prev => ({
+        ...prev,
+        [subjectCode]: `Error: ${err.message}`
+      }));
+    } finally {
+      setLoadingSubject(null);
+    }
+  };
+
+
+
+
   return (
     <SectionLayout title="Subjects" onAdd={() => { setEdit(null); setOpen(true); }}>
       <div className="flex gap-4 mb-4">
@@ -341,20 +397,58 @@ function SubjectSection() {
             <Td>{s.subject_credit}</Td>
             <Td>{s.max_marks}</Td>
             {/* <Td>{s.all_paper_pdf || "Na"}</Td> */}
-            <Td>
-              {s.all_paper_pdf ? (
-                <a
-                  href={s.all_paper_pdf}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-indigo-400 hover:underline"
-                >
-                  View
-                </a>
-              ) : (
-                <span className="text-gray-400 text-xs">NA</span>
-              )}
-          </Td>
+
+                <Td>
+        <div className="flex flex-col items-start gap-1">
+
+          <div className="flex items-center gap-3">
+            
+            {/* VIEW */}
+            {s.all_paper_pdf ? (
+              <a
+                href={s.all_paper_pdf}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-indigo-500 hover:underline text-sm"
+              >
+                View
+              </a>
+            ) : (
+              <span className="text-gray-400 text-xs">NA</span>
+            )}
+
+            {/* MERGE */}
+            <button
+              onClick={() => handleMerge(s.code)}
+              disabled={loadingSubject === s.code}
+              className={`text-xs px-2 py-1 rounded-md border transition
+                ${
+                  loadingSubject === s.code
+                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                    : "bg-indigo-50 text-indigo-600 hover:bg-indigo-100"
+                }`}
+            >
+              {loadingSubject === s.code ? "Merging..." : "Merge"}
+            </button>
+          </div>
+
+          {/* ✅ INLINE MESSAGE */}
+          {statusMap[s.code] && (
+            <span
+              className={`text-xs ${
+                statusMap[s.code].startsWith("Error")
+                  ? "text-red-500"
+                  : "text-green-600"
+              }`}
+            >
+              {statusMap[s.code]}
+            </span>
+          )}
+
+        </div>
+      </Td>
+        
+
             <Td>
               <ActionBtn onClick={() => { setEdit(s); setOpen(true); }}>Edit</ActionBtn>
               <ActionBtn danger onClick={() => remove(s.code)}>Delete</ActionBtn>

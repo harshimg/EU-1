@@ -237,3 +237,16 @@ async def upload_pdf(
         "public_id": result["public_id"]
         }
     }
+
+
+# To merge all papers of a subject
+
+@router.post("/merge-subject-pdfs")
+async def merge_subject(body: dict, admin=Depends(get_current_admin)):
+    subject_code = body.get("subject_code")
+    result = await merge_subject_pdfs(subject_code, admin)
+
+    if not result["success"]:
+        raise HTTPException(status_code=400, detail=result["message"])
+
+    return result

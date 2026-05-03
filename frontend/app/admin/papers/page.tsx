@@ -119,6 +119,7 @@ export default function AdminPapersPage() {
 
   async function remove(id: string) {
     if (!id) return;
+    if (!confirm("Delete this paper?")) return;
 
     await fetch(`${API_URL}/admin/papers/${id}`, {
       method: "DELETE",
