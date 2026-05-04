@@ -51,6 +51,7 @@ export default function PyqDownloadPage() {
 
     // All papers pdf link of one subject
 
+    const [activeSubject, setActiveSubject] = useState<string | null>(null);
     const [activeSubjectCode, setActiveSubjectCode] = useState<string | null>(null);
     const [papers, setPapers] = useState<any[]>([]);
     const [loadingPapers, setLoadingPapers] = useState(false);
@@ -167,12 +168,14 @@ export default function PyqDownloadPage() {
           (s: any) => s.subject_type === "Theory"
         );
         setSubjects(theoryOnly);
+        handleViewPapers(theoryOnly[0])
+        
+        // setLoadingPapers(false);
       })
       .catch(() => setSubjects([]))
       .finally(() => setLoadingSubjects(false));
   }, [semester, branch]);
 
-  
 
 
 // ----------------------FETCH SYYALBUS-----------------
@@ -626,8 +629,10 @@ function getPdfSourceType(url: string) {
 
                 {loadingPapers ? (
                   <p className="text-sm text-slate-500">Loading papers...</p>
-                ) : !papers || papers.length === 0 ? (
-
+                ) : 
+                // !papers || papers.length === 0 ? (
+                  (!papers || papers.length === 0) && !s?.all_paper_pdf ? (
+                    
                   <div className="text-center py-6">
                     <p className="text-sm text-slate-500">
                       No question papers available for this subject yet.
@@ -640,19 +645,7 @@ function getPdfSourceType(url: string) {
                   
                 ) : 
                 (
-                  // papers
-                  // .filter((_, i) => i === activePaperIndex)
-                  // .map((p, i) => {
-
-                  // (activePaperIndex === -1 && s.all_paper_pdf
-                  //   ? [{ id: "merged", pdf: s.all_paper_pdf, paper_pdf: s.all_paper_pdf, year: "All", name: "All Papers" }]
-                  //   : papers
-                  // )
-                  // // .filter((_, i) => activePaperIndex !== -1 && i === activePaperIndex)
-                  // .filter((_, i) =>
-                  //   activePaperIndex === -1 ? true : i === activePaperIndex
-                  // )
-                  //  .map((p, i) => {
+               
 
                   (activePaperIndex === -1 && s.all_paper_pdf
                     ? [{ id: "merged", pdf: s.all_paper_pdf, paper_pdf: s.all_paper_pdf, year: "All", name: "All Papers" }]
