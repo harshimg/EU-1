@@ -263,6 +263,8 @@ export default function PdfViewer({ url }: { url: string }) {
   const [zoom, setZoom] = useState(1);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
+  const renderIdRef = useRef(0);
+
   // 📥 Load PDF
   useEffect(() => {
     const loadPdf = async () => {
@@ -285,64 +287,148 @@ export default function PdfViewer({ url }: { url: string }) {
   }, [url]);
 
   // 🎨 Render pages (HIGH QUALITY + RESPONSIVE)
+  // useEffect(() => {
+  //   const renderPages = async () => {
+  //     if (!pdf || !containerRef.current) return;
+
+  //     const container = containerRef.current;
+  //     container.innerHTML = "";
+
+  //   //   const containerWidth =container.clientWidth || window.innerWidth;
+    
+  //       const containerWidth =
+  //           Math.min(
+  //               containerRef.current?.clientWidth || window.innerWidth,
+  //               800 // 🔥 max width for desktop
+  //           );
+
+  //     // ⚡ render only first few pages initially (faster load)
+  //     const pagesToRender = Math.min(pdf.numPages, 3);
+
+  //     for (let i = 1; i <= pagesToRender; i++) {
+  //       const page = await pdf.getPage(i);
+
+  //       const viewport = page.getViewport({ scale: 1 });
+
+  //       const scale = containerWidth / viewport.width;
+
+  //       // 🔥 HIGH QUALITY FIX
+  //       const devicePixelRatio = window.devicePixelRatio || 1;
+  //       const renderScale = scale * devicePixelRatio * 1.5;
+
+  //       const scaledViewport = page.getViewport({ scale: renderScale });
+
+  //       const canvas = document.createElement("canvas");
+  //       const context = canvas.getContext("2d");
+
+  //       // 🧠 internal resolution
+  //       canvas.height = scaledViewport.height;
+  //       canvas.width = scaledViewport.width;
+
+  //       // 🖥 display size (important)
+  //       canvas.style.width = `${containerWidth}px`;
+  //       canvas.style.height = `${
+  //         (scaledViewport.height / renderScale) * scale
+  //       }px`;
+
+  //       canvas.className = "mb-4 mx-auto rounded shadow";
+
+  //       container.appendChild(canvas);
+
+  //       await page.render({
+  //         canvasContext: context!,
+  //         viewport: scaledViewport,
+  //       }).promise;
+  //     }
+  //   };
+
+  //   renderPages();
+  // }, [pdf]);
+
+  const renderTaskRef = useRef<any>(null);
+
   useEffect(() => {
+    const currentRenderId = ++renderIdRef.current;
+  
     const renderPages = async () => {
       if (!pdf || !containerRef.current) return;
-
+  
       const container = containerRef.current;
+
+
+          // 🔥 cancel previous render
+    if (renderTaskRef.current) {
+      try {
+        renderTaskRef.current.cancel();
+      } catch {}
+    }
+
+  
+      // 🔥 CLEAR OLD CONTENT
       container.innerHTML = "";
-
-    //   const containerWidth =container.clientWidth || window.innerWidth;
-    
-        const containerWidth =
-            Math.min(
-                containerRef.current?.clientWidth || window.innerWidth,
-                800 // 🔥 max width for desktop
-            );
-
-      // ⚡ render only first few pages initially (faster load)
-      const pagesToRender = Math.min(pdf.numPages, 3);
-
+  
+      const containerWidth =
+        Math.min(
+          containerRef.current?.clientWidth || window.innerWidth,
+          800
+        );
+  
+      const pagesToRender = Math.min(pdf.numPages, 10);
+  
       for (let i = 1; i <= pagesToRender; i++) {
+        
+        // ❌ STOP if new render started
+        if (currentRenderId !== renderIdRef.current) return;
+  
         const page = await pdf.getPage(i);
-
+  
         const viewport = page.getViewport({ scale: 1 });
-
         const scale = containerWidth / viewport.width;
-
-        // 🔥 HIGH QUALITY FIX
+  
         const devicePixelRatio = window.devicePixelRatio || 1;
         const renderScale = scale * devicePixelRatio * 1.5;
-
+  
         const scaledViewport = page.getViewport({ scale: renderScale });
-
+  
         const canvas = document.createElement("canvas");
         const context = canvas.getContext("2d");
-
-        // 🧠 internal resolution
+  
         canvas.height = scaledViewport.height;
         canvas.width = scaledViewport.width;
-
-        // 🖥 display size (important)
+  
         canvas.style.width = `${containerWidth}px`;
         canvas.style.height = `${
           (scaledViewport.height / renderScale) * scale
         }px`;
-
+  
         canvas.className = "mb-4 mx-auto rounded shadow";
-
+  
         container.appendChild(canvas);
+  
+        // await page.render({
+        //   canvasContext: context!,
+        //   viewport: scaledViewport,
+        // }).promise;
 
-        await page.render({
+        const renderTask = page.render({
           canvasContext: context!,
           viewport: scaledViewport,
-        }).promise;
+        });
+        
+        // 🔥 store current render task
+        renderTaskRef.current = renderTask;
+        
+        try {
+          await renderTask.promise;
+        } catch (err) {
+          // 🔥 ignore cancelled render errors
+        }
+
       }
     };
-
+  
     renderPages();
   }, [pdf]);
-
 
 // PINCH ZOOM
 useEffect(() => {

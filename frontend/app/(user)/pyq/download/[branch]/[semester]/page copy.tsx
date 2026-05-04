@@ -54,7 +54,7 @@ export default function PyqDownloadPage() {
     const [activeSubjectCode, setActiveSubjectCode] = useState<string | null>(null);
     const [papers, setPapers] = useState<any[]>([]);
     const [loadingPapers, setLoadingPapers] = useState(false);
-    const [activePaperIndex, setActivePaperIndex] = useState(-1);
+    const [activePaperIndex, setActivePaperIndex] = useState(0);
 
     const handleViewPapers = async (subject: any) => {
       // 🔁 TOGGLE CLOSE
@@ -66,7 +66,7 @@ export default function PyqDownloadPage() {
     
       setActiveSubjectCode(subject.code);
       setLoadingPapers(true);
-      setActivePaperIndex(-1); // ✅ RESET
+      setActivePaperIndex(0); // ✅ RESET
     
       try {
         const res = await apiGet(`/api/public/papers/${subject.code}`);
@@ -171,8 +171,6 @@ export default function PyqDownloadPage() {
       .catch(() => setSubjects([]))
       .finally(() => setLoadingSubjects(false));
   }, [semester, branch]);
-
-  
 
 
 // ----------------------FETCH SYYALBUS-----------------
@@ -490,6 +488,16 @@ function getPdfSourceType(url: string) {
   Download
 </button> */}
 
+{/* {papers.map((p, i) => (
+  <button
+    key={i}
+    onClick={() => setActivePaperIndex(i)} // 👈 HERE
+    className="text-sm text-indigo-600"
+  >
+    {p.year}
+  </button>
+))} */}
+
 
 
                 <Link
@@ -575,54 +583,12 @@ function getPdfSourceType(url: string) {
 
        {/* View ALL PDF Quetions */}
         {/* 🔥 VIEW PAPERS (FULL WIDTH BELOW SUBJECT) */}
-
-
-
-        
             {activeSubjectCode === s.code && (
               <div id={`subject-${s.code}`}   className="mt-4 bg-white border rounded-xl shadow-sm p-4 space-y-4">
 
                 <h3 className="font-semibold text-slate-800">
                   Question Papers
                 </h3>
-
-                <div className="flex gap-2 flex-wrap mb-4">
- {/* ALL YEARS BUTTON */}
- {s.all_paper_pdf && (
-    <button
-      onClick={() => setActivePaperIndex(-1)}
-      className={`px-3 py-1.5 rounded-md text-sm border transition
-        ${
-          activePaperIndex === -1
-            ? "bg-indigo-600 text-white"
-            : "bg-white text-slate-600 hover:bg-indigo-50"
-        }`}
-    >
-      All Years
-    </button>
-  )}
-  {papers.map((p, i) => (
-    <button
-      key={p.id}
-      onClick={() => setActivePaperIndex(i)}
-      className={`px-3 py-1.5 rounded-md text-sm border transition
-        ${
-          i === activePaperIndex
-            ? "bg-indigo-600 text-white border-indigo-600"
-            : "bg-white text-slate-600 hover:bg-indigo-50"
-        }`}
-    >
-      {p.year}
-    </button>
-  ))}
-</div>
-
-
-
-
-
-
-
 
                 {loadingPapers ? (
                   <p className="text-sm text-slate-500">Loading papers...</p>
@@ -638,37 +604,8 @@ function getPdfSourceType(url: string) {
                     </p>
                   </div>
                   
-                ) : 
-                (
-                  // papers
-                  // .filter((_, i) => i === activePaperIndex)
-                  // .map((p, i) => {
-
-                  // (activePaperIndex === -1 && s.all_paper_pdf
-                  //   ? [{ id: "merged", pdf: s.all_paper_pdf, paper_pdf: s.all_paper_pdf, year: "All", name: "All Papers" }]
-                  //   : papers
-                  // )
-                  // // .filter((_, i) => activePaperIndex !== -1 && i === activePaperIndex)
-                  // .filter((_, i) =>
-                  //   activePaperIndex === -1 ? true : i === activePaperIndex
-                  // )
-                  //  .map((p, i) => {
-
-                  (activePaperIndex === -1 && s.all_paper_pdf
-                    ? [{ id: "merged", pdf: s.all_paper_pdf, paper_pdf: s.all_paper_pdf, year: "All", name: "All Papers" }]
-                    : papers
-                  )
-                  .filter((_, i) =>
-                    activePaperIndex === -1 ? i === 0 : i === activePaperIndex
-                  )
-                  .map((p, i) => {
-
-                    // (activePaperIndex === -1
-                    //   ? [{ id: "merged", pdf: s.all_paper_pdf, year: "All", name: "All Papers" }]
-                    //   : papers.filter((_, i) => i === activePaperIndex)
-                    // ).map((p, i) => {
-                    
-                    
+                ) : (
+                  papers.map((p, i) => {
                     // const previewLink = p.pdf.replace("/view", "/preview");
                     const previewLink = getPreviewLink(p.pdf);
                     const type = getPdfSourceType(p.pdf);
@@ -676,7 +613,6 @@ function getPdfSourceType(url: string) {
                     return (
                   <div
                           key={p.id}
-                          // key={`${p.pdf}`}
                           ref={(el) => {
                             if (el) viewerRefs.current[p.id] = el;
                           }}
@@ -767,16 +703,9 @@ function getPdfSourceType(url: string) {
     loading="lazy"
   />
 ) : type === "cloudinary" ? (
-  // <PdfViewer key={p.pdf} url={p.pdf} />
-  <iframe
-  key={p.pdf}
-  // src={p.pdf}
-  src={`https://docs.google.com/gview?url=${encodeURIComponent(p.pdf)}&embedded=true`}
-  className="w-full h-[800px] rounded"
-  loading="lazy"
-/>
+  <PdfViewer url={p.pdf} />
 ) : (
-  <div  className="text-center p-4 border rounded">
+  <div className="text-center p-4 border rounded">
     <p className="text-slate-400 text-sm">
       Preview not supported
     </p>
@@ -799,18 +728,11 @@ function getPdfSourceType(url: string) {
                 </div>
                     );
                   })
-                )
-                
-                }
-
-
-
-
-
-                
+                )}
 
               </div>
             )}
+
 
 
     </div>
