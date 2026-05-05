@@ -80,11 +80,11 @@ export default function PyqDownloadPage() {
       }
 
        // ✅ SCROLL AFTER OPEN
-  setTimeout(() => {
-    document
-      .getElementById(`subject-${subject.code}`)
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, 100);
+  // setTimeout(() => {
+  //   document
+  //     .getElementById(`subject-${subject.code}`)
+  //     ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  // }, 100);
     };
 
 
@@ -501,7 +501,7 @@ function getPdfSourceType(url: string) {
         key={s.code}
         className="grid grid-cols-12 items-center py-3 border-b border-white/5 hover:bg-white/5 transition"
       >
-        <div className="col-span-2 text-[11px] text-cyan-300 font-medium">
+        <div className="col-span-2 text-[10px] text-cyan-300 font-medium">
           {s.code}
         </div>
 
