@@ -397,78 +397,9 @@ function getPdfSourceType(url: string) {
 
 
 
-{/* 📊 CREDIT TABLE */}
-<div className="mt-10 bg-white rounded-xl shadow-sm p-5">
-
-  <h2 className="text-lg font-semibold text-slate-800 mb-4 text-center">
-    Subject Credit Table
-  </h2>
-
-  {AllSubjects.length === 0 ? (
-    <p className="text-center text-sm text-slate-500">
-      No subjects available
-    </p>
-  ) : (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm border border-slate-200 rounded-lg overflow-hidden">
-        
-        {/* HEADER */}
-        <thead className="bg-slate-100 text-slate-700">
-          <tr>
-            <th className="px-3 py-2 border">Code</th>
-            <th className="px-3 py-2 border">Subject</th>
-            <th className="px-3 py-2 border">Type</th>
-            <th className="px-3 py-2 border">Credits</th>
-            <th className="px-3 py-2 border">Max Marks</th>
-          </tr>
-        </thead>
-
-        {/* BODY */}
-        <tbody>
-          {AllSubjects.map((s) => (
-            <tr key={s.code} className="text-center hover:bg-slate-50 transition">
-              
-              <td className="px-3 py-2 border text-slate-600">
-                {s.code}
-              </td>
-
-              <td className="px-3 py-2 border text-left">
-                <div className="font-medium text-slate-800">
-                  {s.short_name}
-                </div>
-                <div className="text-xs text-slate-500">
-                  {s.full_name}
-                </div>
-              </td>
-
-              <td className="px-3 py-2 border text-slate-600">
-                {s.subject_type}
-              </td>
-
-              <td className="px-3 py-2 border font-medium text-indigo-600">
-                {s.subject_credit}
-              </td>
-
-              <td className="px-3 py-2 border text-slate-600">
-                {s.max_marks}
-              </td>
-
-            </tr>
-          ))}
-        </tbody>
-
-      </table>
-    </div>
-  )}
-
-</div>
 
 {/* 📊 PREMIUM CREDIT TABLE */}
 <div className="mt-12 bg-gradient-to-br from-white to-slate-50 rounded-2xl shadow-md p-6">
-
-  <h2 className="text-xl font-semibold text-slate-800 mb-6 text-center tracking-tight">
-    Subject Credit Overview
-  </h2>
 
   {AllSubjects.length === 0 ? (
     <p className="text-center text-sm text-slate-500">
@@ -477,92 +408,108 @@ function getPdfSourceType(url: string) {
   ) : (
     <>
       {/* 🔹 GROUP FUNCTION */}
-      {["Theory", "Practical"].map((type) => {
-        const filtered = AllSubjects.filter(s => s.subject_type === type);
+   
 
-        if (filtered.length === 0) return null;
+<div className="mt-12 rounded-2xl bg-gradient-to-br from-[#0a1f44] via-[#0d2b63] to-[#081633] p-5 shadow-xl text-white">
 
-        return (
-          <div key={type} className="mb-8">
+  {/* HEADER */}
+  <h2 className="text-lg font-semibold text-cyan-400 mb-5 text-center tracking-wide">
+    Credits Table
+  </h2>
 
-            {/* SECTION HEADER */}
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold text-slate-700 uppercase tracking-wide">
-                {type} Subjects
-              </h3>
 
-              <span className="text-xs text-slate-500">
-                {filtered.length} subjects
-              </span>
-            </div>
 
-            <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-              <table className="w-full text-sm">
+  {/* THEORY */}
+  <div >
+    {AllSubjects.filter(s => s.subject_type === "Theory").map((s) => (
+      <div
+        key={s.code}
+        className="grid grid-cols-12 items-center py-3 border-b border-white/5 hover:bg-white/5 transition"
+      >
+        <div className="col-span-2 text-[11px] text-blue-300 font-medium">
+          {s.code}
+        </div>
 
-                {/* HEADER */}
-                <thead className="bg-slate-100 text-slate-600 text-xs uppercase">
-                  <tr>
-                    <th className="px-3 py-2 text-left">Code</th>
-                    <th className="px-3 py-2 text-left">Subject</th>
-                    <th className="px-3 py-2 text-center">Credits</th>
-                    <th className="px-3 py-2 text-center">Marks</th>
-                  </tr>
-                </thead>
-
-                {/* BODY */}
-                <tbody>
-                  {filtered.map((s, idx) => (
-                    <tr
-                      key={s.code}
-                      className={`transition ${
-                        idx % 2 === 0 ? "bg-white" : "bg-slate-50"
-                      } hover:bg-indigo-50`}
-                    >
-                      <td className="px-3 py-2 text-slate-500 font-medium">
-                        {s.code}
-                      </td>
-
-                      <td className="px-3 py-2">
-                        <div className="font-medium text-slate-800">
-                          {s.short_name}
-                        </div>
-                        <div className="text-xs text-slate-500">
-                          {s.full_name}
-                        </div>
-                      </td>
-
-                      <td className="px-3 py-2 text-center font-semibold text-indigo-600">
-                        {s.subject_credit}
-                      </td>
-
-                      <td className="px-3 py-2 text-center text-slate-600">
-                        {s.max_marks}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-
-              </table>
-            </div>
-
+        <div className="col-span-6">
+          <div className="text-sm text-white font-medium leading-tight">
+            {s.short_name}
           </div>
-        );
-      })}
+          <div className="text-[11px] text-blue-200/70 truncate">
+            {s.full_name}
+          </div>
+        </div>
 
-      {/* 🔥 TOTAL CREDITS */}
-      <div className="mt-6 text-right text-sm text-slate-600">
-        Total Credits:{" "}
-        <span className="font-semibold text-indigo-600">
-          {AllSubjects.reduce(
-            (sum, s) => sum + Number(s.subject_credit || 0),
-            0
-          )}
-        </span>
+        <div className="col-span-2 text-center">
+          <span className="px-2 py-1 text-[11px] rounded-full bg-blue-500/10 text-blue-300 font-semibold">
+            {s.subject_credit}
+          </span>
+        </div>
+
+        <div className="col-span-2 text-center">
+          <span className="px-2 py-1 text-[11px] rounded-full bg-cyan-400/10 text-cyan-300 font-semibold">
+            {s.max_marks}
+          </span>
+        </div>
       </div>
+    ))}
+  </div>
+
+  {/* PRACTICAL */}
+  <div>
+    {AllSubjects.filter(s => s.subject_type === "Practical").map((s) => (
+      <div
+        key={s.code}
+        className="grid grid-cols-12 items-center py-3 border-b border-white/5 hover:bg-white/5 transition"
+      >
+        <div className="col-span-2 text-[11px] text-cyan-300 font-medium">
+          {s.code}
+        </div>
+
+        <div className="col-span-6">
+          <div className="text-sm text-white font-medium leading-tight">
+            {s.short_name}
+          </div>
+          <div className="text-[11px] text-cyan-200/70 truncate">
+            {s.full_name}
+          </div>
+        </div>
+
+        <div className="col-span-2 text-center">
+          <span className="px-2 py-1 text-[11px] rounded-full bg-blue-500/10 text-blue-300 font-semibold">
+            {s.subject_credit}
+          </span>
+        </div>
+
+        <div className="col-span-2 text-center">
+          <span className="px-2 py-1 text-[11px] rounded-full bg-cyan-400/10 text-cyan-300 font-semibold">
+            {s.max_marks}
+          </span>
+        </div>
+      </div>
+    ))}
+  </div>
+
+  {/* TOTAL */}
+  <div className="flex justify-between mt-6 text-sm font-semibold border-t border-blue-400/20 pt-4">
+    <span className="text-gray-300">TOTAL</span>
+    <span className="text-cyan-400">
+      {AllSubjects.reduce(
+        (sum, s) => sum + Number(s.subject_credit || 0),
+        0
+      )}
+    </span>
+  </div>
+
+</div>
+
+
     </>
   )}
 
 </div>
+
+
+
 
       {/* LOADING SKELETON */}
       {loadingSubjects && (
