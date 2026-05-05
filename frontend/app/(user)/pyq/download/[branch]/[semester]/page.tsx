@@ -396,6 +396,21 @@ function getPdfSourceType(url: string) {
 </div>
 
 
+{/* 🔥 SECTION HEADER */}
+<div className="mb-6 text-center">
+  <h2 className="text-xl font-semibold text-slate-800 tracking-tight">
+    Credits & Marks Overview
+  </h2>
+
+  <p className="text-sm text-slate-500 mt-1">
+    Subject-wise credit distribution and maximum marks for your semester
+  </p>
+
+  {/* OPTIONAL DIVIDER */}
+  <div className="mt-3 w-16 h-1 mx-auto bg-gradient-to-r from-indigo-400 to-cyan-400 rounded-full" />
+</div>
+
+
 
 
 {/* 📊 PREMIUM CREDIT TABLE */}
@@ -416,6 +431,31 @@ function getPdfSourceType(url: string) {
   <h2 className="text-lg font-semibold text-cyan-400 mb-5 text-center tracking-wide">
     Credits Table
   </h2>
+
+
+
+  <div className="grid grid-cols-12 items-center py-2 border-b border-white/50 text-[11px] uppercase tracking-wide text-blue-200/70">
+
+  <div className="col-span-2 font-semibold">
+    Code
+  </div>
+
+  <div className="col-span-6">
+    <div className="font-semibold">Name</div>
+    <div className="text-[10px] text-blue-300/50">
+      Full Name
+    </div>
+  </div>
+
+  <div className="col-span-2 text-center font-semibold">
+    Credit
+  </div>
+
+  <div className="col-span-2 text-center font-semibold">
+    Total Marks
+  </div>
+
+</div>
 
 
 
