@@ -6,12 +6,15 @@ import { apiGet } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import Link from "next/link";
 import { useRef } from "react";
+import Image from "next/image";
 
 import { handleShare } from "@/components/handleShare/handleShare";
 import { Share2, Share, Maximize2  } from "lucide-react";
 
 import { SEMESTERS } from "@/lib/constants/academic";
 import { BRANCHES } from "@/lib/constants/academic";
+
+import { getPosterPath } from "@/lib/posters";
 
 // import { PdfViewer } from "@/components/academic/PdfViewer"
 import dynamic from "next/dynamic";
@@ -49,6 +52,7 @@ export default function PyqDownloadPage() {
       ? semesterParam.replace("sem-", "")
       : "";
 
+      const posterSrc = getPosterPath(semesterFromUrl, branchFromUrl);
 
     // All papers pdf link of one subject
 
@@ -384,6 +388,30 @@ function getPdfSourceType(url: string) {
       )}
 
 
+
+      
+<div className="space-y-6">
+
+{/* 🔥 SINGLE POSTER */}
+<div
+  className="w-full max-w-3xl mx-auto cursor-pointer rounded-xl overflow-hidden shadow hover:scale-[1.02] transition"
+>
+  <Image
+    src={posterSrc}
+    alt={`BEU Semester ${semesterFromUrl} PYQ Download`}
+    width={12000}
+    height={600}
+    className="w-full h-auto"
+    priority
+  />
+</div>
+
+{/* 👉 Your existing download table stays below */}
+
+</div>
+
+
+
 {/* HOW TO USE */}
 <div className="bg-white rounded-xl shadow-sm p-4 text-sm text-slate-600">
   <h3 className="font-semibold text-slate-800 mb-2">
@@ -531,7 +559,7 @@ function getPdfSourceType(url: string) {
 
   {/* TOTAL */}
   <div className="flex justify-between mt-6 text-sm font-semibold border-t border-blue-400/20 pt-4">
-    <span className="text-gray-300">TOTAL</span>
+    <span className="text-gray-300">TOTAL CREDIT</span>
     <span className="text-cyan-400">
       {AllSubjects.reduce(
         (sum, s) => sum + Number(s.subject_credit || 0),
