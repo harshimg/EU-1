@@ -4,12 +4,15 @@ import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { apiGet, apiPost } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
+import Image from "next/image";
 
 import { handleShare } from "@/components/handleShare/handleShare";
 import { Share2, Share  } from "lucide-react";
 
 import { SEMESTERS } from "@/lib/constants/academic";
 import { BRANCHES } from "@/lib/constants/academic";
+
+import { getPosterPath } from "@/lib/posters";
 
 const semesters = SEMESTERS;
 const branches = BRANCHES;
@@ -39,6 +42,8 @@ const params = useParams();
   typeof semesterParam === "string"
     ? semesterParam.replace("sem-", "")
     : "";
+
+    const posterSrc = getPosterPath(semesterFromUrl, branchFromUrl);
 
 
   // Marks
@@ -277,6 +282,30 @@ return (
     Higher marks result in better grade points, which contribute to your overall SGPA.
   </p>
 </div>
+
+
+
+
+<div className="space-y-6">
+
+{/* 🔥 SINGLE POSTER */}
+<div
+  className="w-full max-w-3xl mx-auto cursor-pointer rounded-xl overflow-hidden shadow hover:scale-[1.02] transition"
+>
+  <Image
+    src={posterSrc}
+    alt={`BEU Semester ${semesterFromUrl} PYQ Download`}
+    width={12000}
+    height={600}
+    className="w-full h-auto"
+    priority
+  />
+</div>
+
+{/* 👉 Your existing download table stays below */}
+
+</div>
+
 
       {/* THEORY SUBJECTS */}
       {!loadingSubjects && theorySubjects.length > 0 && (
