@@ -31,6 +31,7 @@ export default function PyqDownloadPage() {
   const [branch, setBranch] = useState("");
 
   const [subjects, setSubjects] = useState<any[]>([]);
+  const [AllSubjects, setAllSubjects] = useState<any[]>([])
   const [loadingSubjects, setLoadingSubjects] = useState(false);
 
   const [openSyllabus, setOpenSyllabus] = useState<string | null>(null);
@@ -168,6 +169,7 @@ export default function PyqDownloadPage() {
           (s: any) => s.subject_type === "Theory"
         );
         setSubjects(theoryOnly);
+        setAllSubjects(res.data)
         handleViewPapers(theoryOnly[0])
         
         // setLoadingPapers(false);
@@ -394,6 +396,174 @@ function getPdfSourceType(url: string) {
 </div>
 
 
+
+{/* 📊 CREDIT TABLE */}
+<div className="mt-10 bg-white rounded-xl shadow-sm p-5">
+
+  <h2 className="text-lg font-semibold text-slate-800 mb-4 text-center">
+    Subject Credit Table
+  </h2>
+
+  {AllSubjects.length === 0 ? (
+    <p className="text-center text-sm text-slate-500">
+      No subjects available
+    </p>
+  ) : (
+    <div className="overflow-x-auto">
+      <table className="w-full text-sm border border-slate-200 rounded-lg overflow-hidden">
+        
+        {/* HEADER */}
+        <thead className="bg-slate-100 text-slate-700">
+          <tr>
+            <th className="px-3 py-2 border">Code</th>
+            <th className="px-3 py-2 border">Subject</th>
+            <th className="px-3 py-2 border">Type</th>
+            <th className="px-3 py-2 border">Credits</th>
+            <th className="px-3 py-2 border">Max Marks</th>
+          </tr>
+        </thead>
+
+        {/* BODY */}
+        <tbody>
+          {AllSubjects.map((s) => (
+            <tr key={s.code} className="text-center hover:bg-slate-50 transition">
+              
+              <td className="px-3 py-2 border text-slate-600">
+                {s.code}
+              </td>
+
+              <td className="px-3 py-2 border text-left">
+                <div className="font-medium text-slate-800">
+                  {s.short_name}
+                </div>
+                <div className="text-xs text-slate-500">
+                  {s.full_name}
+                </div>
+              </td>
+
+              <td className="px-3 py-2 border text-slate-600">
+                {s.subject_type}
+              </td>
+
+              <td className="px-3 py-2 border font-medium text-indigo-600">
+                {s.subject_credit}
+              </td>
+
+              <td className="px-3 py-2 border text-slate-600">
+                {s.max_marks}
+              </td>
+
+            </tr>
+          ))}
+        </tbody>
+
+      </table>
+    </div>
+  )}
+
+</div>
+
+{/* 📊 PREMIUM CREDIT TABLE */}
+<div className="mt-12 bg-gradient-to-br from-white to-slate-50 rounded-2xl shadow-md p-6">
+
+  <h2 className="text-xl font-semibold text-slate-800 mb-6 text-center tracking-tight">
+    Subject Credit Overview
+  </h2>
+
+  {AllSubjects.length === 0 ? (
+    <p className="text-center text-sm text-slate-500">
+      No subjects available
+    </p>
+  ) : (
+    <>
+      {/* 🔹 GROUP FUNCTION */}
+      {["Theory", "Practical"].map((type) => {
+        const filtered = AllSubjects.filter(s => s.subject_type === type);
+
+        if (filtered.length === 0) return null;
+
+        return (
+          <div key={type} className="mb-8">
+
+            {/* SECTION HEADER */}
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                {type} Subjects
+              </h3>
+
+              <span className="text-xs text-slate-500">
+                {filtered.length} subjects
+              </span>
+            </div>
+
+            <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+              <table className="w-full text-sm">
+
+                {/* HEADER */}
+                <thead className="bg-slate-100 text-slate-600 text-xs uppercase">
+                  <tr>
+                    <th className="px-3 py-2 text-left">Code</th>
+                    <th className="px-3 py-2 text-left">Subject</th>
+                    <th className="px-3 py-2 text-center">Credits</th>
+                    <th className="px-3 py-2 text-center">Marks</th>
+                  </tr>
+                </thead>
+
+                {/* BODY */}
+                <tbody>
+                  {filtered.map((s, idx) => (
+                    <tr
+                      key={s.code}
+                      className={`transition ${
+                        idx % 2 === 0 ? "bg-white" : "bg-slate-50"
+                      } hover:bg-indigo-50`}
+                    >
+                      <td className="px-3 py-2 text-slate-500 font-medium">
+                        {s.code}
+                      </td>
+
+                      <td className="px-3 py-2">
+                        <div className="font-medium text-slate-800">
+                          {s.short_name}
+                        </div>
+                        <div className="text-xs text-slate-500">
+                          {s.full_name}
+                        </div>
+                      </td>
+
+                      <td className="px-3 py-2 text-center font-semibold text-indigo-600">
+                        {s.subject_credit}
+                      </td>
+
+                      <td className="px-3 py-2 text-center text-slate-600">
+                        {s.max_marks}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+
+              </table>
+            </div>
+
+          </div>
+        );
+      })}
+
+      {/* 🔥 TOTAL CREDITS */}
+      <div className="mt-6 text-right text-sm text-slate-600">
+        Total Credits:{" "}
+        <span className="font-semibold text-indigo-600">
+          {AllSubjects.reduce(
+            (sum, s) => sum + Number(s.subject_credit || 0),
+            0
+          )}
+        </span>
+      </div>
+    </>
+  )}
+
+</div>
+
       {/* LOADING SKELETON */}
       {loadingSubjects && (
         <div className="space-y-4">
@@ -579,9 +749,6 @@ function getPdfSourceType(url: string) {
        {/* View ALL PDF Quetions */}
         {/* 🔥 VIEW PAPERS (FULL WIDTH BELOW SUBJECT) */}
 
-
-
-        
             {activeSubjectCode === s.code && (
               <div id={`subject-${s.code}`}   className="mt-4 bg-white border rounded-xl shadow-sm p-4 space-y-4">
 
