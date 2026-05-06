@@ -517,7 +517,7 @@ const Header = () => (
     {/* <div className=" mx-auto px-6 py-4"> */}
     <div className="w-full px-8 py-4">
 
-      <h1 className="text-xl font-bold text-white">Academic Structure--</h1>
+      <h1 className="text-xl font-bold text-white">Academic Structure----</h1>
       <p className="text-xs text-slate-400">Semester • Branch • Subject</p>
     </div>
   </header>
