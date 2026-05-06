@@ -250,3 +250,6 @@ async def merge_subject(body: dict, admin=Depends(get_current_admin)):
         raise HTTPException(status_code=400, detail=result["message"])
 
     return result
+
+
+    
